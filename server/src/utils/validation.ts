@@ -22,7 +22,18 @@ export const taskSchema = z.object({
 
 export const updateTaskSchema = taskSchema.partial();
 
+export const addSubtaskSchema = z.object({
+  title: z.string().min(1).max(100),
+});
+
+export const updateSubtaskSchema = z.object({
+  title: z.string().min(1).max(100).optional(),
+  isCompleted: z.boolean().optional(),
+});
+
 export type TaskInput = z.infer<typeof taskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type AddSubtaskInput = z.infer<typeof addSubtaskSchema>;
+export type UpdateSubtaskInput = z.infer<typeof updateSubtaskSchema>;

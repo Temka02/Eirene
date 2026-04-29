@@ -1,5 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export interface ISubtask {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+}
+
 export interface ITask extends Document {
   title: string;
   description?: string;
@@ -7,10 +13,20 @@ export interface ITask extends Document {
   priority: 'low' | 'medium' | 'high';
   deadlineType: 'hard' | 'soft' | 'none';
   deadline?: Date;
+  checklist?: ISubtask[];
   userId: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const SubtaskSchema = new Schema<ISubtask>(
+  {
+    id: { type: String, required: true },
+    title: { type: String, required: true, trim: true, maxlength: 100 },
+    isCompleted: { type: Boolean, default: false },
+  },
+  { _id: false }
+);
 
 const TaskSchema = new Schema<ITask>(
   {
@@ -20,6 +36,7 @@ const TaskSchema = new Schema<ITask>(
     priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
     deadlineType: { type: String, enum: ['hard', 'soft', 'none'], default: 'none' },
     deadline: { type: Date },
+    checklist: { type: [SubtaskSchema], default: [] },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   },
   { timestamps: true }

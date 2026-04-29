@@ -3,6 +3,8 @@ import Task from '../models/Task';
 import { taskSchema, updateTaskSchema } from '../utils/validation';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
+import mongoose from 'mongoose';
+import { addSubtaskSchema, updateSubtaskSchema } from '../utils/validation';
 
 const MAX_ACTIVE_TASKS = 5;
 
@@ -196,6 +198,168 @@ export const deleteTask = async (req: AuthRequest, res: Response) => {
     const task = await Task.findOneAndDelete({ _id: id, userId: req.user!.userId });
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json({ message: 'Task deleted' });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * @openapi
+ * /api/tasks/{taskId}/subtasks:
+ *   post:
+ *     tags: [Tasks, Subtasks]
+ *     summary: Add a subtask to a task
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the parent task
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 100
+ *     responses:
+ *       200:
+ *         description: Subtask added successfully
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: Task not found
+ */
+export const addSubtask = async (req: AuthRequest, res: Response) => {
+  try {
+    const { title } = addSubtaskSchema.parse(req.body);
+    const { taskId } = req.params;
+    const userId = req.user!.userId;
+
+    const subtaskId = new mongoose.Types.ObjectId().toString();
+
+    const task = await Task.findOneAndUpdate(
+      { _id: taskId, userId },
+      { $push: { checklist: { id: subtaskId, title, isCompleted: false } } },
+      { new: true }
+    );
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+    res.json(task);
+  } catch (error) {
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * @openapi
+ * /api/tasks/{taskId}/subtasks/{subtaskId}:
+ *   patch:
+ *     tags: [Tasks, Subtasks]
+ *     summary: Update a subtask
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: subtaskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 100
+ *               isCompleted:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Subtask updated
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: Task or subtask not found
+ */
+export const updateSubtask = async (req: AuthRequest, res: Response) => {
+  try {
+    const data = updateSubtaskSchema.parse(req.body);
+    const { taskId, subtaskId } = req.params;
+    const userId = req.user!.userId;
+
+    const task = await Task.findOne({ _id: taskId, userId });
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+
+    const subtaskIndex = task.checklist?.findIndex((s) => s.id === subtaskId);
+    if (subtaskIndex === -1 || subtaskIndex === undefined) {
+      return res.status(404).json({ error: 'Subtask not found' });
+    }
+
+    if (data.title !== undefined) task.checklist![subtaskIndex].title = data.title;
+    if (data.isCompleted !== undefined)
+      task.checklist![subtaskIndex].isCompleted = data.isCompleted;
+
+    await task.save();
+    res.json(task);
+  } catch (error) {
+    if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * @openapi
+ * /api/tasks/{taskId}/subtasks/{subtaskId}:
+ *   delete:
+ *     tags: [Tasks, Subtasks]
+ *     summary: Delete a subtask
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: subtaskId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Subtask deleted
+ *       404:
+ *         description: Task not found
+ */
+export const deleteSubtask = async (req: AuthRequest, res: Response) => {
+  try {
+    const { taskId, subtaskId } = req.params;
+    const userId = req.user!.userId;
+
+    const task = await Task.findOneAndUpdate(
+      { _id: taskId, userId },
+      { $pull: { checklist: { id: subtaskId } } },
+      { new: true }
+    );
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+    res.json(task);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
