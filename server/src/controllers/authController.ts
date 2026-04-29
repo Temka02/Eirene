@@ -77,3 +77,25 @@ export const logout = (_req: Request, res: Response) => {
   res.clearCookie('refreshToken');
   res.json({ message: 'Logged out' });
 };
+
+export const refresh = async (req: Request, res: Response) => {
+  const token = req.cookies.refreshToken;
+  if (!token) return res.status(401).json({ error: 'Refresh token missing' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as { userId: string };
+    const { accessToken, refreshToken } = generateTokens(decoded.userId);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ accessToken });
+  } catch {
+    res.clearCookie('refreshToken');
+    res.status(403).json({ error: 'Invalid refresh token' });
+  }
+};
