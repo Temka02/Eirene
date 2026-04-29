@@ -11,6 +11,43 @@ const generateTokens = (userId: string) => {
   return { accessToken, refreshToken };
 };
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *               name:
+ *                 type: string
+ *                 maxLength: 50
+ *     responses:
+ *       201:
+ *         description: User registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                 accessToken:
+ *                   type: string
+ *       400:
+ *         description: Validation error or user exists
+ */
 export const register = async (req: Request, res: Response) => {
   try {
     const data = registerSchema.parse(req.body);
@@ -41,6 +78,42 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: User login
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                 accessToken:
+ *                   type: string
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
+ */
 export const login = async (req: Request, res: Response) => {
   try {
     const data = loginSchema.parse(req.body);
@@ -73,11 +146,44 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     tags: [Auth]
+ *     summary: User logout
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out
+ */
 export const logout = (_req: Request, res: Response) => {
   res.clearCookie('refreshToken');
   res.json({ message: 'Logged out' });
 };
 
+/**
+ * @openapi
+ * /api/auth/refresh:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Refresh access token
+ *     responses:
+ *       200:
+ *         description: New access token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *       401:
+ *         description: Refresh token missing
+ *       403:
+ *         description: Invalid refresh token
+ */
 export const refresh = async (req: Request, res: Response) => {
   const token = req.cookies.refreshToken;
   if (!token) return res.status(401).json({ error: 'Refresh token missing' });
