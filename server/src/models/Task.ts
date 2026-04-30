@@ -15,6 +15,7 @@ export interface ITask extends Document {
   deadline?: Date;
   checklist?: ISubtask[];
   userId: mongoose.Types.ObjectId;
+  projectId?: mongoose.Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +39,7 @@ const TaskSchema = new Schema<ITask>(
     deadline: { type: Date },
     checklist: { type: [SubtaskSchema], default: [] },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    projectId: { type: Schema.Types.ObjectId, ref: 'Project', default: null },
   },
   { timestamps: true }
 );

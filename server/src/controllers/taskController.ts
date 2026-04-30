@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import Task from '../models/Task';
+import Project from '../models/Project';
 import { taskSchema, updateTaskSchema } from '../utils/validation';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
@@ -57,6 +58,13 @@ export const createTask = async (req: AuthRequest, res: Response) => {
   try {
     const data = taskSchema.parse(req.body);
     const userId = req.user!.userId;
+
+    if (data.projectId) {
+      const project = await Project.findOne({ _id: data.projectId, userId });
+      if (!project) {
+        return res.status(404).json({ error: 'Project not found or access denied' });
+      }
+    }
 
     if (data.status === 'in_progress') {
       const count = await Task.countDocuments({ userId, status: 'in_progress' });

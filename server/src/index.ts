@@ -10,6 +10,7 @@ import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
 import taskRoutes from './routes/taskRoutes';
+import projectRoutes from './routes/projectRoutes';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/projects', projectRoutes);
 app.use(errorHandler);
 
 const startServer = async () => {

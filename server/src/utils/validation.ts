@@ -18,6 +18,7 @@ export const taskSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
   deadlineType: z.enum(['hard', 'soft', 'none']).default('none'),
   deadline: z.coerce.date().optional(),
+  projectId: z.string().optional(),
 });
 
 export const updateTaskSchema = taskSchema.partial();
@@ -31,9 +32,19 @@ export const updateSubtaskSchema = z.object({
   isCompleted: z.boolean().optional(),
 });
 
+export const projectSchema = z.object({
+  title: z.string().min(1).max(50),
+  description: z.string().max(200).optional(),
+  icon: z.enum(['plant', 'sun', 'waves', 'star', 'ribbon']).optional(),
+});
+
+export const updateProjectSchema = projectSchema.partial();
+
 export type TaskInput = z.infer<typeof taskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type AddSubtaskInput = z.infer<typeof addSubtaskSchema>;
 export type UpdateSubtaskInput = z.infer<typeof updateSubtaskSchema>;
+export type ProjectInput = z.infer<typeof projectSchema>;
+export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
