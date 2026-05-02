@@ -8,10 +8,12 @@ import { swaggerSpec } from './config/swagger';
 import { connectDB } from './config/db';
 import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
+import { startDeadlineScheduler } from './utils/scheduler';
 import authRoutes from './routes/authRoutes';
 import taskRoutes from './routes/taskRoutes';
 import projectRoutes from './routes/projectRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 
 const app = express();
 
@@ -41,10 +43,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use(errorHandler);
 
 const startServer = async () => {
   await connectDB();
+  startDeadlineScheduler();
 
   app.listen(env.PORT, () => {
     logger.info(`Server running on http://localhost:${env.PORT}`);

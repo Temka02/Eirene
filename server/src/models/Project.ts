@@ -24,17 +24,8 @@ const ProjectSchema = new Schema<IProject>(
       trim: true,
       maxlength: [200, 'Description cannot exceed 200 characters'],
     },
-    icon: {
-      type: String,
-      enum: ['plant', 'sun', 'waves', 'star', 'ribbon'],
-      default: 'plant',
-    },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true,
-    },
+    icon: { type: String, enum: ['plant', 'sun', 'waves', 'star', 'ribbon'], default: 'plant' },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   },
   { timestamps: true }
 );

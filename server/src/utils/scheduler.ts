@@ -1,0 +1,58 @@
+import cron from 'node-cron';
+import Task from '../models/Task';
+import Notification from '../models/Notification';
+import logger from './logger';
+
+export const startDeadlineScheduler = () => {
+  cron.schedule('* * * * *', async () => {
+    try {
+      logger.info('Scheduler: Checking upcoming deadlines...');
+
+      const now = new Date();
+      const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+
+      const upcomingTasks = await Task.find({
+        deadline: { $gte: now, $lte: nextHour },
+        status: { $ne: 'done' },
+        deadlineType: { $ne: 'none' },
+      });
+
+      if (!upcomingTasks.length) {
+        logger.info('No upcoming deadlines. Exiting.');
+        return;
+      }
+
+      const notifiedIds = await Notification.distinct('taskId', {
+        type: 'deadline',
+        createdAt: { $gte: startOfToday },
+      });
+
+      const tasksToNotify = upcomingTasks.filter(
+        (t) => !notifiedIds.some((id) => id.toString() === t._id.toString())
+      );
+
+      if (!tasksToNotify.length) {
+        logger.info('All upcoming deadlines already notified.');
+        return;
+      }
+
+      await Notification.insertMany(
+        tasksToNotify.map((task) => ({
+          userId: task.userId,
+          taskId: task._id,
+          type: 'deadline',
+          message: `Дедлайн близко: "${task.title}" истекает ${task.deadline!.toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}`,
+          isRead: false,
+        }))
+      );
+
+      logger.info(`Created ${tasksToNotify.length} deadline alerts`);
+    } catch (error) {
+      logger.error('Deadline scheduler failed:', error);
+    }
+  });
+
+  logger.info('Deadline scheduler registered (runs every 15 min)');
+};

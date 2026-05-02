@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import Task from '../models/Task';
 import Project from '../models/Project';
+import Notification from '../models/Notification';
 import { taskSchema, updateTaskSchema } from '../utils/validation';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
@@ -172,6 +173,15 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
 
     const task = await Task.findOneAndUpdate({ _id: id, userId }, data, { new: true });
     if (!task) return res.status(404).json({ error: 'Task not found' });
+    if (data.status === 'done') {
+      await Notification.create({
+        userId: req.user!.userId,
+        taskId: new mongoose.Types.ObjectId(id as string),
+        type: 'achievement',
+        message: `Отлично! Задача "${task.title}" завершена.`,
+        isRead: false,
+      });
+    }
 
     res.json(task);
   } catch (error) {
