@@ -18,7 +18,7 @@ export const taskSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']).default('medium'),
   deadlineType: z.enum(['hard', 'soft', 'none']).default('none'),
   deadline: z.coerce.date().optional(),
-  projectId: z.string().optional(),
+  projectId: z.string().optional().nullable(),
 });
 
 export const updateTaskSchema = taskSchema.partial();
