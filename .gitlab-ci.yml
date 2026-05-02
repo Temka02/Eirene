@@ -1,0 +1,53 @@
+image: node:20-alpine
+
+stages:
+  - install
+  - lint
+  - build
+
+# Кэшируем зависимости сервера отдельно
+cache:
+  key:
+    files:
+      - server/package-lock.json
+  paths:
+    - server/node_modules/
+
+install_dependencies:
+  stage: install
+  script:
+    - cd server
+    - npm ci
+  cache:
+    policy: read-write
+    paths:
+      - server/node_modules/
+
+lint:
+  stage: lint
+  script:
+    - cd server
+    - npm run lint
+  needs:
+    - install_dependencies
+
+build:
+  stage: build
+  script:
+    - cd server
+    - npm run build
+  needs:
+    - lint
+  artifacts:
+    paths:
+      - server/dist/
+    expire_in: 1 week
+  stage: build
+  script:
+    - npm run build
+  needs:
+    - lint
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week

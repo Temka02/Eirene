@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Response } from 'express';
 import Task from '../models/Task';
 import Project from '../models/Project';
@@ -43,7 +44,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     const top3Tasks = await Task.aggregate([
       {
         $match: {
-          userId: new (require('mongoose').Types.ObjectId)(userId),
+          userId: new mongoose.Types.ObjectId(userId),
           status: 'todo',
         },
       },
