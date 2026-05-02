@@ -11,12 +11,13 @@ cache:
       - server/package-lock.json
   paths:
     - server/node_modules/
+  policy: pull-push
 
 install_dependencies:
   stage: install
   script:
     - cd server
-    - npm ci
+    - npm ci --ignore-scripts
   cache:
     policy: pull-push
     paths:
@@ -26,14 +27,18 @@ lint:
   stage: lint
   script:
     - cd server
+    - if [ ! -d "node_modules" ]; then npm ci; fi
     - npm run lint
   needs:
     - install_dependencies
+  cache:
+    policy: pull
 
 build:
   stage: build
   script:
     - cd server
+    - if [ ! -d "node_modules" ]; then npm ci; fi
     - npm run build
   needs:
     - lint
@@ -41,12 +46,5 @@ build:
     paths:
       - server/dist/
     expire_in: 1 week
-  stage: build
-  script:
-    - npm run build
-  needs:
-    - lint
-  artifacts:
-    paths:
-      - dist/
-    expire_in: 1 week
+  cache:
+    policy: pull
