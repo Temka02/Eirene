@@ -75,6 +75,15 @@ export const createTask = async (req: AuthRequest, res: Response) => {
     }
 
     const task = await Task.create({ ...data, userId });
+    if (data.deadlineType !== 'none' && data.deadline) {
+      await Notification.create({
+        userId,
+        taskId: task._id,
+        type: 'deadline',
+        message: `Задача "${task.title}" добавлена с дедлайном ${data.deadline.toLocaleString('ru-RU', { day: 'numeric', month: 'short' })}`,
+        isRead: false,
+      });
+    }
     res.status(201).json(task);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
