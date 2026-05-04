@@ -6,6 +6,7 @@ export interface INotification extends Document {
   isRead: boolean;
   userId: mongoose.Types.ObjectId;
   taskId?: mongoose.Types.ObjectId;
+  projectId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +18,7 @@ const NotificationSchema = new Schema<INotification>(
     isRead: { type: Boolean, required: true, default: false },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     taskId: { type: Schema.Types.ObjectId, ref: 'Task' },
+    projectId: { type: Schema.Types.ObjectId, ref: 'Project' },
   },
   { timestamps: true }
 );

@@ -4,6 +4,7 @@ import Task from '../models/Task';
 import { projectSchema, updateProjectSchema } from '../utils/validation';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
+import Notification from '../models/Notification';
 
 /**
  * @openapi
@@ -40,8 +41,14 @@ export const createProject = async (req: AuthRequest, res: Response) => {
   try {
     const data = projectSchema.parse(req.body);
     const userId = req.user!.userId;
-
     const project = await Project.create({ ...data, userId });
+    await Notification.create({
+      userId,
+      type: 'achievement',
+      message: `Проект "${project.title}" создан! Вперёд к целям!`,
+      isRead: false,
+      projectId: project._id,
+    });
     res.status(201).json(project);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });

@@ -4,17 +4,17 @@ import Notification from '../models/Notification';
 import logger from './logger';
 
 export const startDeadlineScheduler = () => {
-  cron.schedule('* * * * *', async () => {
+  cron.schedule('*/15 * * * *', async () => {
     try {
       logger.info('Scheduler: Checking upcoming deadlines...');
 
       const now = new Date();
-      const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+      const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
 
       const upcomingTasks = await Task.find({
-        deadline: { $gte: now, $lte: nextHour },
+        deadline: { $gte: now, $lte: tomorrow },
         status: { $ne: 'done' },
         deadlineType: { $ne: 'none' },
       });
