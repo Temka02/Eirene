@@ -55,14 +55,14 @@ const routes = [
       { path: 'dashboard', element: <DashboardPage /> },
 
       { path: 'projects', element: <ProjectsPage /> },
-      { path: 'project/:id', element: <ProjectDetailsPage /> },
-      { path: 'project/create', element: <CreateProjectPage /> },
-      { path: 'project/:id/edit', element: <EditProjectPage /> },
+      { path: 'projects/:id', element: <ProjectDetailsPage /> },
+      { path: 'projects/create', element: <CreateProjectPage /> },
+      { path: 'projects/:id/edit', element: <EditProjectPage /> },
 
       { path: 'tasks', element: <TasksPage /> },
-      { path: 'task/:id', element: <TaskDetailsPage /> },
-      { path: 'task/create', element: <CreateTaskPage /> },
-      { path: 'task/:id/edit', element: <EditTaskPage /> },
+      { path: 'tasks/:id', element: <TaskDetailsPage /> },
+      { path: 'tasks/create', element: <CreateTaskPage /> },
+      { path: 'tasks/:id/edit', element: <EditTaskPage /> },
 
       { path: 'notifications', element: <NotificationsPage /> },
     ],
