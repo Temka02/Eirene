@@ -35,9 +35,9 @@ const generateTokens = (userId: string) => {
  *                 minLength: 1
  *                 maxLength: 50
  *               surname:
- *                 type:string
+ *                 type: string
  *                 minLength: 1
- *                 maxLength:50
+ *                 maxLength: 50
  *     responses:
  *       201:
  *         description: User registered

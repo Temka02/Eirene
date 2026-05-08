@@ -51,7 +51,6 @@ const routes = [
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <DashboardPage /> },
       { path: 'dashboard', element: <DashboardPage /> },
 
       { path: 'projects', element: <ProjectsPage /> },
