@@ -6,10 +6,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../entities/auth/validation';
 import { useLoginMutation } from '../../features/auth/authApi';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../../store/authSlice';
 
 export default function LoginPage() {
   const [login, { isLoading, error }] = useLoginMutation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -21,9 +24,11 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginCredentials) => {
     try {
       const res = await login(data).unwrap();
-      localStorage.setItem('accessToken', res.accessToken);
+      dispatch(setCredentials(res));
       navigate('/dashboard');
-    } catch {}
+    } catch (err) {
+      console.error(err);
+    }
   };
   return (
     <div className="relative min-h-[calc(100vh-3.25rem)] text-xl my-[1.625rem] mx-4 md:mx-[3rem] rounded-[1rem] overflow-hidden">

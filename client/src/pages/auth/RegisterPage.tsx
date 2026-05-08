@@ -6,9 +6,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema } from '../../entities/auth/validation';
 import type { RegisterFormValues } from '../../types';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../../store/authSlice';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [registerUser, { isLoading, error }] = useRegisterMutation();
 
   const {
@@ -23,7 +26,7 @@ export default function RegisterPage() {
     try {
       const { repeatPassword, ...credentials } = data;
       const res = await registerUser(credentials).unwrap();
-      localStorage.setItem('accessToken', res.accessToken);
+      dispatch(setCredentials(res));
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
@@ -38,7 +41,7 @@ export default function RegisterPage() {
         <img src="/logo-eirene.svg" alt="Eirene logo" className="w-[11.5rem] h-[4.8rem] mx-auto" />
 
         <Box className="min-h-[14rem] w-full max-w-[36rem] bg-white mx-auto px-4 md:px-14 pt-4 pb-6 rounded-[1.25rem] mt-4">
-          <form className="w-[100%]" onSubmit={handleSubmit(onSubmit)}>
+          <form className="w-[100%]" onSubmit={handleSubmit(onSubmit)} noValidate>
             <h1 className="text-[1.65rem] mb-[0.75rem] text-center">Регистрация</h1>
             <div className="flex flex-col mb-4">
               <label htmlFor="name" className="ml-[0.5rem] text-base font-medium">

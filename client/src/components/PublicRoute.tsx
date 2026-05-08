@@ -1,7 +1,10 @@
+import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
+import type { RootState } from '../store';
+import type { ReactNode } from 'react';
 
-export default function PublicRoute({ children }) {
-  const token = localStorage.getItem('accessToken');
+export default function PublicRoute({ children }: { children: ReactNode }) {
+  const token = useSelector((state: RootState) => state.auth.accessToken);
   if (token) {
     return <Navigate to={'/dashboard'} replace />;
   }
