@@ -32,7 +32,12 @@ const generateTokens = (userId: string) => {
  *                 minLength: 6
  *               name:
  *                 type: string
+ *                 minLength: 1
  *                 maxLength: 50
+ *               surname:
+ *                 type:string
+ *                 minLength: 1
+ *                 maxLength:50
  *     responses:
  *       201:
  *         description: User registered
@@ -66,7 +71,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({
-      user: { id: user._id, email: user.email, name: user.name },
+      user: { id: user._id, email: user.email, name: user.name, surname: user.surname },
       accessToken,
     });
   } catch (error) {
@@ -134,7 +139,7 @@ export const login = async (req: Request, res: Response) => {
     });
 
     res.json({
-      user: { id: user._id, email: user.email, name: user.name },
+      user: { id: user._id, email: user.email, name: user.name, surname: user.surname },
       accessToken,
     });
   } catch (error) {

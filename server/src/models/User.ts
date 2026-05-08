@@ -4,7 +4,8 @@ import bcrypt from 'bcryptjs';
 export interface IUser extends Document {
   email: string;
   password: string;
-  name?: string;
+  name: string;
+  surname: string;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -29,6 +30,13 @@ const UserSchema = new Schema<IUser>(
       type: String,
       trim: true,
       maxlength: [50, 'Name cannot exceed 50 characters'],
+      required: [true, 'Name is required'],
+    },
+    surname: {
+      type: String,
+      trim: true,
+      maxlength: [50, 'Surname cannot exceed 50 characters'],
+      required: [true, 'Surname is required'],
     },
   },
   { timestamps: true }
