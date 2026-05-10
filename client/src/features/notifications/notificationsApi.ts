@@ -6,6 +6,13 @@ export const notificationsApi = api.injectEndpoints({
       query: () => ({ url: '/notifications' }),
       providesTags: ['Notifications'],
     }),
+    markAsRead: builder.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `/notifications/${id}`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['Notifications'],
+    }),
     markAllRead: builder.mutation<void, void>({
       query: () => ({
         url: '/notifications/read-all',
@@ -23,5 +30,9 @@ export const notificationsApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetNotificationsQuery, useMarkAllReadMutation, useDeleteNotificationMutation } =
-  notificationsApi;
+export const {
+  useGetNotificationsQuery,
+  useMarkAsReadMutation,
+  useMarkAllReadMutation,
+  useDeleteNotificationMutation,
+} = notificationsApi;

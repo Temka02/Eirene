@@ -45,6 +45,55 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
 
 /**
  * @openapi
+ * /api/notifications/{id}:
+ * patch:
+ *   tags: [Notifications]
+ *   summary: Mark a single notification as read
+ *   security:
+ *     - bearerAuth: []
+ *   parameters:
+ *     - in: path
+ *       name: id
+ *       required: true
+ *       schema:
+ *         type: string
+ *   responses:
+ *     200:
+ *       description: Notification marked as read
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *               notification:
+ *                 type: object
+ *     404:
+ *       description: Notification not found
+ *     500:
+ *       description: Internal server error
+ */
+export const markAsRead = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user!.userId;
+
+    const notification = await Notification.findOneAndUpdate(
+      { _id: id, userId },
+      { $set: { isRead: true } },
+      { new: true }
+    );
+
+    if (!notification) return res.status(404).json({ error: 'Notification not found' });
+    res.json({ message: 'Notification marked as read', notification });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * @openapi
  * /api/notifications/read-all:
  *   patch:
  *     tags: [Notifications]
