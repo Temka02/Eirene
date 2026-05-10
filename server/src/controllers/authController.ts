@@ -5,6 +5,61 @@ import { registerSchema, loginSchema } from '../utils/validation';
 import { z } from 'zod';
 import logger from '../utils/logger';
 
+/**
+ * @openapi
+ * /auth/me:
+ * get:
+ *   tags: [Auth]
+ *   summary: Get current user profile
+ *   security:
+ *     - bearerAuth: []
+ *   responses:
+ *     200:
+ *       description: User profile retrieved successfully
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   surname:
+ *                     type: string
+ *     401:
+ *       description: No token provided or invalid token
+ *     404:
+ *       description: User not found
+ */
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ error: 'No token provided' });
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    const user = await User.findById(decoded.userId).select('-password');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        surname: user.surname,
+      },
+    });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
 const generateTokens = (userId: string) => {
   const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: '15m' });
   const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, { expiresIn: '7d' });

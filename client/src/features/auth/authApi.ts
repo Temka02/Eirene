@@ -4,6 +4,7 @@ import type {
   RegisterCredentials,
   AuthResponse,
 } from '../../entities/auth/model';
+import type { User } from '../../entities/user/model';
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -27,7 +28,12 @@ export const authApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
+    getMe: builder.query<{ user: User }, void>({
+      query: () => ({
+        url: '/auth/me',
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useLogoutMutation, useGetMeQuery } = authApi;
