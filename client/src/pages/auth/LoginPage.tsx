@@ -8,9 +8,11 @@ import { loginSchema } from '../../entities/auth/validation';
 import { useLoginMutation } from '../../features/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/authSlice';
+import { useState } from 'react';
 
 export default function LoginPage() {
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -22,17 +24,20 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginCredentials) => {
+    setSubmitError(null);
     try {
       const res = await login(data).unwrap();
+      console.log(res);
       dispatch(setCredentials(res));
       navigate('/dashboard');
     } catch (err) {
-      console.error(err);
+      const message = err?.data?.error || 'Ошибка подключения к серверу';
+      setSubmitError(message);
     }
   };
   return (
     <div className="relative min-h-[calc(100vh-3.25rem)] text-xl my-[1.625rem] mx-4 md:mx-[3rem] rounded-[1rem] overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/auth-bg.svg')] bg-cover bg-top bg-no-repeat opacity-80 -z-10" />
+      <div className="absolute inset-0 bg-[url('/auth-bg.webp')] bg-cover bg-top bg-no-repeat opacity-80 -z-10" />
 
       <div className="relative py-[1.7rem] px-[1.6rem] text-[#2F3A34]">
         <HeaderForUnauthorized />
@@ -92,11 +97,11 @@ export default function LoginPage() {
               {isLoading ? 'Вход...' : 'Войти'}
             </button>
           </form>
-          {error && (
-            <p className="text-red-500 text-sm text-center mb-4">
-              {typeof error === 'object' && error !== null && 'data' in error
-                ? (error as any).data?.error?.[0]?.message || 'Ошибка валидации'
-                : 'Ошибка подключения к серверу'}
+          {submitError && (
+            <p className="text-red-500 text-sm text-center mb-4 animate-pulse">
+              {submitError === 'Invalid credentials'
+                ? 'Такого пользователя не существует'
+                : submitError}
             </p>
           )}
           <div className="bg-[#D9D9D9] w-[100%] h-[1px] mb-6"></div>

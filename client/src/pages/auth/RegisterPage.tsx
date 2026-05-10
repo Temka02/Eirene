@@ -34,7 +34,7 @@ export default function RegisterPage() {
   };
   return (
     <div className="relative min-h-[calc(100vh-3.25rem)] text-xl my-[1.625rem] mx-4 md:mx-[3rem] rounded-[1rem] overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/auth-bg.svg')] bg-cover bg-top bg-no-repeat opacity-80 -z-10" />
+      <div className="absolute inset-0 bg-[url('/auth-bg.webp')] bg-cover bg-top bg-no-repeat opacity-80 -z-10" />
 
       <div className="relative py-[1.7rem] px-[1.6rem] text-[#2F3A34]">
         <HeaderForUnauthorized />
