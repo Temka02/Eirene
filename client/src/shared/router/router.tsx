@@ -17,6 +17,8 @@ import {
 } from '../../pages/projects';
 import { TasksPage, CreateTaskPage, EditTaskPage, TaskDetailsPage } from '../../pages/tasks';
 import FocusModePage from '../../pages/focus/FocusModePage';
+import SettingsPage from '../../pages/settings/SettingsPage';
+import CalendarPage from '../../pages/calendar/CalendarPage';
 
 const routes = [
   {
@@ -64,12 +66,10 @@ const routes = [
       { path: 'tasks/:id/edit', element: <EditTaskPage /> },
 
       { path: 'notifications', element: <NotificationsPage /> },
+      { path: 'settings', element: <SettingsPage /> },
+      { path: 'calendar', element: <CalendarPage /> },
+      { path: 'focus/:id', element: <FocusModePage /> },
     ],
-  },
-
-  {
-    path: 'focus/:id',
-    element: <FocusModePage />,
   },
 
   {
