@@ -1,11 +1,18 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useGetNotificationsQuery } from '../features/notifications/notificationsApi';
 import type { RootState } from '../store';
 
 export default function HeaderForAuthorized() {
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
 
+  const { data: unreadNotifications } = useGetNotificationsQuery({
+    isRead: false,
+    limit: 1,
+  });
+
+  const hasUnread = unreadNotifications?.total > 0;
   const getInitials = () => {
     if (!user) return '??';
     const firstLetter = user.name?.[0]?.toUpperCase() || '?';
@@ -19,7 +26,7 @@ export default function HeaderForAuthorized() {
   };
 
   return (
-    <header className="h-20 flex items-center justify-end px-6 md:px-8">
+    <header className="h-16 flex items-center justify-end px-6 md:px-8 pt-4">
       <div className="flex items-center gap-4 md:gap-6">
         <button
           onClick={() => navigate('/notifications')}
@@ -27,7 +34,9 @@ export default function HeaderForAuthorized() {
           aria-label="Уведомления"
         >
           <img src="/notifications-header-icon.svg" alt="" className="w-6 h-7" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+          {hasUnread && (
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+          )}
         </button>
 
         <div className="hidden md:flex items-center">
