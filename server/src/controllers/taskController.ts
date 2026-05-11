@@ -79,9 +79,11 @@ export const createTask = async (req: AuthRequest, res: Response) => {
       await Notification.create({
         userId,
         taskId: task._id,
-        type: 'deadline',
-        message: `Задача "${task.title}" добавлена с дедлайном ${data.deadline.toLocaleString('ru-RU', { day: 'numeric', month: 'short' })}`,
+        type: 'system',
+        message: `Задача "${task.title}" добавлена`,
         isRead: false,
+        deadline: data.deadline,
+        deadlineType: data.deadlineType,
       });
     }
     res.status(201).json(task);

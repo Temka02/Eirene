@@ -43,8 +43,10 @@ export const startDeadlineScheduler = () => {
           userId: task.userId,
           taskId: task._id,
           type: 'deadline',
-          message: `Дедлайн близко: "${task.title}" истекает ${task.deadline!.toLocaleString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}`,
+          message: `Напоминание: дедлайн задачи "${task.title}" близко`,
           isRead: false,
+          deadlineType: task.deadlineType,
+          deadline: task.deadline,
         }))
       );
 

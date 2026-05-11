@@ -10,6 +10,14 @@ import { AuthRequest } from '../middleware/auth';
  *     summary: Get all user notifications
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [achievement, deadline, system]
+ *         description: Filter by notification type
+ *         required: false
  *     responses:
  *       200:
  *         description: List of notifications
@@ -24,20 +32,46 @@ import { AuthRequest } from '../middleware/auth';
  *                     type: string
  *                   type:
  *                     type: string
- *                     enum: [achievement, deadline]
+ *                     enum: [achievement, deadline, system]
  *                   message:
  *                     type: string
  *                   isRead:
  *                     type: boolean
+ *                   deadlineType:
+ *                     type: string
+ *                     enum: [hard, soft, none]
+ *                   deadline:
+ *                     type: string
+ *                     format: date-time
  *                   createdAt:
  *                     type: string
  *                     format: date-time
+ *       500:
+ *         description: Internal server error
  */
 export const getNotifications = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }).lean();
-    res.json(notifications);
+    const { type, isRead, limit = '10', skip = '0' } = req.query;
+
+    const filter: any = { userId };
+    if (type && typeof type === 'string') {
+      const validTypes = ['achievement', 'deadline', 'system'];
+      if (validTypes.includes(type)) filter.type = type;
+    }
+    if (isRead === 'true') filter.isRead = true;
+    if (isRead === 'false') filter.isRead = false;
+
+    const [notifications, total] = await Promise.all([
+      Notification.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(Number(skip))
+        .limit(Number(limit))
+        .lean(),
+      Notification.countDocuments(filter),
+    ]);
+
+    res.json({ data: notifications, total });
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

@@ -44,7 +44,7 @@ export const createProject = async (req: AuthRequest, res: Response) => {
     const project = await Project.create({ ...data, userId });
     await Notification.create({
       userId,
-      type: 'achievement',
+      type: 'system',
       message: `Проект "${project.title}" создан! Вперёд к целям!`,
       isRead: false,
       projectId: project._id,
