@@ -14,9 +14,10 @@ export const axiosBaseQuery: BaseQueryFn<AxiosBaseQueryArgs, unknown, unknown> =
   url,
   method = 'get',
   data,
+  params,
 }) => {
   try {
-    const result = await apiClient({ url, method, data });
+    const result = await apiClient({ url, method, data, params });
     return { data: result.data };
   } catch (axiosError) {
     const err = axiosError as AxiosError;
