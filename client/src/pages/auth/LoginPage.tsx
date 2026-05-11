@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import HeaderForUnauthorized from '../../layouts/HeaderForUnauthorized';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { LoginCredentials } from '../../entities/auth/model';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,6 +15,8 @@ export default function LoginPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
   const {
     register,
     handleSubmit,
@@ -27,9 +29,8 @@ export default function LoginPage() {
     setSubmitError(null);
     try {
       const res = await login(data).unwrap();
-      console.log(res);
       dispatch(setCredentials(res));
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (err) {
       const message = err?.data?.error || 'Ошибка подключения к серверу';
       setSubmitError(message);

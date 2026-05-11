@@ -5,6 +5,7 @@ import type { AuthResponse } from '../entities/auth/model';
 interface AuthState {
   user: User | null;
   accessToken: string | null;
+  isInitialized: boolean;
   isLoading: boolean;
   error: string | null;
 }
@@ -14,6 +15,7 @@ const authSlice = createSlice({
   initialState: {
     user: null,
     accessToken: null,
+    isInitialized: false,
     isLoading: false,
     error: null,
   } satisfies AuthState,
@@ -27,6 +29,7 @@ const authSlice = createSlice({
     logout(state: AuthState) {
       state.user = null;
       state.accessToken = null;
+      state.isInitialized = true;
       localStorage.removeItem('accessToken');
     },
     initialize(state: AuthState) {
@@ -34,6 +37,7 @@ const authSlice = createSlice({
       if (token) {
         state.accessToken = token;
       }
+      state.isInitialized = true;
     },
     setUser(state, action: PayloadAction<User>) {
       state.user = action.payload;
