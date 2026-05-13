@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export type ProjectIconKey = 'plant' | 'sun' | 'waves' | 'star' | 'ribbon';
+export type ProjectIconKey = 'plant' | 'sun' | 'waves' | 'star' | 'mountains' | 'flower';
 
 export interface IProject extends Document {
   title: string;

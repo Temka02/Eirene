@@ -1,6 +1,6 @@
 export interface Notification {
   _id: string;
-  type: 'achievement' | 'deadline' | 'system';
+  type: 'achievement' | 'deadline';
   message: string;
   isRead: boolean;
   userId: string;
@@ -13,7 +13,7 @@ export interface Notification {
 }
 
 export interface CreateNotificationDto {
-  type: 'achievement' | 'deadline' | 'system';
+  type: 'achievement' | 'deadline';
   message: string;
   taskId?: string;
   projectId?: string;

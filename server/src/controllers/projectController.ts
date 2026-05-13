@@ -4,7 +4,6 @@ import Task from '../models/Task';
 import { projectSchema, updateProjectSchema } from '../utils/validation';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
-import Notification from '../models/Notification';
 
 /**
  * @openapi
@@ -42,16 +41,40 @@ export const createProject = async (req: AuthRequest, res: Response) => {
     const data = projectSchema.parse(req.body);
     const userId = req.user!.userId;
     const project = await Project.create({ ...data, userId });
-    await Notification.create({
-      userId,
-      type: 'system',
-      message: `Проект "${project.title}" создан! Вперёд к целям!`,
-      isRead: false,
-      projectId: project._id,
-    });
     res.status(201).json(project);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * @openapi
+ * /api/projects/{id}:
+ *   get:
+ *     tags: [Projects]
+ *     summary: Get a single project by ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Project found
+ *       404:
+ *         description: Project not found
+ */
+export const getProject = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const project = await Project.findOne({ _id: id, userId: req.user!.userId });
+    if (!project) return res.status(404).json({ error: 'Project not found' });
+    res.json(project);
+  } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
 };

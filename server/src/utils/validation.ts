@@ -36,7 +36,7 @@ export const updateSubtaskSchema = z.object({
 export const projectSchema = z.object({
   title: z.string().min(1).max(50),
   description: z.string().max(200).optional(),
-  icon: z.enum(['plant', 'sun', 'waves', 'star', 'ribbon']).optional(),
+  icon: z.enum(['plant', 'sun', 'waves', 'star', 'mountains', 'flower']).optional(),
 });
 
 export const updateProjectSchema = projectSchema.partial();

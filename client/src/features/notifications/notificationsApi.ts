@@ -2,7 +2,7 @@ import type { Notification } from '../../entities/notification/model';
 import { api } from '../../store/api';
 
 type GetNotificationsParams = {
-  type?: 'achievement' | 'deadline' | 'system';
+  type?: 'achievement' | 'deadline';
   isRead?: boolean;
   limit?: number;
   skip?: number;

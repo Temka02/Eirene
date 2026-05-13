@@ -15,7 +15,7 @@ import { AuthRequest } from '../middleware/auth';
  *         name: type
  *         schema:
  *           type: string
- *           enum: [achievement, deadline, system]
+ *           enum: [achievement, deadline]
  *         description: Filter by notification type
  *         required: false
  *     responses:
@@ -32,7 +32,7 @@ import { AuthRequest } from '../middleware/auth';
  *                     type: string
  *                   type:
  *                     type: string
- *                     enum: [achievement, deadline, system]
+ *                     enum: [achievement, deadline]
  *                   message:
  *                     type: string
  *                   isRead:
@@ -56,7 +56,7 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
 
     const filter: any = { userId };
     if (type && typeof type === 'string') {
-      const validTypes = ['achievement', 'deadline', 'system'];
+      const validTypes = ['achievement', 'deadline'];
       if (validTypes.includes(type)) filter.type = type;
     }
     if (isRead === 'true') filter.isRead = true;

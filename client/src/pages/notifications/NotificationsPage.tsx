@@ -9,7 +9,7 @@ import {
 import type { Notification as NotificationItem } from '../../entities/notification/model';
 
 type TabType = 'all' | 'unread';
-type NotificationType = 'all' | 'deadline' | 'achievement' | 'system';
+type NotificationType = 'all' | 'deadline' | 'achievement';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -118,8 +118,6 @@ export default function NotificationsPage() {
         return '/notification-deadline-icon.svg';
       case 'achievement':
         return '/notification-success-icon.svg';
-      default:
-        return '/notification-system-icon.svg';
     }
   };
 
@@ -135,7 +133,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="px-8 md:px-11 h-[calc(100vh-8rem)] overflow-y-auto eirene-scrollbar">
+    <div className="px-5 md:px-8 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full">
         <h1 className="text-2xl text-[#2F3A34] mb-3">Уведомления</h1>
 
@@ -162,14 +160,14 @@ export default function NotificationsPage() {
               Непрочитанные
             </button>
           </div>
-          <button
-            onClick={handleMarkAllRead}
-            className="border-2 bg-[#F0F3ED] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)] rounded-lg px-6 py-2 text-sm text-[#6F7D75] hover:text-[#2F3A34] transition-colors"
-          >
-            Прочитать все
-          </button>
 
-          <div ref={dropdownRef} className="relative">
+          <div ref={dropdownRef} className="relative flex gap-2">
+            <button
+              onClick={handleMarkAllRead}
+              className="bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] rounded-lg px-6 py-2 text-sm text-white transition-colors"
+            >
+              Прочитать все
+            </button>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex w-44 items-center justify-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-sm text-[#6F7D75] hover:bg-[#F0F3ED]/50 transition-colors"
@@ -192,30 +190,28 @@ export default function NotificationsPage() {
 
             {isDropdownOpen && (
               <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                {(['all', 'deadline', 'achievement', 'system'] as NotificationType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      onClick={() => {
-                        setSelectedType(type);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                        selectedType === type
-                          ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                          : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      {type === 'all'
-                        ? 'Все'
-                        : type === 'deadline'
-                          ? 'Напоминания'
-                          : type === 'achievement'
-                            ? 'Завершенные'
-                            : 'Системные'}
-                    </button>
-                  )
-                )}
+                {(['all', 'deadline', 'achievement'] as NotificationType[]).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setSelectedType(type);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                      selectedType === type
+                        ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
+                        : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
+                    }`}
+                  >
+                    {type === 'all'
+                      ? 'Все'
+                      : type === 'deadline'
+                        ? 'Напоминания'
+                        : type === 'achievement'
+                          ? 'Завершенные'
+                          : 'Системные'}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -233,7 +229,7 @@ export default function NotificationsPage() {
             <p className="text-lg font-medium">Уведомлений нет</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {groupedItems.map((group) => (
               <div key={group.date}>
                 <h2 className="font-medium text-[#2F3A34] mb-1 ml-6">{group.date}</h2>
@@ -241,20 +237,22 @@ export default function NotificationsPage() {
                   {group.items.map((notification) => (
                     <div
                       key={notification._id}
-                      className={`bg-white p-3 rounded-2xl flex items-center gap-4 transition-all border-2 border-[#F0F1F2] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)]`}
+                      className={`bg-white p-2.5 rounded-2xl flex items-center gap-4 transition-all border-2 border-[#F0F1F2] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)]`}
                     >
                       <div
-                        className={`w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 ${getIconBg(notification.type)}`}
+                        className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${getIconBg(notification.type)}`}
                       >
-                        <img src={getIconSrc(notification.type)} alt="" className="w-6 h-6" />
+                        <img src={getIconSrc(notification.type)} alt="" className="w-5 h-5" />
                       </div>
 
                       <div className="flex-1 min-w-0 text-xs">
                         <div className="flex items-center gap-2 mb-1">
                           {!notification.isRead && (
-                            <div className="w-2 h-2 bg-[#F59E0B] rounded-full flex-shrink-0" />
+                            <div
+                              className={`w-2 h-2 ${notification.type === 'achievement' ? 'bg-[#8CA693]' : 'bg-[#FFC65C]'} rounded-full flex-shrink-0`}
+                            />
                           )}
-                          <p className="text-[#2F3A34] font-medium  leading-snug">
+                          <p className="text-[#2F3A34] font-medium  leading-snug truncate">
                             {notification.message}
                           </p>
                         </div>
@@ -351,7 +349,7 @@ export default function NotificationsPage() {
                             className="flex-shrink-0 p-2 text-[#8CA693] hover:bg-[#F0F3ED] rounded-lg transition-colors"
                             title="Отметить как прочитанное"
                           >
-                            <img src="/readNotification-icon.svg" alt="" className="w-5 h-5" />
+                            <img src="/readNotification-icon.svg" alt="" className="w-4 h-4" />
                           </button>
                         )}
 
@@ -360,7 +358,7 @@ export default function NotificationsPage() {
                           className=" opacity-85 flex-shrink-0 p-2 hover:bg-[#E25760]/15 rounded-lg transition-colors"
                           title="Удалить уведомление"
                         >
-                          <img src="/delete-icon.svg" alt="" className="w-5 h-5" />
+                          <img src="/delete-icon.svg" alt="" className="w-4 h-4" />
                         </button>
                       </div>
                     </div>

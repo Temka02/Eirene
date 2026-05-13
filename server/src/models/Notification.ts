@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface INotification extends Document {
-  type: 'achievement' | 'deadline' | 'system';
+  type: 'achievement' | 'deadline';
   message: string;
   isRead: boolean;
   userId: mongoose.Types.ObjectId;
@@ -15,7 +15,7 @@ export interface INotification extends Document {
 
 const NotificationSchema = new Schema<INotification>(
   {
-    type: { type: String, enum: ['achievement', 'deadline', 'system'], default: 'achievement' },
+    type: { type: String, enum: ['achievement', 'deadline'], default: 'achievement' },
     message: { type: String, required: true },
     isRead: { type: Boolean, required: true, default: false },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
