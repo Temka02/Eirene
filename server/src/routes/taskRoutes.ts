@@ -8,6 +8,7 @@ import {
   addSubtask,
   updateSubtask,
   deleteSubtask,
+  getTask,
 } from '../controllers/taskController';
 
 const router = Router();
@@ -15,6 +16,7 @@ const router = Router();
 router.use(protect);
 
 router.post('/', createTask);
+router.get('/:id', getTask);
 router.get('/', getTasks);
 router.put('/:id', updateTask);
 router.delete('/:id', deleteTask);

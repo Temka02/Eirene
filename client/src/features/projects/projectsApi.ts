@@ -11,6 +11,12 @@ export const projectsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Project'],
     }),
+    getProject: builder.query<Project, string>({
+      query: (id) => ({
+        url: `/projects/${id}`,
+      }),
+      providesTags: ['Project'],
+    }),
     getProjects: builder.query<Project[], void>({
       query: () => ({ url: '/projects' }),
       providesTags: ['Project'],
@@ -34,6 +40,7 @@ export const projectsApi = api.injectEndpoints({
 });
 
 export const {
+  useGetProjectQuery,
   useCreateProjectMutation,
   useGetProjectsQuery,
   useDeleteProjectMutation,
