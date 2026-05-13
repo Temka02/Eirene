@@ -26,7 +26,7 @@ export default function HeaderForAuthorized() {
   };
 
   return (
-    <header className="h-16 flex items-center justify-end px-6 md:px-8 pt-4">
+    <header className="h-16 flex items-center justify-end px-6 md:px-8 pt-4 mb-2">
       <div className="flex items-center gap-4 md:gap-6">
         <button
           onClick={() => navigate('/notifications')}
@@ -49,12 +49,12 @@ export default function HeaderForAuthorized() {
             <input
               type="text"
               placeholder="Поиск.."
-              className="w-64 h-11 pl-16 pr-4 bg-white rounded-xl text-sm placeholder-[#5F6F65] focus:outline-none focus:ring-2 focus:ring-[#8CA693] transition"
+              className="w-64 h-11 pl-16 pr-4 bg-white rounded-xl text-sm placeholder-[#5F6F65] focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-3 cursor-pointer group">
+        <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 py-1">
             <span className="text-[#2F3A34] text-xl font-medium">{getInitials()}</span>
           </div>
