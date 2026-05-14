@@ -47,6 +47,15 @@ const routes = [
   },
 
   {
+    path: 'focus/:id',
+    element: (
+      <ProtectedRoute>
+        <FocusModePage />
+      </ProtectedRoute>
+    ),
+  },
+
+  {
     element: (
       <ProtectedRoute>
         <MainLayout />
@@ -68,7 +77,6 @@ const routes = [
       { path: 'notifications', element: <NotificationsPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'calendar', element: <CalendarPage /> },
-      { path: 'focus/:id', element: <FocusModePage /> },
     ],
   },
 
