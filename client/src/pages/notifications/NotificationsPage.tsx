@@ -225,7 +225,7 @@ export default function NotificationsPage() {
           </div>
         ) : groupedItems.length === 0 && !isFetching ? (
           <div className="flex flex-col items-center justify-center py-20 text-[#6F7D75]">
-            <img src="/empty-notifications.svg" alt="" className="w-24 h-24 mb-4 opacity-50" />
+            <img src="/empty-notifications-icon.svg" alt="" className="w-24 h-24 mb-4 opacity-75" />
             <p className="text-lg font-medium">Уведомлений нет</p>
           </div>
         ) : (

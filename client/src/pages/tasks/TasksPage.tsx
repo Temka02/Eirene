@@ -397,21 +397,8 @@ export default function TasksPage() {
                 </div>
               ) : tasks.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-[#6F7D75]">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-16 h-16 mb-3 opacity-40"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                    />
-                  </svg>
-                  <p className="text-sm font-medium">Задач не найдено</p>
+                  <img src="/allTasks-icon.svg" alt="" className="w-16 h-16 mb-3 opacity-70" />
+                  <p className="text-lg font-medium">Задач не найдено</p>
                 </div>
               ) : (
                 <div>
@@ -562,164 +549,171 @@ export default function TasksPage() {
                   </span>
                 </div>
                 <div className="flex-1">
-                  {tasks
-                    .filter((task) => task.status === 'todo')
-                    .map((task) => {
-                      const p = getPriorityConfig(task.priority);
-                      const dt = getDeadlineConfig(task.deadlineType);
-                      const d = formatDate(task.deadline);
-                      const isCompleted = task.status === 'done';
-                      const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
+                  {tasks.filter((t) => t.status === 'todo').length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-32 text-[#6F7D75]">
+                      <img src="/allTasks-icon.svg" alt="" className="w-8 h-8 mb-3 opacity-70" />
+                      <p className="font-medium text-center">Нет задач</p>
+                    </div>
+                  ) : (
+                    tasks
+                      .filter((task) => task.status === 'todo')
+                      .map((task) => {
+                        const p = getPriorityConfig(task.priority);
+                        const dt = getDeadlineConfig(task.deadlineType);
+                        const d = formatDate(task.deadline);
+                        const isCompleted = task.status === 'done';
+                        const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
 
-                      return (
-                        <div
-                          key={task._id}
-                          onClick={() => navigate(`/tasks/${task._id}`)}
-                          className="bg-white rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
-                        >
-                          <div className="flex flex-col justify-between min-w-0">
-                            <div className="flex items-center gap-1 mb-2 min-w-0">
-                              <div className="w-2 h-2 bg-[#4C95E9] rounded-full flex-shrink-0" />
-                              <h4
-                                className="text-xs font-medium text-[#2F3A34] truncate w-full"
-                                title={task.title}
-                              >
-                                {task.title}
-                              </h4>
-                            </div>
-
-                            <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
-                              <div className="flex gap-1 items-center min-w-0">
-                                <img
-                                  src="/projects-icon.svg"
-                                  alt=""
-                                  className="w-2.5 h-2.5 flex-shrink-0"
-                                />
-                                <span className="truncate">
-                                  {task.projectId ? 'Проект' : 'Личное'}
-                                </span>
+                        return (
+                          <div
+                            key={task._id}
+                            onClick={() => navigate(`/tasks/${task._id}`)}
+                            className="bg-white rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
+                          >
+                            <div className="flex flex-col justify-between min-w-0">
+                              <div className="flex items-center gap-1 mb-2 min-w-0">
+                                <div className="w-2 h-2 bg-[#4C95E9] rounded-full flex-shrink-0" />
+                                <h4
+                                  className="text-xs font-medium text-[#2F3A34] truncate w-full"
+                                  title={task.title}
+                                >
+                                  {task.title}
+                                </h4>
                               </div>
-                              {task.deadline ? (
-                                <div className="flex flex-col items-start min-w-0">
+
+                              <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
+                                <div className="flex gap-1 items-center min-w-0">
+                                  <img
+                                    src="/projects-icon.svg"
+                                    alt=""
+                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                  />
+                                  <span className="truncate">
+                                    {task.projectId ? 'Проект' : 'Личное'}
+                                  </span>
+                                </div>
+                                {task.deadline ? (
+                                  <div className="flex flex-col items-start min-w-0">
+                                    <div className="flex gap-1 items-center min-w-0">
+                                      <img
+                                        src="/calendar-icon.svg"
+                                        alt=""
+                                        className="w-2.5 h-2.5 flex-shrink-0"
+                                      />
+                                      <span
+                                        className={`text-xs font-medium truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+                                      >
+                                        {d.text}
+                                      </span>
+                                    </div>
+                                    {d.isOverdue && (
+                                      <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
+                                        Просрочено
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
                                   <div className="flex gap-1 items-center min-w-0">
                                     <img
                                       src="/calendar-icon.svg"
                                       alt=""
                                       className="w-2.5 h-2.5 flex-shrink-0"
                                     />
-                                    <span
-                                      className={`text-xs font-medium truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
-                                    >
-                                      {d.text}
-                                    </span>
+                                    <span className="text-xs text-[#6F7D75]">-</span>
                                   </div>
-                                  {d.isOverdue && (
-                                    <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
-                                      Просрочено
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="flex gap-1 items-center min-w-0">
-                                  <img
-                                    src="/calendar-icon.svg"
-                                    alt=""
-                                    className="w-2.5 h-2.5 flex-shrink-0"
-                                  />
-                                  <span className="text-xs text-[#6F7D75]">-</span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col justify-center items-center">
+                              {task.deadline && !isCompleted && progress && (
+                                <div className="relative w-10 h-10">
+                                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <circle
+                                      cx="18"
+                                      cy="18"
+                                      r="15.915"
+                                      pathLength="100"
+                                      fill="none"
+                                      stroke="#F0F1F2"
+                                      strokeWidth="3"
+                                    />
+                                    <circle
+                                      cx="18"
+                                      cy="18"
+                                      r="15.915"
+                                      pathLength="100"
+                                      fill="none"
+                                      stroke={progress.color}
+                                      strokeWidth="3"
+                                      strokeDasharray="100"
+                                      strokeDashoffset={100 - progress.percent}
+                                      strokeLinecap="round"
+                                      className="transition-all duration-300"
+                                    />
+                                  </svg>
                                 </div>
                               )}
                             </div>
-                          </div>
 
-                          <div className="flex flex-col justify-center items-center">
-                            {task.deadline && !isCompleted && progress && (
-                              <div className="relative w-10 h-10">
-                                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                                  <circle
-                                    cx="18"
-                                    cy="18"
-                                    r="15.915"
-                                    pathLength="100"
-                                    fill="none"
-                                    stroke="#F0F1F2"
-                                    strokeWidth="3"
+                            <div className="flex flex-col items-center gap-2">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
+                              >
+                                {task.priority === 'high' && (
+                                  <img
+                                    src="/highPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
                                   />
-                                  <circle
-                                    cx="18"
-                                    cy="18"
-                                    r="15.915"
-                                    pathLength="100"
-                                    fill="none"
-                                    stroke={progress.color}
-                                    strokeWidth="3"
-                                    strokeDasharray="100"
-                                    strokeDashoffset={100 - progress.percent}
-                                    strokeLinecap="round"
-                                    className="transition-all duration-300"
+                                )}
+                                {task.priority === 'medium' && (
+                                  <img
+                                    src="/mediumPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
                                   />
-                                </svg>
-                              </div>
-                            )}
+                                )}
+                                {task.priority === 'low' && (
+                                  <img
+                                    src="/lowPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                <span className="truncate">{p.label}</span>
+                              </span>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
+                              >
+                                {task.deadlineType === 'hard' && (
+                                  <img
+                                    src="/hardDeadlineType-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.deadlineType === 'soft' && (
+                                  <img
+                                    src="/softDeadlineType-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.deadlineType === 'none' && (
+                                  <img
+                                    src="/noDeadline-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                <span className="truncate">{dt.label}</span>
+                              </span>
+                            </div>
                           </div>
-
-                          <div className="flex flex-col items-center gap-2">
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
-                            >
-                              {task.priority === 'high' && (
-                                <img
-                                  src="/highPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.priority === 'medium' && (
-                                <img
-                                  src="/mediumPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.priority === 'low' && (
-                                <img
-                                  src="/lowPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{p.label}</span>
-                            </span>
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
-                            >
-                              {task.deadlineType === 'hard' && (
-                                <img
-                                  src="/hardDeadlineType-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.deadlineType === 'soft' && (
-                                <img
-                                  src="/softDeadlineType-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.deadlineType === 'none' && (
-                                <img
-                                  src="/noDeadline-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{dt.label}</span>
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                  )}
                 </div>
               </div>
 
@@ -734,163 +728,170 @@ export default function TasksPage() {
                   </span>
                 </div>
                 <div className="flex-1">
-                  {tasks
-                    .filter((task) => task.status === 'in_progress')
-                    .map((task) => {
-                      const p = getPriorityConfig(task.priority);
-                      const dt = getDeadlineConfig(task.deadlineType);
-                      const d = formatDate(task.deadline);
-                      const isCompleted = task.status === 'done';
-                      const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
+                  {tasks.filter((t) => t.status === 'in_progress').length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-32 text-[#6F7D75]">
+                      <img src="/allTasks-icon.svg" alt="" className="w-8 h-8 mb-3 opacity-70" />
+                      <p className="font-medium text-center">Нет задач</p>
+                    </div>
+                  ) : (
+                    tasks
+                      .filter((task) => task.status === 'in_progress')
+                      .map((task) => {
+                        const p = getPriorityConfig(task.priority);
+                        const dt = getDeadlineConfig(task.deadlineType);
+                        const d = formatDate(task.deadline);
+                        const isCompleted = task.status === 'done';
+                        const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
 
-                      return (
-                        <div
-                          key={task._id}
-                          onClick={() => navigate(`/tasks/${task._id}`)}
-                          className="bg-white rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
-                        >
-                          <div className="flex flex-col justify-between min-w-0">
-                            <div className="flex items-center gap-1 mb-2 min-w-0">
-                              <div className="w-2 h-2 bg-[#FFC65C] rounded-full flex-shrink-0" />
-                              <h4
-                                className="text-xs font-medium text-[#2F3A34] truncate w-full"
-                                title={task.title}
-                              >
-                                {task.title}
-                              </h4>
-                            </div>
-                            <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
-                              <div className="flex gap-1 items-center min-w-0">
-                                <img
-                                  src="/projects-icon.svg"
-                                  alt=""
-                                  className="w-2.5 h-2.5 flex-shrink-0"
-                                />
-                                <span className="truncate">
-                                  {task.projectId ? 'Проект' : 'Личное'}
-                                </span>
+                        return (
+                          <div
+                            key={task._id}
+                            onClick={() => navigate(`/tasks/${task._id}`)}
+                            className="bg-white rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
+                          >
+                            <div className="flex flex-col justify-between min-w-0">
+                              <div className="flex items-center gap-1 mb-2 min-w-0">
+                                <div className="w-2 h-2 bg-[#FFC65C] rounded-full flex-shrink-0" />
+                                <h4
+                                  className="text-xs font-medium text-[#2F3A34] truncate w-full"
+                                  title={task.title}
+                                >
+                                  {task.title}
+                                </h4>
                               </div>
-                              {task.deadline ? (
-                                <div className="flex flex-col items-start min-w-0">
+                              <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
+                                <div className="flex gap-1 items-center min-w-0">
+                                  <img
+                                    src="/projects-icon.svg"
+                                    alt=""
+                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                  />
+                                  <span className="truncate">
+                                    {task.projectId ? 'Проект' : 'Личное'}
+                                  </span>
+                                </div>
+                                {task.deadline ? (
+                                  <div className="flex flex-col items-start min-w-0">
+                                    <div className="flex gap-1 items-center min-w-0">
+                                      <img
+                                        src="/calendar-icon.svg"
+                                        alt=""
+                                        className="w-2.5 h-2.5 flex-shrink-0"
+                                      />
+                                      <span
+                                        className={`text-xs font-medium truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+                                      >
+                                        {d.text}
+                                      </span>
+                                    </div>
+                                    {d.isOverdue && (
+                                      <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
+                                        Просрочено
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
                                   <div className="flex gap-1 items-center min-w-0">
                                     <img
                                       src="/calendar-icon.svg"
                                       alt=""
                                       className="w-2.5 h-2.5 flex-shrink-0"
                                     />
-                                    <span
-                                      className={`text-xs font-medium truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
-                                    >
-                                      {d.text}
-                                    </span>
+                                    <span className="text-xs text-[#6F7D75]">-</span>
                                   </div>
-                                  {d.isOverdue && (
-                                    <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
-                                      Просрочено
-                                    </span>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="flex gap-1 items-center min-w-0">
-                                  <img
-                                    src="/calendar-icon.svg"
-                                    alt=""
-                                    className="w-2.5 h-2.5 flex-shrink-0"
-                                  />
-                                  <span className="text-xs text-[#6F7D75]">-</span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col justify-center items-center">
+                              {task.deadline && !isCompleted && progress && (
+                                <div className="relative w-10 h-10">
+                                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <circle
+                                      cx="18"
+                                      cy="18"
+                                      r="15.915"
+                                      pathLength="100"
+                                      fill="none"
+                                      stroke="#F0F1F2"
+                                      strokeWidth="3"
+                                    />
+                                    <circle
+                                      cx="18"
+                                      cy="18"
+                                      r="15.915"
+                                      pathLength="100"
+                                      fill="none"
+                                      stroke={progress.color}
+                                      strokeWidth="3"
+                                      strokeDasharray="100"
+                                      strokeDashoffset={100 - progress.percent}
+                                      strokeLinecap="round"
+                                      className="transition-all duration-300"
+                                    />
+                                  </svg>
                                 </div>
                               )}
                             </div>
-                          </div>
 
-                          <div className="flex flex-col justify-center items-center">
-                            {task.deadline && !isCompleted && progress && (
-                              <div className="relative w-10 h-10">
-                                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                                  <circle
-                                    cx="18"
-                                    cy="18"
-                                    r="15.915"
-                                    pathLength="100"
-                                    fill="none"
-                                    stroke="#F0F1F2"
-                                    strokeWidth="3"
+                            <div className="flex flex-col items-center gap-2">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
+                              >
+                                {task.priority === 'high' && (
+                                  <img
+                                    src="/highPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
                                   />
-                                  <circle
-                                    cx="18"
-                                    cy="18"
-                                    r="15.915"
-                                    pathLength="100"
-                                    fill="none"
-                                    stroke={progress.color}
-                                    strokeWidth="3"
-                                    strokeDasharray="100"
-                                    strokeDashoffset={100 - progress.percent}
-                                    strokeLinecap="round"
-                                    className="transition-all duration-300"
+                                )}
+                                {task.priority === 'medium' && (
+                                  <img
+                                    src="/mediumPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
                                   />
-                                </svg>
-                              </div>
-                            )}
+                                )}
+                                {task.priority === 'low' && (
+                                  <img
+                                    src="/lowPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                <span className="truncate">{p.label}</span>
+                              </span>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
+                              >
+                                {task.deadlineType === 'hard' && (
+                                  <img
+                                    src="/hardDeadlineType-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.deadlineType === 'soft' && (
+                                  <img
+                                    src="/softDeadlineType-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.deadlineType === 'none' && (
+                                  <img
+                                    src="/noDeadline-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                <span className="truncate">{dt.label}</span>
+                              </span>
+                            </div>
                           </div>
-
-                          <div className="flex flex-col items-center gap-2">
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
-                            >
-                              {task.priority === 'high' && (
-                                <img
-                                  src="/highPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.priority === 'medium' && (
-                                <img
-                                  src="/mediumPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.priority === 'low' && (
-                                <img
-                                  src="/lowPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{p.label}</span>
-                            </span>
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
-                            >
-                              {task.deadlineType === 'hard' && (
-                                <img
-                                  src="/hardDeadlineType-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.deadlineType === 'soft' && (
-                                <img
-                                  src="/softDeadlineType-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.deadlineType === 'none' && (
-                                <img
-                                  src="/noDeadline-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{dt.label}</span>
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                  )}
                 </div>
               </div>
 
@@ -905,127 +906,137 @@ export default function TasksPage() {
                   </span>
                 </div>
                 <div className="flex-1">
-                  {tasks
-                    .filter((task) => task.status === 'done')
-                    .map((task) => {
-                      const p = getPriorityConfig(task.priority);
-                      const dt = getDeadlineConfig(task.deadlineType);
-                      const d = formatDate(task.deadline);
+                  {tasks.filter((t) => t.status === 'done').length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-32 text-[#6F7D75]">
+                      <img src="/allTasks-icon.svg" alt="" className="w-8 h-8 mb-3 opacity-70" />
+                      <p className="font-medium text-center">Нет задач</p>
+                    </div>
+                  ) : (
+                    tasks
+                      .filter((task) => task.status === 'done')
+                      .map((task) => {
+                        const p = getPriorityConfig(task.priority);
+                        const dt = getDeadlineConfig(task.deadlineType);
+                        const d = formatDate(task.deadline);
 
-                      return (
-                        <div
-                          key={task._id}
-                          onClick={() => navigate(`/tasks/${task._id}`)}
-                          className="bg-[#E4F0E5] rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
-                        >
-                          <div className="flex flex-col justify-between min-w-0">
-                            <div className="flex items-center gap-1 mb-2 min-w-0">
-                              <img src="/taskDone-icon.svg" className="w-3.5 h-3.5 flex-shrink-0" />
-                              <h4
-                                className="text-xs font-medium text-[#2F3A34] truncate w-full"
-                                title={task.title}
-                              >
-                                {task.title}
-                              </h4>
-                            </div>
-                            <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
-                              <div className="flex gap-1 items-center min-w-0">
+                        return (
+                          <div
+                            key={task._id}
+                            onClick={() => navigate(`/tasks/${task._id}`)}
+                            className="bg-[#E4F0E5] rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
+                          >
+                            <div className="flex flex-col justify-between min-w-0">
+                              <div className="flex items-center gap-1 mb-2 min-w-0">
                                 <img
-                                  src="/projects-icon.svg"
-                                  alt=""
-                                  className="w-2.5 h-2.5 flex-shrink-0"
+                                  src="/taskDone-icon.svg"
+                                  className="w-3.5 h-3.5 flex-shrink-0"
                                 />
-                                <span className="truncate">
-                                  {task.projectId ? 'Проект' : 'Личное'}
-                                </span>
+                                <h4
+                                  className="text-xs font-medium text-[#2F3A34] truncate w-full"
+                                  title={task.title}
+                                >
+                                  {task.title}
+                                </h4>
                               </div>
-                              {task.deadline ? (
-                                <div className="flex flex-col items-start min-w-0">
+                              <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
+                                <div className="flex gap-1 items-center min-w-0">
+                                  <img
+                                    src="/projects-icon.svg"
+                                    alt=""
+                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                  />
+                                  <span className="truncate">
+                                    {task.projectId ? 'Проект' : 'Личное'}
+                                  </span>
+                                </div>
+                                {task.deadline ? (
+                                  <div className="flex flex-col items-start min-w-0">
+                                    <div className="flex gap-1 items-center min-w-0">
+                                      <img
+                                        src="/calendar-icon.svg"
+                                        alt=""
+                                        className="w-2.5 h-2.5 flex-shrink-0"
+                                      />
+                                      <span className="text-xs font-medium truncate text-[#6F7D75]">
+                                        {d.text}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
                                   <div className="flex gap-1 items-center min-w-0">
                                     <img
                                       src="/calendar-icon.svg"
                                       alt=""
                                       className="w-2.5 h-2.5 flex-shrink-0"
                                     />
-                                    <span className="text-xs font-medium truncate text-[#6F7D75]">
-                                      {d.text}
-                                    </span>
+                                    <span className="text-xs text-[#6F7D75]">-</span>
                                   </div>
-                                </div>
-                              ) : (
-                                <div className="flex gap-1 items-center min-w-0">
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col justify-center items-center">
+                              <div className="relative w-10 h-10"></div>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-2">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color} opacity-75`}
+                              >
+                                {task.priority === 'high' && (
                                   <img
-                                    src="/calendar-icon.svg"
+                                    src="/highPriority-icon.svg"
                                     alt=""
-                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                    className="w-3.5 h-3.5 flex-shrink-0"
                                   />
-                                  <span className="text-xs text-[#6F7D75]">-</span>
-                                </div>
-                              )}
+                                )}
+                                {task.priority === 'medium' && (
+                                  <img
+                                    src="/mediumPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.priority === 'low' && (
+                                  <img
+                                    src="/lowPriority-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                <span className="truncate">{p.label}</span>
+                              </span>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color} opacity-75`}
+                              >
+                                {task.deadlineType === 'hard' && (
+                                  <img
+                                    src="/hardDeadlineType-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.deadlineType === 'soft' && (
+                                  <img
+                                    src="/softDeadlineType-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                {task.deadlineType === 'none' && (
+                                  <img
+                                    src="/noDeadline-icon.svg"
+                                    alt=""
+                                    className="w-3.5 h-3.5 flex-shrink-0"
+                                  />
+                                )}
+                                <span className="truncate">{dt.label}</span>
+                              </span>
                             </div>
                           </div>
-
-                          <div className="flex flex-col justify-center items-center">
-                            <div className="relative w-10 h-10"></div>
-                          </div>
-
-                          <div className="flex flex-col items-center gap-2">
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color} opacity-75`}
-                            >
-                              {task.priority === 'high' && (
-                                <img
-                                  src="/highPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.priority === 'medium' && (
-                                <img
-                                  src="/mediumPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.priority === 'low' && (
-                                <img
-                                  src="/lowPriority-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{p.label}</span>
-                            </span>
-                            <span
-                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color} opacity-75`}
-                            >
-                              {task.deadlineType === 'hard' && (
-                                <img
-                                  src="/hardDeadlineType-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.deadlineType === 'soft' && (
-                                <img
-                                  src="/softDeadlineType-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              {task.deadlineType === 'none' && (
-                                <img
-                                  src="/noDeadline-icon.svg"
-                                  alt=""
-                                  className="w-3.5 h-3.5 flex-shrink-0"
-                                />
-                              )}
-                              <span className="truncate">{dt.label}</span>
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                  )}
                 </div>
               </div>
             </div>
