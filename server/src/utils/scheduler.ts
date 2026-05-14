@@ -2,6 +2,8 @@ import cron from 'node-cron';
 import Task from '../models/Task';
 import Notification from '../models/Notification';
 import logger from './logger';
+import User from '../models/User';
+import { sendDeadlineEmail } from './email';
 
 export const startDeadlineScheduler = () => {
   cron.schedule('*/15 * * * *', async () => {
@@ -49,6 +51,14 @@ export const startDeadlineScheduler = () => {
           deadline: task.deadline,
         }))
       );
+
+      for (const task of tasksToNotify) {
+        const user = await User.findById(task.userId).select('email emailNotifications');
+
+        if (user && user.emailNotifications) {
+          await sendDeadlineEmail(user.email, task.title, task.deadline!);
+        }
+      }
 
       logger.info(`Created ${tasksToNotify.length} deadline alerts`);
     } catch (error) {

@@ -4,6 +4,7 @@ import User from '../models/User';
 import { registerSchema, loginSchema } from '../utils/validation';
 import { z } from 'zod';
 import logger from '../utils/logger';
+import { AuthRequest } from '../middleware/auth';
 
 /**
  * @openapi
@@ -53,10 +54,78 @@ export const getMe = async (req: Request, res: Response) => {
         email: user.email,
         name: user.name,
         surname: user.surname,
+        emailNotifications: user.emailNotifications,
       },
     });
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+/**
+ * @openapi
+ * /api/auth/me:
+ *   put:
+ *     tags: [Auth]
+ *     summary: Update current user profile
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               surname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated
+ *       400:
+ *         description: Validation error or email exists
+ */
+export const updateMe = async (req: AuthRequest, res: Response) => {
+  try {
+    const { name, surname, email, emailNotifications } = req.body;
+    const userId = req.user!.userId;
+
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (surname !== undefined) updateData.surname = surname;
+    if (emailNotifications !== undefined) updateData.emailNotifications = emailNotifications;
+
+    if (email !== undefined) {
+      const existing = await User.findOne({ email, _id: { $ne: userId } });
+      if (existing) {
+        return res.status(400).json({ error: 'Этот email уже используется' });
+      }
+      updateData.email = email;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select('-password');
+
+    if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+
+    res.json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        surname: user.surname,
+        emailNotifications: user.emailNotifications,
+      },
+    });
+  } catch (error) {
+    logger.error('UpdateMe error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 

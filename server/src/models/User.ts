@@ -6,6 +6,7 @@ export interface IUser extends Document {
   password: string;
   name: string;
   surname: string;
+  emailNotifications: boolean;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -38,6 +39,7 @@ const UserSchema = new Schema<IUser>(
       maxlength: [50, 'Surname cannot exceed 50 characters'],
       required: [true, 'Surname is required'],
     },
+    emailNotifications: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

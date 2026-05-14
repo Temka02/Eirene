@@ -4,7 +4,7 @@ import type {
   RegisterCredentials,
   AuthResponse,
 } from '../../entities/auth/model';
-import type { User } from '../../entities/user/model';
+import type { UpdateMeDto, User } from '../../entities/user/model';
 
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -27,13 +27,29 @@ export const authApi = api.injectEndpoints({
         url: '/auth/logout',
         method: 'POST',
       }),
+      invalidatesTags: ['User'],
     }),
     getMe: builder.query<{ user: User }, void>({
       query: () => ({
         url: '/auth/me',
       }),
+      providesTags: ['User'],
+    }),
+    updateMe: builder.mutation<{ user: User }, UpdateMeDto>({
+      query: (data) => ({
+        url: '/auth/me',
+        method: 'PUT',
+        data,
+      }),
+      invalidatesTags: ['User'],
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation, useGetMeQuery } = authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useGetMeQuery,
+  useUpdateMeMutation,
+} = authApi;
