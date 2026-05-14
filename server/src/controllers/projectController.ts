@@ -4,6 +4,7 @@ import Task from '../models/Task';
 import { projectSchema, updateProjectSchema } from '../utils/validation';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
+import mongoose from 'mongoose';
 
 /**
  * @openapi
@@ -75,6 +76,136 @@ export const getProject = async (req: AuthRequest, res: Response) => {
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json(project);
   } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+/**
+ * @openapi
+ * /api/projects/{id}/tasks:
+ *   get:
+ *     tags: [Projects, Tasks]
+ *     summary: Get tasks for a specific project with filters and pagination
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *       - in: query
+ *         name: priority
+ *         schema: { type: string, enum: [high, medium, low] }
+ *       - in: query
+ *         name: deadlineType
+ *         schema: { type: string, enum: [hard, soft, none] }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [todo, in_progress, done] }
+ *       - in: query
+ *         name: search
+ *         schema: { type: string }
+ *       - in: query
+ *         name: sortBy
+ *         schema: { type: string, enum: [deadline, priority, createdAt], default: deadline }
+ *       - in: query
+ *         name: order
+ *         schema: { type: string, enum: [asc, desc], default: asc }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: string, default: '5' }
+ *       - in: query
+ *         name: page
+ *         schema: { type: string, default: '1' }
+ *     responses:
+ *       200:
+ *         description: List of project tasks with pagination
+ */
+export const getProjectTasks = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id: projectId } = req.params;
+    if (typeof projectId !== 'string') {
+      return res.status(400).json({ error: 'Invalid project ID' });
+    }
+    const userId = new mongoose.Types.ObjectId(req.user!.userId);
+    const projectIdObj = new mongoose.Types.ObjectId(projectId);
+
+    const {
+      priority,
+      deadlineType,
+      status,
+      search,
+      sortBy = 'deadline',
+      order = 'asc',
+      limit = '5',
+      page = '1',
+    } = req.query;
+
+    const project = await Project.findOne({ _id: projectId, userId });
+    if (!project) return res.status(404).json({ error: 'Project not found or access denied' });
+
+    const filter: any = { userId, projectId: projectIdObj };
+
+    if (priority && ['high', 'medium', 'low'].includes(priority as string))
+      filter.priority = priority;
+    if (deadlineType && ['hard', 'soft', 'none'].includes(deadlineType as string))
+      filter.deadlineType = deadlineType;
+    if (status && ['todo', 'in_progress', 'done'].includes(status as string))
+      filter.status = status;
+    if (search && typeof search === 'string') filter.title = { $regex: search, $options: 'i' };
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const pipeline: any[] = [{ $match: filter }];
+
+    if (sortBy === 'deadline') {
+      pipeline.push(
+        {
+          $addFields: {
+            _sortDeadline: {
+              $ifNull: [
+                '$deadline',
+                order === 'asc' ? new Date('9999-12-31') : new Date('1970-01-01'),
+              ],
+            },
+          },
+        },
+        { $sort: { _sortDeadline: order === 'asc' ? 1 : -1 } },
+        { $project: { _sortDeadline: 0 } }
+      );
+    } else if (sortBy === 'priority') {
+      pipeline.push({ $sort: { priority: order === 'asc' ? 1 : -1 } });
+    } else {
+      pipeline.push({ $sort: { createdAt: order === 'asc' ? 1 : -1 } });
+    }
+
+    pipeline.push(
+      { $skip: skip },
+      { $limit: Number(limit) },
+      {
+        $lookup: {
+          from: 'projects',
+          localField: 'projectId',
+          foreignField: '_id',
+          as: 'projectInfo',
+        },
+      },
+      { $unwind: { path: '$projectInfo', preserveNullAndEmptyArrays: true } },
+      { $project: { projectInfo: 0 } }
+    );
+
+    const [data, total] = await Promise.all([
+      Task.aggregate(pipeline),
+      Task.countDocuments(filter),
+    ]);
+
+    res.json({
+      data,
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / Number(limit)),
+    });
+  } catch (err) {
+    console.error('getProjectTasks error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

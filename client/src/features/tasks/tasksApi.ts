@@ -1,7 +1,8 @@
 import { api } from '../../store/api';
 import type { CreateTaskDto, Task, UpdateTaskDto } from '../../entities/task/model';
 
-type GetTasksParams = {
+export type GetTasksParams = {
+  projectId?: string;
   priority?: 'high' | 'medium' | 'low';
   deadlineType?: 'hard' | 'soft' | 'none';
   status?: 'todo' | 'in_progress' | 'done';
@@ -39,6 +40,7 @@ export const tasksApi = api.injectEndpoints({
       query: (params) => ({
         url: '/tasks',
         params: {
+          projectId: params?.projectId,
           priority: params?.priority,
           deadlineType: params?.deadlineType,
           status: params?.status,

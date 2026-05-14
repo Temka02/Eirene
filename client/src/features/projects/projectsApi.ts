@@ -1,5 +1,6 @@
 import type { CreateProjectDto, Project, UpdateProjectDto } from '../../entities/project/model';
 import { api } from '../../store/api';
+import type { GetTasksParams, TasksResponse } from '../tasks/tasksApi';
 
 export const projectsApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -16,6 +17,22 @@ export const projectsApi = api.injectEndpoints({
         url: `/projects/${id}`,
       }),
       providesTags: ['Project'],
+    }),
+    getProjectTasks: builder.query<TasksResponse, { id: string } & Partial<GetTasksParams>>({
+      query: ({ id, ...params }) => ({
+        url: `/projects/${id}/tasks`,
+        params: {
+          priority: params.priority,
+          deadlineType: params.deadlineType,
+          status: params.status,
+          search: params.search,
+          sortBy: params.sortBy,
+          order: params.order,
+          limit: params.limit,
+          page: params.page,
+        },
+      }),
+      providesTags: ['Task', 'Project'],
     }),
     getProjects: builder.query<Project[], void>({
       query: () => ({ url: '/projects' }),
@@ -42,6 +59,7 @@ export const projectsApi = api.injectEndpoints({
 export const {
   useGetProjectQuery,
   useCreateProjectMutation,
+  useGetProjectTasksQuery,
   useGetProjectsQuery,
   useDeleteProjectMutation,
   useUpdateProjectMutation,

@@ -8,15 +8,21 @@ export interface Task {
   deadline?: string;
   checklist?: Subtask[];
   userId: string;
-  projectId?: string | null;
+  projectId?: string | ProjectBasic | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Subtask {
-  _id: string;
+  id: string;
   title: string;
   isCompleted: boolean;
+}
+
+export interface ProjectBasic {
+  _id: string;
+  title: string;
+  icon: string;
 }
 
 export interface CreateTaskDto {

@@ -105,7 +105,10 @@ export const createTask = async (req: AuthRequest, res: Response) => {
 export const getTask = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const task = await Task.findOne({ _id: id, userId: req.user!.userId });
+    const task = await Task.findOne({ _id: id, userId: req.user!.userId }).populate(
+      'projectId',
+      'title icon'
+    );
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json(task);
   } catch {
@@ -151,6 +154,7 @@ export const getTasks = async (req: AuthRequest, res: Response) => {
       deadlineType,
       status,
       search,
+      projectId,
       sortBy = 'deadline',
       order = 'asc',
       limit = '5',
@@ -158,7 +162,7 @@ export const getTasks = async (req: AuthRequest, res: Response) => {
     } = req.query;
 
     const filter: any = { userId };
-
+    if (projectId && typeof projectId === 'string') filter.projectId = projectId;
     if (priority && ['high', 'medium', 'low'].includes(priority as string))
       filter.priority = priority;
     if (deadlineType && ['hard', 'soft', 'none'].includes(deadlineType as string))
