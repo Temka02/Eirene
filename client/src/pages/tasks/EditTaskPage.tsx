@@ -26,20 +26,22 @@ export default function EditTaskPage() {
     if (task) {
       setTitle(task.title || '');
       setDescription(task.description || '');
-      setProjectId(task.projectId || undefined);
+
+      const rawProjectId = task.projectId;
+
+      setProjectId(
+        typeof rawProjectId === 'string' ? rawProjectId : (rawProjectId as any)?._id || undefined
+      );
       setPriority(task.priority || 'medium');
       setDeadlineType(task.deadlineType || 'none');
       if (task.deadline) {
         const date = new Date(task.deadline);
-        setDeadline(date.toISOString().slice(0, 16));
+        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+        setDeadline(localDate.toISOString().slice(0, 16));
       }
       setSubtasks(task.checklist?.length ? task.checklist.map((s) => s.title) : ['']);
     }
   }, [task]);
-
-  useEffect(() => {
-    if (deadlineType === 'none') setDeadline('');
-  }, [deadlineType]);
 
   const handleAddSubtaskInput = () => setSubtasks([...subtasks, '']);
   const handleRemoveSubtask = (index: number) => {
@@ -79,7 +81,7 @@ export default function EditTaskPage() {
         id: id!,
         title,
         description,
-        projectId: projectId || null,
+        projectId: projectId || undefined,
         priority,
         deadlineType,
         deadline: deadlineType !== 'none' ? deadline : undefined,
@@ -91,7 +93,7 @@ export default function EditTaskPage() {
     }
   };
 
-  if (isLoadingTask) {
+  if (isLoadingTask || !task) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
         <div className="text-[#6F7D75] text-sm">Загрузка данных...</div>
@@ -239,7 +241,10 @@ export default function EditTaskPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setDeadlineType('none')}
+                      onClick={() => {
+                        setDeadlineType('none');
+                        setDeadline('');
+                      }}
                       className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'none' ? 'border-[#a1b0a8] bg-[#F3F4F6] text-[#6F7D75]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
                     >
                       <img src="/noDeadline-icon.svg" alt="" className="w-5 h-5 mb-1" />
@@ -292,6 +297,7 @@ export default function EditTaskPage() {
                       className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
                     />
                     <input
+                      key={task?._id}
                       id="date"
                       type="datetime-local"
                       value={deadline}
