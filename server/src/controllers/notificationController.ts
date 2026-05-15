@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import Notification from '../models/Notification';
 import { AuthRequest } from '../middleware/auth';
+import logger from '../utils/logger';
 
 /**
  * @openapi
@@ -110,19 +111,24 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
  */
 export const markAsRead = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
     const userId = req.user!.userId;
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is missing' });
+    }
 
-    const notification = await Notification.findOneAndUpdate(
-      { _id: id, userId },
-      { $set: { isRead: true } },
-      { new: true }
+    const result = await Notification.updateMany(
+      { userId, isRead: false },
+      { $set: { isRead: true } }
     );
 
-    if (!notification) return res.status(404).json({ error: 'Notification not found' });
-    res.json({ message: 'Notification marked as read', notification });
-  } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    logger.info(`Marked ${result.modifiedCount} notifications as read for user ${userId}`);
+    res.json({ message: 'All notifications marked as read', modifiedCount: result.modifiedCount });
+  } catch (error) {
+    logger.error('Error in markAllRead:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error : undefined,
+    });
   }
 };
 

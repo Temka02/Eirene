@@ -24,15 +24,33 @@ export default function NotificationsPage() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [markAsRead] = useMarkAsReadMutation();
-  const [markAllRead] = useMarkAllReadMutation();
-  const [deleteNotification] = useDeleteNotificationMutation();
+  const [markAllRead, { isLoading: isMarkingAll }] = useMarkAllReadMutation();
+  const [deleteNotification, { isLoading: isDeleting }] = useDeleteNotificationMutation();
 
   const handleMarkAllRead = async () => {
-    await markAllRead();
+    try {
+      await markAllRead().unwrap();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await deleteNotification({ id });
+    const deletedItem = allNotifications.find((n) => n._id === id);
+    setAllNotifications((prev) => prev.filter((n) => n._id !== id));
+
+    try {
+      await deleteNotification({ id }).unwrap();
+    } catch (error) {
+      if (deletedItem) {
+        setAllNotifications((prev) =>
+          [...prev, deletedItem].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+        );
+      }
+      console.error(error);
+    }
   };
 
   const { data, isLoading, isFetching, isSuccess } = useGetNotificationsQuery({
@@ -55,7 +73,9 @@ export default function NotificationsPage() {
 
       setAllNotifications((prev) => {
         const merged = page === 1 ? notifications : [...prev, ...notifications];
-        return Array.from(new Map(merged.map((item) => [item._id, item])).values()).sort(
+        const unique = Array.from(new Map(merged.map((item) => [item._id, item])).values());
+
+        return unique.sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       });
@@ -110,6 +130,12 @@ export default function NotificationsPage() {
   };
 
   const groupedItems = useMemo(() => groupByDate(allNotifications), [allNotifications]);
+
+  const unreadCount = useMemo(() => {
+    if (activeTab === 'unread') return allNotifications.length;
+    return allNotifications.filter((n) => !n.isRead).length;
+  }, [allNotifications, activeTab]);
+
   const loadMore = () => setPage((p) => p + 1);
 
   const getIconSrc = (type: NotificationItem['type']) => {
@@ -118,6 +144,8 @@ export default function NotificationsPage() {
         return '/notification-deadline-icon.svg';
       case 'achievement':
         return '/notification-success-icon.svg';
+      default:
+        return '/notification-deadline-icon.svg';
     }
   };
 
@@ -164,9 +192,10 @@ export default function NotificationsPage() {
           <div ref={dropdownRef} className="relative flex gap-2">
             <button
               onClick={handleMarkAllRead}
-              className="bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] rounded-lg px-6 py-2 text-sm text-white transition-colors"
+              disabled={isMarkingAll || unreadCount === 0}
+              className="bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] rounded-lg px-6 py-2 text-sm text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Прочитать все
+              {isMarkingAll ? 'Обновление...' : unreadCount > 0 ? `Прочитать все` : 'Все прочитано'}
             </button>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -252,7 +281,7 @@ export default function NotificationsPage() {
                               className={`w-2 h-2 ${notification.type === 'achievement' ? 'bg-[#8CA693]' : 'bg-[#FFC65C]'} rounded-full flex-shrink-0`}
                             />
                           )}
-                          <p className="text-[#2F3A34] font-medium  leading-snug truncate">
+                          <p className="text-[#2F3A34] font-medium leading-snug truncate">
                             {notification.message}
                           </p>
                         </div>
@@ -355,8 +384,11 @@ export default function NotificationsPage() {
 
                         <button
                           onClick={() => handleDelete(notification._id)}
-                          className=" opacity-85 flex-shrink-0 p-2 hover:bg-[#E25760]/15 rounded-lg transition-colors"
+                          className={`flex-shrink-0 p-2 hover:bg-[#E25760]/15 rounded-lg transition-colors ${
+                            isDeleting ? 'opacity-50 cursor-not-allowed' : 'opacity-85'
+                          }`}
                           title="Удалить уведомление"
+                          disabled={isDeleting}
                         >
                           <img src="/delete-icon.svg" alt="" className="w-4 h-4" />
                         </button>
