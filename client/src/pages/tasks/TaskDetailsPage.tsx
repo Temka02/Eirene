@@ -207,12 +207,12 @@ export default function TaskDetailsPage() {
   const canManageSubtasks = task.status === 'in_progress';
 
   return (
-    <div className="px-5 md:px-8 lg:px-11 h-[calc(100vh-8rem)] overflow-y-auto">
+    <div className="px-5 md:px-8 lg:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full max-w-7xl mx-auto">
         <div className="flex items-center gap-2 mb-6">
           <button
             onClick={() => navigate('/tasks')}
-            className="w-10 h-7 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F8FAFC] transition-colors"
+            className="w-10 h-7 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
           >
             <img src="/sortArrow-icon.svg" alt="Назад" className="w-3.5 h-3.5 -rotate-90" />
           </button>

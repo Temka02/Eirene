@@ -188,12 +188,12 @@ export default function ProjectDetailsPage() {
   const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
 
   return (
-    <div className="px-5 md:px-8 lg:px-11 h-[calc(100vh-8rem)] overflow-y-auto">
+    <div className="px-5 md:px-8 lg:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full max-w-[1280px] mx-auto">
         <div className="flex items-center gap-2 mb-6">
           <button
             onClick={() => navigate('/projects')}
-            className="w-10 h-7 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F8FAFC] transition-colors"
+            className="w-10 h-7 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
           >
             <img src="/sortArrow-icon.svg" alt="Назад" className="w-3.5 h-3.5 -rotate-90" />
           </button>
@@ -291,7 +291,7 @@ export default function ProjectDetailsPage() {
                 <div ref={priorityRef} className="relative">
                   <button
                     onClick={() => setIsPriorityOpen(!isPriorityOpen)}
-                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F8FAFC] transition-colors"
+                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
                     <span>
                       {priority
@@ -342,7 +342,7 @@ export default function ProjectDetailsPage() {
                 <div ref={deadlineTypeRef} className="relative">
                   <button
                     onClick={() => setIsDeadlineTypeOpen(!isDeadlineTypeOpen)}
-                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F8FAFC] transition-colors"
+                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
                     <span>
                       {deadlineType
@@ -397,7 +397,7 @@ export default function ProjectDetailsPage() {
                 <div ref={statusRef} className="relative">
                   <button
                     onClick={() => setIsStatusOpen(!isStatusOpen)}
-                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F8FAFC] transition-colors"
+                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
                     <span>
                       {status
@@ -455,7 +455,7 @@ export default function ProjectDetailsPage() {
 
                 <button
                   onClick={() => setOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
-                  className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F8FAFC] transition-colors"
+                  className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                 >
                   <span>Дедлайн</span>
                   <img
@@ -556,14 +556,14 @@ export default function ProjectDetailsPage() {
                       <button
                         disabled={page === 1}
                         onClick={() => setPage((p) => p - 1)}
-                        className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F8FAFC]"
+                        className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
                       >
                         Назад
                       </button>
                       <button
                         disabled={page === totalPages}
                         onClick={() => setPage((p) => p + 1)}
-                        className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F8FAFC]"
+                        className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
                       >
                         Вперёд
                       </button>

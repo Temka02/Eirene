@@ -103,12 +103,12 @@ export default function EditTaskPage() {
   }
 
   return (
-    <div className="px-5 md:px-8 h-[calc(100vh-8rem)] overflow-y-auto">
+    <div className="px-5 md:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full mx-auto">
         <div className="flex items-center gap-4 mb-3">
           <button
             onClick={() => navigate('/tasks')}
-            className="w-12 h-9 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F8FAFC] transition-colors"
+            className="w-12 h-9 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
           >
             <img src="/sortArrow-icon.svg" alt="Назад" className="w-4 h-4 -rotate-90" />
           </button>
@@ -186,7 +186,7 @@ export default function EditTaskPage() {
                     <button
                       type="button"
                       onClick={() => setPriority('high')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${priority === 'high' ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${priority === 'high' ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/highPriority-icon.svg" alt="" className="w-5 h-5" />
                       <span className="text-xs font-medium">Высокий</span>
@@ -197,7 +197,7 @@ export default function EditTaskPage() {
                     <button
                       type="button"
                       onClick={() => setPriority('medium')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${priority === 'medium' ? 'border-[#FFC65C] bg-[#FFF4E5] text-[#FFC65C]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${priority === 'medium' ? 'border-[#FFC65C] bg-[#FFF4E5] text-[#FFC65C]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/mediumPriority-icon.svg" alt="" className="w-5 h-5" />
                       <span className="text-xs font-medium">Средний</span>
@@ -208,7 +208,7 @@ export default function EditTaskPage() {
                     <button
                       type="button"
                       onClick={() => setPriority('low')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${priority === 'low' ? 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${priority === 'low' ? 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/lowPriority-icon.svg" alt="" className="w-5 h-5" />
                       <span className="text-xs font-medium">Низкий</span>
@@ -225,7 +225,7 @@ export default function EditTaskPage() {
                     <button
                       type="button"
                       onClick={() => setDeadlineType('hard')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'hard' ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'hard' ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/hardDeadlineType-icon.svg" alt="" className="w-5 h-5 mb-1" />
                       <span className="text-xs font-medium">Жёсткий</span>
@@ -234,7 +234,7 @@ export default function EditTaskPage() {
                     <button
                       type="button"
                       onClick={() => setDeadlineType('soft')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'soft' ? 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'soft' ? 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/softDeadlineType-icon.svg" alt="" className="w-5 h-5 mb-1" />
                       <span className="text-xs font-medium">Мягкий</span>
@@ -246,7 +246,7 @@ export default function EditTaskPage() {
                         setDeadlineType('none');
                         setDeadline('');
                       }}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'none' ? 'border-[#a1b0a8] bg-[#F3F4F6] text-[#6F7D75]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F8FAFC]'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'none' ? 'border-[#a1b0a8] bg-[#F3F4F6] text-[#6F7D75]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/noDeadline-icon.svg" alt="" className="w-5 h-5 mb-1" />
                       <span className="text-xs font-medium">Без срока</span>
@@ -371,7 +371,7 @@ export default function EditTaskPage() {
             <button
               type="button"
               onClick={() => navigate('/tasks')}
-              className="w-[13.5rem] text-center py-3 bg-white text-[#8CA693] rounded-xl text-sm font-medium hover:bg-[#F8FAFC] transition-colors"
+              className="w-[13.5rem] text-center py-3 bg-white text-[#8CA693] rounded-xl text-sm font-medium hover:bg-[#F0F3ED]/70 transition-colors"
             >
               Отменить
             </button>

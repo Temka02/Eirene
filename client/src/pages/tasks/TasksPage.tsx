@@ -142,7 +142,7 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="px-5 md:px-8 h-[calc(100vh-8rem)] overflow-y-auto">
+    <div className="px-5 md:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full">
         <h1 className="text-2xl text-[#2F3A34] mb-3">Мои задачи</h1>
 
@@ -198,7 +198,7 @@ export default function TasksPage() {
             <div ref={priorityRef} className="relative">
               <button
                 onClick={() => setIsPriorityOpen(!isPriorityOpen)}
-                className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F8FAFC] transition-colors"
+                className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
               >
                 <span>
                   {priority
@@ -253,7 +253,7 @@ export default function TasksPage() {
             <div ref={deadlineTypeRef} className="relative">
               <button
                 onClick={() => setIsDeadlineTypeOpen(!isDeadlineTypeOpen)}
-                className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F8FAFC] transition-colors"
+                className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
               >
                 <span>
                   {deadlineType
@@ -309,7 +309,7 @@ export default function TasksPage() {
               <div ref={statusRef} className="relative">
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
-                  className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F8FAFC] transition-colors"
+                  className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
                 >
                   <span>
                     {status
@@ -364,7 +364,7 @@ export default function TasksPage() {
 
             <button
               onClick={() => setOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
-              className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F8FAFC] transition-colors"
+              className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
             >
               <span>Дедлайн:</span>
               <img
@@ -517,14 +517,14 @@ export default function TasksPage() {
                     <button
                       disabled={page === 1 || isFetching}
                       onClick={() => setPage((p) => p - 1)}
-                      className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F8FAFC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Назад
                     </button>
                     <button
                       disabled={page === totalPages || isFetching}
                       onClick={() => setPage((p) => p + 1)}
-                      className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F8FAFC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Вперёд
                     </button>

@@ -103,12 +103,12 @@ export default function EditProjectPage() {
   }
 
   return (
-    <div className="px-5 md:px-8 h-[calc(100vh-8rem)] overflow-y-auto">
+    <div className="px-5 md:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate('/projects')}
-            className="w-12 h-9 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F8FAFC] transition-colors"
+            className="w-12 h-9 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
           >
             <img src="/sortArrow-icon.svg" alt="Назад" className="w-4 h-4 -rotate-90" />
           </button>
@@ -223,7 +223,7 @@ export default function EditProjectPage() {
             <button
               type="button"
               onClick={() => navigate('/projects')}
-              className="w-[13.5rem] text-center py-3 bg-white text-[#8CA693] rounded-xl text-sm font-medium hover:bg-[#F8FAFC] transition-colors"
+              className="w-[13.5rem] text-center py-3 bg-white text-[#8CA693] rounded-xl text-sm font-medium hover:bg-[#F0F3ED]/70 transition-colors"
             >
               Отменить
             </button>
