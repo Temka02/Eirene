@@ -10,15 +10,16 @@ interface AuthState {
   error: string | null;
 }
 
+const initialState: AuthState = {
+  user: null,
+  accessToken: null,
+  isInitialized: false,
+  isLoading: false,
+  error: null,
+};
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    accessToken: null,
-    isInitialized: false,
-    isLoading: false,
-    error: null,
-  } satisfies AuthState,
+  initialState,
   reducers: {
     setCredentials(state: AuthState, action: PayloadAction<AuthResponse>) {
       state.user = action.payload.user;

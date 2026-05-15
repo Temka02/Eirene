@@ -168,7 +168,7 @@ export default function RegisterPage() {
               {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
             </button>
           </form>
-          {error && (
+          {!!error && (
             <p className="text-red-500 text-sm text-center mb-4">
               {typeof error === 'object' && error !== null && 'data' in error
                 ? (error as any).data?.error || 'Ошибка валидации'
