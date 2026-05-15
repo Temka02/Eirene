@@ -32,7 +32,7 @@ export default function LoginPage() {
       dispatch(setCredentials(res));
       navigate(from, { replace: true });
     } catch (err) {
-      const message = err?.data?.error || 'Ошибка подключения к серверу';
+      const message = (err as any)?.data?.error || 'Ошибка подключения к серверу';
       setSubmitError(message);
     }
   };

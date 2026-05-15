@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import logger from '../utils/logger';
 
 export class AppError extends Error {
@@ -13,12 +13,7 @@ export class AppError extends Error {
   }
 }
 
-export const errorHandler = (
-  err: Error | AppError,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-) => {
+export const errorHandler = (err: Error | AppError, _req: Request, res: Response) => {
   if (err instanceof AppError) {
     logger.warn(`Operational error: ${err.message} (${err.statusCode})`);
     return res.status(err.statusCode).json({ error: err.message });

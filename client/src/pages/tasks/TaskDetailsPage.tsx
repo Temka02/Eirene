@@ -233,10 +233,12 @@ export default function TaskDetailsPage() {
               <div className="flex items-start gap-4 mb-4">
                 {task.projectId && typeof task.projectId === 'object' ? (
                   <div
-                    className={`w-12 h-12 rounded-xl ${projectIconConfig[task.projectId.icon].iconBg} flex items-center justify-center flex-shrink-0`}
+                    className={`w-12 h-12 rounded-xl ${projectIconConfig[task.projectId.icon as keyof typeof projectIconConfig].iconBg} flex items-center justify-center flex-shrink-0`}
                   >
                     <img
-                      src={projectIconConfig[task.projectId.icon].src}
+                      src={
+                        projectIconConfig[task.projectId.icon as keyof typeof projectIconConfig].src
+                      }
                       alt=""
                       className="w-7 h-7"
                     />

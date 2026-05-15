@@ -188,7 +188,7 @@ export default function ProjectDetailsPage() {
   const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
 
   return (
-    <div className="px-5 md:px-8 lg:px-11 h-[calc(100vh-8rem)] overflow-y-auto eirene-scrollbar">
+    <div className="px-5 md:px-8 lg:px-11 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full max-w-[1280px] mx-auto">
         <div className="flex items-center gap-2 mb-6">
           <button

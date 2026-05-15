@@ -108,11 +108,12 @@ export default function NotificationsPage() {
     items.forEach((item) => {
       const itemDate = new Date(item.createdAt);
       itemDate.setHours(0, 0, 0, 0);
-      let label = '';
-
-      if (itemDate.getTime() === today.getTime()) label = 'Сегодня';
-      else if (itemDate.getTime() === yesterday.getTime()) label = 'Вчера';
-      else label = itemDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+      const label =
+        itemDate.getTime() === today.getTime()
+          ? 'Сегодня'
+          : itemDate.getTime() === yesterday.getTime()
+            ? 'Вчера'
+            : itemDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 
       if (!groups[label]) groups[label] = [];
       groups[label].push(item);

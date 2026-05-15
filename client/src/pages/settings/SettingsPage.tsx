@@ -84,7 +84,7 @@ export default function SettingsPage() {
   if (loadingMe) return <div className="p-10 text-center">Загрузка...</div>;
 
   return (
-    <div className="px-5 md:px-8 lg:px-11 h-[calc(100vh-8rem)] overflow-y-auto eirene-scrollbar">
+    <div className="px-5 md:px-8 lg:px-11 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full max-w-[800px] mx-auto">
         <h1 className="text-2xl text-[#2F3A34] mb-6">Настройки</h1>
 

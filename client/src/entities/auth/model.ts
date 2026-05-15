@@ -11,6 +11,6 @@ export interface RegisterCredentials extends LoginCredentials {
 }
 
 export interface AuthResponse {
-  user: User;
+  user: User | null;
   accessToken: string;
 }

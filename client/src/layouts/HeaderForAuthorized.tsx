@@ -12,17 +12,17 @@ export default function HeaderForAuthorized() {
     limit: 1,
   });
 
-  const hasUnread = unreadNotifications?.total > 0;
+  const hasUnread = unreadNotifications && unreadNotifications.total > 0;
   const getInitials = () => {
     if (!user) return '??';
-    const firstLetter = user.name?.[0]?.toUpperCase() || '?';
-    const secondLetter = user.surname?.[0]?.toUpperCase() || '?';
+    const firstLetter = user?.name?.[0]?.toUpperCase() || '?';
+    const secondLetter = user?.surname?.[0]?.toUpperCase() || '?';
     return `${firstLetter}${secondLetter}`;
   };
 
   const getFullName = () => {
     if (!user) return 'Пользователь';
-    return `${user.name || ''}`.trim() || 'Пользователь';
+    return `${user?.name || ''}`.trim() || 'Пользователь';
   };
 
   return (

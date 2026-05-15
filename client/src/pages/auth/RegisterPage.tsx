@@ -24,7 +24,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      const { repeatPassword, ...credentials } = data;
+      const { ...credentials } = data;
       const res = await registerUser(credentials).unwrap();
       dispatch(setCredentials(res));
       navigate('/dashboard');
@@ -62,7 +62,7 @@ export default function RegisterPage() {
                   className="border-[#F0F1F2] border-2 rounded-[0.5rem] h-11 w-full pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+              {errors?.name && <p className="text-red-500 text-sm mt-1">{errors?.name.message}</p>}
             </div>
 
             <div className="flex flex-col mb-4">
@@ -84,8 +84,8 @@ export default function RegisterPage() {
                   className="border-[#F0F1F2] border-2 rounded-[0.5rem] h-11 w-full pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
-              {errors.surname && (
-                <p className="text-red-500 text-sm mt-1">{errors.surname.message}</p>
+              {errors?.surname && (
+                <p className="text-red-500 text-sm mt-1">{errors?.surname.message}</p>
               )}
             </div>
 
@@ -108,7 +108,9 @@ export default function RegisterPage() {
                   className="border-[#F0F1F2] border-2 rounded-[0.5rem] h-11 w-full pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+              {errors?.email && (
+                <p className="text-red-500 text-sm mt-1">{errors?.email.message}</p>
+              )}
             </div>
 
             <div className="flex flex-col mb-4">
@@ -130,8 +132,8 @@ export default function RegisterPage() {
                   className="border-[#F0F1F2] border-2 rounded-[0.5rem] h-11 w-full pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              {errors?.password && (
+                <p className="text-red-500 text-sm mt-1">{errors?.password.message}</p>
               )}
             </div>
 
@@ -153,8 +155,8 @@ export default function RegisterPage() {
                   className="border-[#F0F1F2] border-2 rounded-[0.5rem] w-full h-11 pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
-              {errors.repeatPassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.repeatPassword.message}</p>
+              {errors?.repeatPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors?.repeatPassword.message}</p>
               )}
             </div>
 
@@ -169,7 +171,7 @@ export default function RegisterPage() {
           {error && (
             <p className="text-red-500 text-sm text-center mb-4">
               {typeof error === 'object' && error !== null && 'data' in error
-                ? (error as any).data?.error?.[0]?.message || 'Ошибка валидации'
+                ? (error as any).data?.error || 'Ошибка валидации'
                 : 'Ошибка подключения к серверу'}
             </p>
           )}

@@ -57,7 +57,7 @@ export const getMe = async (req: Request, res: Response) => {
         emailNotifications: user.emailNotifications,
       },
     });
-  } catch (error) {
+  } catch {
     res.status(401).json({ error: 'Invalid token' });
   }
 };

@@ -142,9 +142,9 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="px-5 md:px-8 h-[calc(100vh-8rem)] overflow-y-auto eirene-scrollbar">
+    <div className="px-5 md:px-8 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full">
-        <h1 className="text-2xl text-[#2F3A34] mb-3">Все задачи</h1>
+        <h1 className="text-2xl text-[#2F3A34] mb-3">Мои задачи</h1>
 
         <div className="mb-4">
           <div className="flex flex-col md:flex-row gap-24">

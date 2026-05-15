@@ -85,7 +85,7 @@ export default function EditTaskPage() {
         priority,
         deadlineType,
         deadline: deadlineType !== 'none' ? deadline : undefined,
-        status: task.status,
+        status: task?.status,
       }).unwrap();
 
       navigate('/tasks');
