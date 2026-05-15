@@ -28,13 +28,13 @@ export const tasksApi = api.injectEndpoints({
         method: 'POST',
         data,
       }),
-      invalidatesTags: ['Task'],
+      invalidatesTags: ['Task', 'Dashboard'],
     }),
     getTask: builder.query<Task, string>({
       query: (id) => ({
         url: `/tasks/${id}`,
       }),
-      providesTags: ['Task'],
+      providesTags: ['Task', 'Dashboard'],
     }),
     getTasks: builder.query<TasksResponse, GetTasksParams | undefined>({
       query: (params) => ({
@@ -51,7 +51,7 @@ export const tasksApi = api.injectEndpoints({
           page: params?.page,
         },
       }),
-      providesTags: ['Task'],
+      providesTags: ['Task', 'Dashboard'],
     }),
     updateTask: builder.mutation<Task, { id: string } & UpdateTaskDto>({
       query: ({ id, ...updateData }) => ({
@@ -59,14 +59,14 @@ export const tasksApi = api.injectEndpoints({
         method: 'PUT',
         data: updateData,
       }),
-      invalidatesTags: ['Task'],
+      invalidatesTags: ['Task', 'Dashboard'],
     }),
     deleteTask: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({
         url: `/tasks/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Task'],
+      invalidatesTags: ['Task', 'Dashboard'],
     }),
   }),
 });

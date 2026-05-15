@@ -10,13 +10,13 @@ export const projectsApi = api.injectEndpoints({
         method: 'POST',
         data,
       }),
-      invalidatesTags: ['Project'],
+      invalidatesTags: ['Project', 'Dashboard'],
     }),
     getProject: builder.query<Project, string>({
       query: (id) => ({
         url: `/projects/${id}`,
       }),
-      providesTags: ['Project'],
+      providesTags: ['Project', 'Dashboard'],
     }),
     getProjectTasks: builder.query<TasksResponse, { id: string } & Partial<GetTasksParams>>({
       query: ({ id, ...params }) => ({
@@ -32,11 +32,11 @@ export const projectsApi = api.injectEndpoints({
           page: params.page,
         },
       }),
-      providesTags: ['Task', 'Project'],
+      providesTags: ['Task', 'Project', 'Dashboard'],
     }),
     getProjects: builder.query<Project[], void>({
       query: () => ({ url: '/projects' }),
-      providesTags: ['Project'],
+      providesTags: ['Project', 'Dashboard'],
     }),
     updateProject: builder.mutation<Project, { id: string } & UpdateProjectDto>({
       query: ({ id, ...updateData }) => ({
@@ -44,14 +44,14 @@ export const projectsApi = api.injectEndpoints({
         method: 'PUT',
         data: updateData,
       }),
-      invalidatesTags: ['Project'],
+      invalidatesTags: ['Project', 'Dashboard'],
     }),
     deleteProject: builder.mutation<void, { id: string }>({
-      query: (id) => ({
+      query: ({ id }) => ({
         url: `/projects/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['Project'],
+      invalidatesTags: ['Project', 'Dashboard'],
     }),
   }),
 });
