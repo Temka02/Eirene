@@ -227,22 +227,31 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
     const projects = await Project.find({ userId }).sort({ createdAt: -1 });
 
-    const projectsWithProgress = await Promise.all(
+    const projectsWithStats = await Promise.all(
       projects.map(async (project) => {
         const total = await Task.countDocuments({ userId, projectId: project._id });
+        const todo = await Task.countDocuments({ userId, projectId: project._id, status: 'todo' });
+        const inProgress = await Task.countDocuments({
+          userId,
+          projectId: project._id,
+          status: 'in_progress',
+        });
         const done = await Task.countDocuments({ userId, projectId: project._id, status: 'done' });
+
         const progress = total > 0 ? Math.round((done / total) * 100) : 0;
 
         return {
           ...project.toObject(),
           progress,
           totalTasks: total,
+          todoTasks: todo,
+          inProgressTasks: inProgress,
           completedTasks: done,
         };
       })
     );
 
-    res.json(projectsWithProgress);
+    res.json(projectsWithStats);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

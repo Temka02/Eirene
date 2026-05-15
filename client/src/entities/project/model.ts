@@ -6,6 +6,11 @@ export interface Project {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  progress?: number;
+  totalTasks?: number;
+  todoTasks?: number;
+  inProgressTasks?: number;
+  completedTasks?: number;
 }
 
 export interface CreateProjectDto {
