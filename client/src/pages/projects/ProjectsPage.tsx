@@ -187,8 +187,12 @@ export default function ProjectsPage() {
             })}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white/50 rounded-3xl border-2 border-dashed border-[#D9D9D9]">
-            <img src="/empty-projects.svg" alt="" className="w-24 h-24 mx-auto mb-4 opacity-20" />
+          <div className="text-center py-20 rounded-3xl">
+            <img
+              src="/empty-projects-icon.svg"
+              alt=""
+              className="w-24 h-24 mx-auto mb-4 opacity-75"
+            />
             <p className="text-[#6F7D75] font-medium">
               {search ? 'Проекты не найдены' : 'У вас пока нет проектов'}
             </p>

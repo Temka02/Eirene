@@ -102,17 +102,19 @@ export default function FocusModePage() {
               </p>
             )}
 
-            <h2 className="font-medium text-[#2F3A34] text-left mb-2 w-full px-4">Прогресс:</h2>
             {subtasks.length > 0 && (
-              <div className="w-full flex items-center gap-4 mb-8 px-4">
-                <div className="w-full h-2 bg-[#D9D9D9] rounded-xl">
-                  <div
-                    className="h-full bg-[#8CA693] transition-all duration-500 ease-out rounded-xl"
-                    style={{ width: `${progressPercent}%` }}
-                  />
+              <>
+                <h2 className="font-medium text-[#2F3A34] text-left mb-2 w-full px-4">Прогресс:</h2>
+                <div className="w-full flex items-center gap-4 mb-8 px-4">
+                  <div className="w-full h-2 bg-[#D9D9D9] rounded-xl">
+                    <div
+                      className="h-full bg-[#8CA693] transition-all duration-500 ease-out rounded-xl"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                  <span className="text-[#6F7D75] flex-shrink-0">{progressPercent}%</span>
                 </div>
-                <span className="text-[#6F7D75] flex-shrink-0">{progressPercent}%</span>
-              </div>
+              </>
             )}
 
             {subtasks.length > 0 && (

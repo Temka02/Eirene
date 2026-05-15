@@ -17,9 +17,13 @@ const IconImages = {
   projects: '/projects-icon.svg',
 };
 
-const Icon = ({ name, className = 'w-5 h-5' }: { name: string; className?: string }) => (
-  <img src={IconImages[name as keyof typeof IconImages]} alt="" className={className} />
-);
+const Icon = ({
+  name,
+  className = 'w-5 h-5 -translate-y-[3px]',
+}: {
+  name: string;
+  className?: string;
+}) => <img src={IconImages[name as keyof typeof IconImages]} alt="" className={className} />;
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);

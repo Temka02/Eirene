@@ -108,9 +108,9 @@ export default function LoginPage() {
           <div className="bg-[#D9D9D9] w-[100%] h-[1px] mb-6"></div>
           <div className="text-center">
             <span className="text-base">
-              Забыли пароль?
-              <Link to={'#'} className="ml-2 text-[#8CA693]">
-                Восстановить
+              Нет аккаунта?
+              <Link to={'/register'} className="ml-2 text-[#8CA693]">
+                Зарегистрироваться
               </Link>
             </span>
           </div>

@@ -175,7 +175,13 @@ export default function TasksPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
           <div className="flex items-center gap-1 max-w-64 w-full bg-white p-1 rounded-[0.625rem] shadow-sm text-[#6F7D75]">
             <button
-              onClick={() => setView('list')}
+              onClick={() => {
+                setView('list');
+                setPriority(undefined);
+                setDeadlineType(undefined);
+                setStatus(undefined);
+                setOrder('asc');
+              }}
               className={`px-4 py-2 w-1/2 rounded-[0.625rem] text-xs font-medium transition-all flex justify-center items-center gap-2 ${
                 view === 'list' ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/90'
               }`}
@@ -184,7 +190,13 @@ export default function TasksPage() {
               Список
             </button>
             <button
-              onClick={() => setView('kanban')}
+              onClick={() => {
+                setView('kanban');
+                setPriority(undefined);
+                setDeadlineType(undefined);
+                setStatus(undefined);
+                setOrder('asc');
+              }}
               className={`px-4 py-2 w-1/2 rounded-[0.625rem] text-xs font-medium transition-all flex justify-center items-center gap-2 ${
                 view === 'kanban' ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/90'
               }`}
