@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const token = useSelector((state: RootState) => state.auth.accessToken);
   if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   return children;
 }

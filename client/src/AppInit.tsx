@@ -16,7 +16,7 @@ export function AppInit({ children }: AppInitProps) {
     dispatch(initialize());
     const token = localStorage.getItem('accessToken');
     if (token) {
-      dispatch(authApi.endpoints.getMe.initiate())
+      dispatch(authApi.endpoints.getMe.initiate(undefined, { forceRefetch: true }))
         .unwrap()
         .then((response) => {
           dispatch(setUser(response.user));
