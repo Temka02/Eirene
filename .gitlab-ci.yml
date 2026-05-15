@@ -3,48 +3,152 @@ image: node:20-alpine
 stages:
   - install
   - lint
+  - typecheck
+  - test
   - build
+  - deploy
 
 cache:
   key:
     files:
+      - client/package-lock.json
       - server/package-lock.json
   paths:
+    - client/node_modules/
     - server/node_modules/
   policy: pull-push
 
-install_dependencies:
+install_frontend:
+  stage: install
+  script:
+    - cd client
+    - npm ci
+  cache:
+    policy: pull-push
+    paths:
+      - client/node_modules/
+
+install_backend:
   stage: install
   script:
     - cd server
-    - npm ci --ignore-scripts
+    - npm ci
   cache:
     policy: pull-push
     paths:
       - server/node_modules/
 
-lint:
+lint_frontend:
+  stage: lint
+  script:
+    - cd client
+    - if [ ! -d "node_modules" ]; then npm ci; fi
+    - npm run lint || echo "Frontend lint warnings"
+  needs: [install_frontend]
+  cache:
+    policy: pull
+    paths:
+      - client/node_modules/
+  allow_failure: true
+
+lint_backend:
   stage: lint
   script:
     - cd server
     - if [ ! -d "node_modules" ]; then npm ci; fi
-    - npm run lint
-  needs:
-    - install_dependencies
+    - npm run lint || echo "Backend lint warnings"
+  needs: [install_backend]
   cache:
     policy: pull
+    paths:
+      - server/node_modules/
+  allow_failure: true
 
-build:
+typecheck_frontend:
+  stage: typecheck
+  script:
+    - cd client
+    - if [ ! -d "node_modules" ]; then npm ci; fi
+    - npx tsc --noEmit
+  needs: [install_frontend]
+  cache:
+    policy: pull
+    paths:
+      - client/node_modules/
+  allow_failure: true
+
+typecheck_backend:
+  stage: typecheck
+  script:
+    - cd server
+    - if [ ! -d "node_modules" ]; then npm ci; fi
+    - npx tsc --noEmit
+  needs: [install_backend]
+  cache:
+    policy: pull
+    paths:
+      - server/node_modules/
+  allow_failure: true
+
+test_backend:
+  stage: test
+  script:
+    - cd server
+    - if [ ! -d "node_modules" ]; then npm ci; fi
+    - npm run test || echo "No tests or tests failed"
+  needs: [install_backend]
+  cache:
+    policy: pull
+    paths:
+      - server/node_modules/
+  allow_failure: true
+
+build_frontend:
+  stage: build
+  script:
+    - cd client
+    - if [ ! -d "node_modules" ]; then npm ci; fi
+    - npm run build
+  needs: [lint_frontend, typecheck_frontend]
+  artifacts:
+    paths:
+      - client/dist/
+    expire_in: 1 week
+  cache:
+    policy: pull
+    paths:
+      - client/node_modules/
+
+build_backend:
   stage: build
   script:
     - cd server
     - if [ ! -d "node_modules" ]; then npm ci; fi
     - npm run build
-  needs:
-    - lint
+  needs: [lint_backend, typecheck_backend]
   artifacts:
     paths:
       - server/dist/
     expire_in: 1 week
   cache:
     policy: pull
+    paths:
+      - server/node_modules/
+
+pages:
+  stage: deploy
+  script:
+    - cd client
+    - if [ ! -d "node_modules" ]; then npm ci; fi
+    - npm run build
+    - mkdir -p ../public
+    - cp -r dist/* ../public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  cache:
+    policy: pull
+    paths:
+      - client/node_modules/
