@@ -24,7 +24,12 @@ export default function FocusModePage() {
     if (!task) return;
     setIsCompleting(true);
     try {
-      await updateTask({ id: task._id, status: 'done' }).unwrap();
+      await updateTask({
+        id: task._id,
+        status: 'done',
+        priority: task.priority,
+        deadlineType: task.deadlineType,
+      }).unwrap();
       setTimeout(() => {
         navigate('/tasks', { replace: true });
       }, 800);
@@ -47,8 +52,14 @@ export default function FocusModePage() {
 
   if (!task) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#F0F1F2]">
+      <div className="flex flex-col gap-4 items-center justify-center h-screen bg-[#F0F1F2]">
         <div className="text-[#6F7D75]">Задача не найдена</div>
+        <button
+          onClick={() => navigate('/tasks')}
+          className="px-8 py-3 bg-[#8CA693] text-white rounded-xl text-sm font-medium hover:bg-[#7A9181] transition-all shadow-[0_6px_20px_0_rgba(140,166,147,0.3)] hover:shadow-[0_8px_25px_0_rgba(140,166,147,0.4)] active:scale-95 focus:outline-none"
+        >
+          К задачам
+        </button>
       </div>
     );
   }
@@ -64,7 +75,7 @@ export default function FocusModePage() {
       <div className="absolute inset-0 bg-white/25 backdrop-blur-sm" />
 
       <div className="relative z-10 flex items-center justify-center h-full p-4 md:p-8">
-        <div className="w-full max-w-2xl bg-white/25 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="w-full max-w-2xl bg-white/25 backdrop-blur-md rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh] flex flex-col relative">
           <div className="absolute top-6 right-6">
             <button
               onClick={() => navigate(`/tasks/${id}`, { replace: true })}
@@ -74,13 +85,11 @@ export default function FocusModePage() {
             </button>
           </div>
 
-          <div className="p-8 md:p-12 flex flex-col items-center text-center flex-1 justify-center">
-            {/* Заголовок задачи */}
-            <h1 className="text-xl md:text-3xl font-medium text-[#2F3A34] mb-4 leading-tight">
+          <div className="p-8 md:p-12 flex flex-col items-center text-center flex-1">
+            <h1 className="text-xl md:text-3xl font-medium text-[#2F3A34] mb-4 leading-tight break-words w-full px-4">
               {task.title}
             </h1>
 
-            {/* Дедлайн */}
             {task.deadline && (
               <p className="text-sm text-[#6F7D75] mb-4 flex items-center gap-2">
                 Дедлайн:{' '}
@@ -93,47 +102,46 @@ export default function FocusModePage() {
               </p>
             )}
 
-            <h2 className="font-medium text-[#2F3A34] text-left mb-2">Прогресс:</h2>
+            <h2 className="font-medium text-[#2F3A34] text-left mb-2 w-full px-4">Прогресс:</h2>
             {subtasks.length > 0 && (
-              <div className="w-full flex items-center gap-4 mb-8">
-                <div className="w-full h-2 bg-[#F0F1F2] rounded-xl">
+              <div className="w-full flex items-center gap-4 mb-8 px-4">
+                <div className="w-full h-2 bg-[#D9D9D9] rounded-xl">
                   <div
                     className="h-full bg-[#8CA693] transition-all duration-500 ease-out rounded-xl"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-                <span className="text-[#6F7D75]">{progressPercent}%</span>
+                <span className="text-[#6F7D75] flex-shrink-0">{progressPercent}%</span>
               </div>
             )}
 
-            {/* Подзадачи */}
             {subtasks.length > 0 && (
-              <div className="w-full space-y-3 mb-8 text-left">
-                <h3 className="text-xs font-medium text-[#6F7D75] uppercase tracking-wider mb-4">
-                  Подзадачи
-                </h3>
+              <div className="w-full space-y-3 mb-8 text-left px-4">
+                <h3 className="ml-2 font-medium text-[#6F7D75] mb-4">Подзадачи</h3>
                 {subtasks.map((subtask) => (
                   <label
                     key={subtask.id}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/80 cursor-pointer transition-all group"
+                    className="flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/80 cursor-pointer transition-all group min-w-0"
                   >
                     <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
                         subtask.isCompleted
                           ? 'bg-[#8CA693] border-[#8CA693]'
                           : 'border-[#D9D9D9] group-hover:border-[#8CA693]'
                       }`}
                     >
-                      {subtask.isCompleted && <span className="text-white text-xs">✓</span>}
+                      {subtask.isCompleted && <img src="/taskDone-icon.svg" className="w-6 h-6" />}
                     </div>
-                    <span
-                      className={`text-sm ${
-                        subtask.isCompleted
-                          ? 'text-[#6F7D75] line-through'
-                          : 'text-[#2F3A34] font-medium'
-                      }`}
-                    >
-                      {subtask.title}
+                    <span className="text-sm flex-1 min-w-0 truncate" title={subtask.title}>
+                      <span
+                        className={
+                          subtask.isCompleted
+                            ? 'line-through text-[#6F7D75]'
+                            : 'text-[#2F3A34] font-medium'
+                        }
+                      >
+                        {subtask.title}
+                      </span>
                     </span>
                     <input
                       type="checkbox"
@@ -146,24 +154,31 @@ export default function FocusModePage() {
               </div>
             )}
 
-            {/* Описание (если есть) */}
             {task.description && (
-              <p className="text-sm text-[#6F7D75] leading-relaxed max-w-lg mb-8">
+              <p className="text-sm text-[#6F7D75] leading-relaxed max-w-lg mb-8 break-words min-w-0">
                 Описание: {task.description}
               </p>
             )}
 
-            {/* Кнопка завершения */}
             <button
               onClick={handleCompleteTask}
-              disabled={isCompleting}
-              className={`px-8 py-4 rounded-2xl text-white font-medium text-lg shadow-lg transition-all transform hover:scale-105 active:scale-95 ${
-                isCompleting
-                  ? 'bg-[#6F7D75] cursor-not-allowed'
-                  : 'bg-[#8CA693] hover:bg-[#7A9181] hover:shadow-xl'
+              disabled={isCompleting || task.status === 'done'}
+              className={`px-8 py-4 rounded-2xl text-white font-medium text-lg shadow-lg transition-all transform hover:scale-[1.025] active:scale-95 ${
+                isCompleting || task.status === 'done'
+                  ? 'bg-[#8CA693]/65 cursor-not-allowed'
+                  : 'bg-[#8CA693]/85 hover:bg-[#7A9181] hover:shadow-xl'
               }`}
             >
-              {isCompleting ? 'Завершаем...' : '✓ Завершить задачу'}
+              {isCompleting ? (
+                'Завершаем...'
+              ) : task.status === 'done' ? (
+                <span>Задача завершена</span>
+              ) : (
+                <div className="flex gap-2">
+                  <img src="/completeTask-icon.svg" alt="" className="-translate-y-[0.25px]" />
+                  <span>Завершить задачу</span>
+                </div>
+              )}
             </button>
           </div>
         </div>
