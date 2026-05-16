@@ -298,7 +298,7 @@ export default function NotificationsPage() {
                                       className="w-4 h-4"
                                     />
                                     <span>
-                                      Жёсткий{' '}
+                                      Жeсткий{' '}
                                       <span className="text-[#8CA693] ml-2">
                                         Лучше выполнить в срок
                                       </span>
@@ -407,7 +407,7 @@ export default function NotificationsPage() {
                   disabled={isFetching}
                   className="px-6 py-2 bg-white border border-[#D9D9D9] rounded-lg text-[#8CA693] font-medium hover:bg-[#F0F3ED] transition disabled:opacity-50"
                 >
-                  {isFetching ? 'Загрузка...' : 'Показать ещё'}
+                  {isFetching ? 'Загрузка...' : 'Показать ещe'}
                 </button>
               </div>
             )}

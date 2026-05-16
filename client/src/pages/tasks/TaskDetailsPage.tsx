@@ -76,7 +76,7 @@ export default function TaskDetailsPage() {
   const getDeadlineTypeInfo = (type: Task['deadlineType']) => {
     switch (type) {
       case 'hard':
-        return { label: 'Жёсткий', color: 'text-[#D32F2F]', icon: '/hardDeadlineType-icon.svg' };
+        return { label: 'Жeсткий', color: 'text-[#D32F2F]', icon: '/hardDeadlineType-icon.svg' };
       case 'soft':
         return { label: 'Мягкий', color: 'text-[#10B981]', icon: '/softDeadlineType-icon.svg' };
       case 'none':

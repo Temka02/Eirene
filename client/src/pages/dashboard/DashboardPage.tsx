@@ -64,7 +64,7 @@ const getDeadlineTypeConfig = (dt: Task['deadlineType']) => {
   switch (dt) {
     case 'hard':
       return {
-        label: 'Жёсткий',
+        label: 'Жeсткий',
         color: 'text-[#D32F2F]',
         icon: '/hardDeadlineType-icon.svg',
         bg: 'bg-[#FFEDEE]',
@@ -263,7 +263,8 @@ export default function DashboardPage() {
                   </>
                 ) : (
                   <div className="p-10 text-center text-[#6F7D75] bg-[#F8FAFC]">
-                    <p>Нет срочных задач. Отличное время для отдыха или планирования</p>
+                    <p>Нет срочных задач</p>
+                    <p>Отличное время для отдыха или планирования</p>
                   </div>
                 )}
               </div>
@@ -295,7 +296,8 @@ export default function DashboardPage() {
                   </>
                 ) : (
                   <div className="p-10 text-center text-[#6F7D75] bg-[#F8FAFC]">
-                    Нет активных задач. Возьми что-нибудь из бэклога
+                    <p>Нет активных задач</p>
+                    <p>Добавь новую задачу или выбери из списка</p>
                   </div>
                 )}
               </div>

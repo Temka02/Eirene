@@ -248,7 +248,7 @@ export default function CreateTaskPage() {
                       }`}
                     >
                       <img src="/hardDeadlineType-icon.svg" alt="" className="w-5 h-5 mb-1" />
-                      <span className="text-xs font-medium">Жёсткий</span>
+                      <span className="text-xs font-medium">Жeсткий</span>
                       <span className="text-[0.625rem] opacity-75">Лучше выполнить в срок</span>
                     </button>
                     <button

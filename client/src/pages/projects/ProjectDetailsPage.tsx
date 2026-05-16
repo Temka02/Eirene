@@ -137,7 +137,7 @@ export default function ProjectDetailsPage() {
     switch (dt) {
       case 'hard':
         return {
-          label: 'Жёсткий',
+          label: 'Жeсткий',
           icon: '/hardDeadlineType-icon.svg',
           color: 'text-[#D32F2F]',
           bg: 'bg-[#FFEDEE]',
@@ -172,7 +172,7 @@ export default function ProjectDetailsPage() {
 
   const handleDelete = async () => {
     if (window.confirm('Вы уверены, что хотите удалить проект и все его задачи?')) {
-      await deleteProject({ id: project._id }).unwrap();
+      await deleteProject({ id: project?._id }).unwrap();
       navigate('/projects');
     }
   };
@@ -347,7 +347,7 @@ export default function ProjectDetailsPage() {
                     <span>
                       {deadlineType
                         ? deadlineType === 'hard'
-                          ? 'Жёсткий'
+                          ? 'Жeсткий'
                           : deadlineType === 'soft'
                             ? 'Мягкий'
                             : 'Без срока'
@@ -374,7 +374,7 @@ export default function ProjectDetailsPage() {
                               : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                           }`}
                         >
-                          {dt === 'hard' ? 'Жёсткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
+                          {dt === 'hard' ? 'Жeсткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
                         </button>
                       ))}
                       <button
@@ -565,7 +565,7 @@ export default function ProjectDetailsPage() {
                         onClick={() => setPage((p) => p + 1)}
                         className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
                       >
-                        Вперёд
+                        Вперeд
                       </button>
                     </div>
                   </div>

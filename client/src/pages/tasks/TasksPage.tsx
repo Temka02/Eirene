@@ -82,7 +82,7 @@ export default function TasksPage() {
   const getDeadlineConfig = (dt: Task['deadlineType']) => {
     switch (dt) {
       case 'hard':
-        return { label: 'Жёсткий', color: 'text-[#D32F2F]', bg: 'bg-[#FFEDEE]' };
+        return { label: 'Жeсткий', color: 'text-[#D32F2F]', bg: 'bg-[#FFEDEE]' };
       case 'soft':
         return { label: 'Мягкий', color: 'text-[#10B981]', bg: 'bg-[#E6F9F1]' };
       case 'none':
@@ -270,7 +270,7 @@ export default function TasksPage() {
                 <span>
                   {deadlineType
                     ? deadlineType === 'hard'
-                      ? 'Жёсткий'
+                      ? 'Жeсткий'
                       : deadlineType === 'soft'
                         ? 'Мягкий'
                         : 'Без срока'
@@ -297,7 +297,7 @@ export default function TasksPage() {
                           : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                       }`}
                     >
-                      {dt === 'hard' ? 'Жёсткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
+                      {dt === 'hard' ? 'Жeсткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
                     </button>
                   ))}
                   <button
@@ -538,7 +538,7 @@ export default function TasksPage() {
                       onClick={() => setPage((p) => p + 1)}
                       className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      Вперёд
+                      Вперeд
                     </button>
                   </div>
                 </div>

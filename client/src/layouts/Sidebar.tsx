@@ -19,7 +19,7 @@ const IconImages = {
 
 const Icon = ({
   name,
-  className = 'w-5 h-5 -translate-y-[3px]',
+  className = 'w-5 h-5 -translate-y-[1px]',
 }: {
   name: string;
   className?: string;
@@ -32,7 +32,7 @@ export default function Sidebar() {
   return (
     <aside
       className={`relative min-h-[calc(100vh-3.25rem)] h-full bg-white flex flex-col transition-all duration-300 ease-in-out pt-5 ${
-        isCollapsed ? 'w-20' : 'w-64'
+        isCollapsed ? 'w-20' : 'w-56'
       }`}
     >
       {!isCollapsed && <img src="/logo-eirene.svg" alt="Eirene" className="mx-auto h-10 mb-5" />}
@@ -45,7 +45,7 @@ export default function Sidebar() {
             <NavLink
               key={item.path}
               to={item.path}
-              className={`h-11 text-[0.95rem] flex items-center gap-3 px-3 py-2.5 rounded-[0.625rem] transition-all duration-200 text-[#5F6F65] font-medium ${
+              className={`h-11 flex items-center gap-3 px-3 py-2.5 rounded-[0.625rem] transition-all duration-200 text-[#5F6F65] font-medium ${
                 isActive ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/70'
               } ${isCollapsed ? 'justify-center px-0' : ''}`}
             >
@@ -59,7 +59,7 @@ export default function Sidebar() {
       </nav>
 
       {!isCollapsed && (
-        <div className="h-48 mx-[1.875rem] mb-6 rounded-[1.25rem] bg-cover bg-center relative overflow-hidden bg-[url('/mountains-bg.jpg')]">
+        <div className="h-48 mx-4 mb-6 rounded-[1.25rem] bg-cover bg-center relative overflow-hidden bg-[url('/mountains-bg.jpg')]">
           <div className="flex flex-col h-[50%] top-[50%] absolute w-full bg-gradient-to-t from-[#DCE6DD] to-[#E8F0E9] opacity-80">
             <div className="p-3 ">
               <p className="text-[#8CA693] text-[0.95rem] font-medium">

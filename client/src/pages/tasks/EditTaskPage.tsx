@@ -228,7 +228,7 @@ export default function EditTaskPage() {
                       className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${deadlineType === 'hard' ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]' : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       <img src="/hardDeadlineType-icon.svg" alt="" className="w-5 h-5 mb-1" />
-                      <span className="text-xs font-medium">Жёсткий</span>
+                      <span className="text-xs font-medium">Жeсткий</span>
                       <span className="text-[0.625rem] opacity-75">Лучше выполнить в срок</span>
                     </button>
                     <button
