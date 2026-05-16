@@ -106,21 +106,16 @@ export default function CalendarPage() {
   const totalDays = lastDayOfMonth.getDate();
 
   const sortTasks = (tasks: Task[]) => {
-    // Вес для статусов (меньше = выше)
     const statusWeight: Record<Task['status'], number> = {
       in_progress: 1,
       todo: 2,
       done: 3,
     };
-
-    // Вес для типа дедлайна (жесткий важнее)
     const typeWeight: Record<Task['deadlineType'], number> = {
       hard: 1,
       soft: 2,
       none: 3,
     };
-
-    // Вес для приоритета
     const priorityWeight: Record<Task['priority'], number> = {
       high: 1,
       medium: 2,

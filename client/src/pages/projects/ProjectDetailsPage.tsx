@@ -172,7 +172,7 @@ export default function ProjectDetailsPage() {
 
   const handleDelete = async () => {
     if (window.confirm('Вы уверены, что хотите удалить проект и все его задачи?')) {
-      await deleteProject({ id: project?._id }).unwrap();
+      await deleteProject({ id: id! }).unwrap();
       navigate('/projects');
     }
   };
