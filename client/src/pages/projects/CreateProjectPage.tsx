@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateProjectMutation } from '../../features/projects/projectsApi';
 import { useForm } from 'react-hook-form';
@@ -78,7 +79,7 @@ export default function CreateProjectPage() {
       }).unwrap();
       navigate('/projects');
     } catch (err: any) {
-      console.error(err);
+      Sentry.captureException(err);
     }
   };
 

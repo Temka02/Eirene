@@ -21,6 +21,11 @@ export const axiosBaseQuery: BaseQueryFn<AxiosBaseQueryArgs, unknown, unknown> =
     return { data: result.data };
   } catch (axiosError) {
     const err = axiosError as AxiosError;
+
+    if (err.response?.status !== 401) {
+      console.error('API Error:', err.message);
+    }
+
     return {
       error: {
         status: err.response?.status,

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { Box } from '@mui/material';
 import HeaderForUnauthorized from '../../layouts/HeaderForUnauthorized';
 import { Link, useNavigate } from 'react-router-dom';
@@ -29,7 +30,7 @@ export default function RegisterPage() {
       dispatch(setCredentials(res));
       navigate('/dashboard');
     } catch (err) {
-      console.error(err);
+      Sentry.captureException(err);
     }
   };
   return (

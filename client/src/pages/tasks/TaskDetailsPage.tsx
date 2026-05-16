@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useState, type SyntheticEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -112,7 +113,7 @@ export default function TaskDetailsPage() {
       setNewSubtask('');
       setIsAddingSubtask(false);
     } catch (error) {
-      console.error(error);
+      Sentry.captureException(error);
       setError('Ошибка при добавлении подзадачи');
     }
   };

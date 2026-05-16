@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -31,7 +32,7 @@ export default function NotificationsPage() {
     try {
       await markAllRead().unwrap();
     } catch (err) {
-      console.error(err);
+      Sentry.captureException(err);
     }
   };
 
@@ -49,7 +50,7 @@ export default function NotificationsPage() {
           )
         );
       }
-      console.error(error);
+      Sentry.captureException(error);
     }
   };
 

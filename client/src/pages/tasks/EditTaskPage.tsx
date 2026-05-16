@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateTaskMutation, useGetTaskQuery } from '../../features/tasks/tasksApi';
@@ -89,7 +90,7 @@ export default function EditTaskPage() {
       try {
         await deleteSubtask({ taskId: id!, subtaskId: subtaskToRemove.id }).unwrap();
       } catch (err) {
-        console.error('Failed to delete subtask', err);
+        Sentry.captureException('Failed to delete subtask', err);
       }
     }
   };
@@ -132,7 +133,7 @@ export default function EditTaskPage() {
 
       navigate('/tasks');
     } catch (err: any) {
-      console.error(err);
+      Sentry.captureException(err);
     }
   };
 

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateProjectMutation, useGetProjectQuery } from '../../features/projects/projectsApi';
@@ -93,7 +94,7 @@ export default function EditProjectPage() {
       }).unwrap();
       navigate('/projects');
     } catch (err: any) {
-      console.error(err);
+      Sentry.captureException(err);
     }
   };
 

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetMeQuery, useUpdateMeMutation, useLogoutMutation } from '../../features/auth/authApi';
@@ -74,7 +75,7 @@ export default function SettingsPage() {
       dispatch(api.util.resetApiState());
       navigate('/login');
     } catch (err) {
-      console.error('Logout error:', err);
+      Sentry.captureException('Logout error:', err);
     }
   };
 
