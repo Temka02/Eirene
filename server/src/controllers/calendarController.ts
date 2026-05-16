@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 import Task from '../models/Task';
 import { AuthRequest } from '../middleware/auth';
@@ -26,6 +27,7 @@ export const getCalendarData = async (req: AuthRequest, res: Response) => {
 
     res.json(tasks);
   } catch (error) {
+    Sentry.captureException(error);
     console.error('Calendar error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }

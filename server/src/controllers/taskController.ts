@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 import Task from '../models/Task';
 import Project from '../models/Project';
@@ -78,6 +79,7 @@ export const createTask = async (req: AuthRequest, res: Response) => {
     res.status(201).json(task);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -111,7 +113,8 @@ export const getTask = async (req: AuthRequest, res: Response) => {
     );
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json(task);
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -223,6 +226,7 @@ export const getTasks = async (req: AuthRequest, res: Response) => {
     });
   } catch (err) {
     console.error('getTasks error:', err);
+    Sentry.captureException(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -292,6 +296,7 @@ export const updateTask = async (req: AuthRequest, res: Response) => {
     res.json(task);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -322,7 +327,8 @@ export const deleteTask = async (req: AuthRequest, res: Response) => {
     const task = await Task.findOneAndDelete({ _id: id, userId: req.user!.userId });
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json({ message: 'Task deleted' });
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -378,6 +384,7 @@ export const addSubtask = async (req: AuthRequest, res: Response) => {
     res.json(task);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -443,6 +450,7 @@ export const updateSubtask = async (req: AuthRequest, res: Response) => {
     res.json(task);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -484,7 +492,8 @@ export const deleteSubtask = async (req: AuthRequest, res: Response) => {
     );
     if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json(task);
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
@@ -124,6 +125,7 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
       },
     });
   } catch (error) {
+    Sentry.captureException(error);
     logger.error('UpdateMe error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -194,6 +196,12 @@ export const register = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    Sentry.setUser({
+      id: user._id.toString(),
+      email: user.email,
+      username: user.name,
+    });
+
     res.status(201).json({
       user: { id: user._id, email: user.email, name: user.name, surname: user.surname },
       accessToken,
@@ -203,6 +211,7 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ error: error.issues });
     }
     logger.error('Registration error:', error);
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -262,6 +271,12 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    Sentry.setUser({
+      id: user._id.toString(),
+      email: user.email,
+      username: user.name,
+    });
+
     res.json({
       user: { id: user._id, email: user.email, name: user.name, surname: user.surname },
       accessToken,
@@ -271,6 +286,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: error.issues });
     }
     logger.error('Login error:', error);
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -289,6 +305,7 @@ export const login = async (req: Request, res: Response) => {
  */
 export const logout = (_req: Request, res: Response) => {
   res.clearCookie('refreshToken');
+  Sentry.setUser(null);
   res.json({ message: 'Logged out' });
 };
 

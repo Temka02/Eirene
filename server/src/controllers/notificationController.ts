@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 import Notification from '../models/Notification';
 import { AuthRequest } from '../middleware/auth';
@@ -73,7 +74,8 @@ export const getNotifications = async (req: AuthRequest, res: Response) => {
     ]);
 
     res.json({ data: notifications, total });
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -125,6 +127,7 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
     res.json({ message: 'All notifications marked as read', modifiedCount: result.modifiedCount });
   } catch (error) {
     logger.error('Error in markAllRead:', error);
+    Sentry.captureException(error);
     res.status(500).json({
       error: 'Internal server error',
       details: process.env.NODE_ENV === 'development' ? error : undefined,
@@ -149,7 +152,8 @@ export const markAllRead = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
     await Notification.updateMany({ userId, isRead: false }, { $set: { isRead: true } });
     res.json({ message: 'All notifications marked as read' });
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -181,7 +185,8 @@ export const deleteNotification = async (req: AuthRequest, res: Response) => {
     const notification = await Notification.findOneAndDelete({ _id: id, userId });
     if (!notification) return res.status(404).json({ error: 'Notification not found' });
     res.json({ message: 'Notification deleted' });
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

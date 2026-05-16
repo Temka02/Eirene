@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import mongoose from 'mongoose';
 import { Response } from 'express';
 import Task from '../models/Task';
@@ -110,6 +111,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Dashboard error:', error);
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

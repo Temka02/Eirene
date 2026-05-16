@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 import Project from '../models/Project';
 import Task from '../models/Task';
@@ -45,6 +46,7 @@ export const createProject = async (req: AuthRequest, res: Response) => {
     res.status(201).json(project);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -75,7 +77,8 @@ export const getProject = async (req: AuthRequest, res: Response) => {
     const project = await Project.findOne({ _id: id, userId: req.user!.userId });
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json(project);
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -206,6 +209,7 @@ export const getProjectTasks = async (req: AuthRequest, res: Response) => {
     });
   } catch (err) {
     console.error('getProjectTasks error:', err);
+    Sentry.captureException(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -252,7 +256,8 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
     );
 
     res.json(projectsWithStats);
-  } catch {
+  } catch (err) {
+    Sentry.captureException(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -300,6 +305,7 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
 
     res.json(project);
   } catch (error) {
+    Sentry.captureException(error);
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.issues });
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -336,7 +342,8 @@ export const deleteProject = async (req: AuthRequest, res: Response) => {
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     res.json({ message: 'Project and all associated tasks deleted' });
-  } catch {
+  } catch (err) {
+    Sentry.captureException(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
