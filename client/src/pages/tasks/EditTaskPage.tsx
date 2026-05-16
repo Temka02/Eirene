@@ -90,7 +90,7 @@ export default function EditTaskPage() {
       try {
         await deleteSubtask({ taskId: id!, subtaskId: subtaskToRemove.id }).unwrap();
       } catch (err) {
-        Sentry.captureException('Failed to delete subtask', err);
+        Sentry.captureException(err, { extra: { context: 'Failed to delete subtask' } });
       }
     }
   };
@@ -133,7 +133,7 @@ export default function EditTaskPage() {
 
       navigate('/tasks');
     } catch (err: any) {
-      Sentry.captureException(err);
+      Sentry.captureException(err, { extra: { context: 'Failed to update task' } });
     }
   };
 

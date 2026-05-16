@@ -75,7 +75,9 @@ export default function SettingsPage() {
       dispatch(api.util.resetApiState());
       navigate('/login');
     } catch (err) {
-      Sentry.captureException('Logout error:', err);
+      Sentry.captureException(err, {
+        extra: { context: 'Logout error' },
+      });
     }
   };
 
