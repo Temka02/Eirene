@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateProjectMutation, useGetProjectQuery } from '../../features/projects/projectsApi';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { projectSchema, type ProjectFormData } from '../../entities/validation';
 
 type IconType = 'plant' | 'sun' | 'waves' | 'star' | 'mountains' | 'flower';
 
@@ -56,41 +59,41 @@ export default function EditProjectPage() {
   const { data: project, isLoading: isLoadingProject } = useGetProjectQuery(id!);
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState<IconType>('plant');
-  const [error, setError] = useState('');
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: { icon: 'plant' },
+  });
+
+  const selectedIcon = watch('icon');
 
   useEffect(() => {
     if (project) {
-      setTitle(project.title || '');
-      setDescription(project.description || '');
-      setSelectedIcon((project.icon as IconType) || 'plant');
+      reset({
+        title: project.title,
+        description: project.description,
+        icon: (project.icon as IconType) || 'plant',
+      });
     }
-  }, [project]);
+  }, [project, reset]);
 
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!title.trim()) {
-      setError('Название проекта обязательно');
-      return;
-    }
-    if (title.length > 50) {
-      setError('Название проекта не должно превышать 50 символов');
-      return;
-    }
-    if (description.length > 200) {
-      setError('Описание не должно превышать 200 символов');
-      return;
-    }
-
+  const onSubmit = async (data: ProjectFormData) => {
     try {
-      await updateProject({ id: id!, title, description, icon: selectedIcon }).unwrap();
+      await updateProject({
+        id: id!,
+        title: data.title,
+        description: data.description,
+        icon: data.icon,
+      }).unwrap();
       navigate('/projects');
     } catch (err: any) {
-      setError(err.data?.error || 'Ошибка при обновлении проекта');
+      console.error(err);
     }
   };
 
@@ -115,11 +118,7 @@ export default function EditProjectPage() {
           <h1 className="text-2xl text-[#2F3A34]">Редактировать проект</h1>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-[#FFEDEE] text-[#D32F2F] text-sm rounded-lg">{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-white rounded-2xl py-4 px-6 shadow-sm mb-4">
             <h2 className="text-base font-medium text-[#2F3A34] ml-4 mb-4 flex items-center gap-2">
               Информация о проекте
@@ -143,12 +142,14 @@ export default function EditProjectPage() {
                     <input
                       id="title"
                       type="text"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
                       placeholder="Введите название проекта"
                       className="w-full pl-12 pr-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
+                      {...register('title')}
                     />
                   </div>
+                  {errors.title && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.title.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -166,17 +167,19 @@ export default function EditProjectPage() {
                     />
                     <textarea
                       id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
                       placeholder="Кратко напишите, о чем ваш проект"
                       rows={7}
                       maxLength={200}
                       className="w-full pl-12 pr-11 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all resize-none"
+                      {...register('description')}
                     />
                     <span className="absolute bottom-3 right-3 text-sm text-[#A0AEC0]">
-                      {description.length}/200
+                      {watch('description')?.length || 0}/200
                     </span>
                   </div>
+                  {errors.description && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.description.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -191,7 +194,7 @@ export default function EditProjectPage() {
                       <button
                         key={icon.id}
                         type="button"
-                        onClick={() => setSelectedIcon(icon.id)}
+                        onClick={() => setValue('icon', icon.id)}
                         className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all ${icon.iconBg} ${
                           isSelected ? `${icon.activeBorderColor} border-2` : 'border-0'
                         }`}

@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { LoginCredentials } from '../../entities/auth/model';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema } from '../../entities/auth/validation';
+import { loginSchema } from '../../entities/validation';
 import { useLoginMutation } from '../../features/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/authSlice';

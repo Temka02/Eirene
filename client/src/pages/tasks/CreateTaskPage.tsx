@@ -1,9 +1,11 @@
-import { useEffect, useState, type SyntheticEvent } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateTaskMutation } from '../../features/tasks/tasksApi';
 import { useGetProjectsQuery } from '../../features/projects/projectsApi';
-import type { Task } from '../../entities/task/model';
 import { useAddSubtaskMutation } from '../../features/tasks/subtasksApi';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { taskSchema, type TaskFormData } from '../../entities/validation';
 
 export default function CreateTaskPage() {
   const navigate = useNavigate();
@@ -12,89 +14,58 @@ export default function CreateTaskPage() {
   const { data: projectsData } = useGetProjectsQuery();
   const projects = projectsData || [];
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [projectId, setProjectId] = useState<string | undefined>(undefined);
-  const [priority, setPriority] = useState<Task['priority']>('medium');
-  const [deadlineType, setDeadlineType] = useState<Task['deadlineType']>('none');
-  const [deadline, setDeadline] = useState('');
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<TaskFormData>({
+    resolver: zodResolver(taskSchema),
+    defaultValues: {
+      priority: 'medium',
+      deadlineType: 'none',
+    },
+  });
+
+  const deadlineType = watch('deadlineType');
   const [subtasks, setSubtasks] = useState<string[]>(['']);
-  const [error, setError] = useState('');
+  const [apiError, setApiError] = useState('');
 
-  useEffect(() => {
-    if (deadlineType === 'none') {
-      setDeadline('');
-    }
-  }, [deadlineType]);
-
-  const handleAddSubtaskInput = () => {
-    setSubtasks([...subtasks, '']);
-  };
-
+  const handleAddSubtaskInput = () => setSubtasks([...subtasks, '']);
   const handleRemoveSubtask = (index: number) => {
     const newSubtasks = [...subtasks];
     newSubtasks.splice(index, 1);
     setSubtasks(newSubtasks);
   };
-
   const handleSubtaskChange = (index: number, value: string) => {
     const newSubtasks = [...subtasks];
     newSubtasks[index] = value;
     setSubtasks(newSubtasks);
   };
 
-  const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!title.trim()) {
-      setError('Название задачи обязательно');
-      return;
-    }
-
-    if (title.length > 100) {
-      setError('Название задачи не должно превышать 100 символов');
-      return;
-    }
-
-    if (description.length > 500) {
-      setError('Описание не должно превышать 500 символов');
-      return;
-    }
-
-    if (deadlineType !== 'none' && !deadline) {
-      setError('Укажите дату дедлайна');
-      return;
-    }
-
-    const validSubtasks = subtasks.filter((s) => s.trim() !== '');
-    if (validSubtasks.length > 20) {
-      setError('Максимум 20 подзадач');
-      return;
-    }
-
+  const onSubmit = async (data: TaskFormData) => {
+    setApiError('');
     try {
       const createdTask = await createTask({
-        title,
-        description,
-        projectId: projectId || undefined,
-        priority,
-        deadlineType,
-        deadline: deadlineType !== 'none' ? deadline : undefined,
+        title: data.title,
+        description: data.description,
+        projectId: data.projectId || undefined,
+        priority: data.priority,
+        deadlineType: data.deadlineType,
+        deadline: data.deadlineType !== 'none' ? data.deadline : undefined,
       }).unwrap();
 
+      const validSubtasks = subtasks.filter((s) => s.trim() !== '');
       if (createdTask._id && validSubtasks.length > 0) {
         for (const subtaskTitle of validSubtasks) {
-          await addSubtask({
-            taskId: createdTask._id,
-            title: subtaskTitle,
-          }).unwrap();
+          await addSubtask({ taskId: createdTask._id, title: subtaskTitle }).unwrap();
         }
       }
 
       navigate('/tasks');
     } catch (err: any) {
-      setError(err.data?.error || 'Ошибка при создании задачи');
+      setApiError(err.data?.error || 'Ошибка при создании задачи');
     }
   };
 
@@ -111,11 +82,7 @@ export default function CreateTaskPage() {
           <h1 className="text-2xl text-[#2F3A34]">Добавить задачу</h1>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-[#FFEDEE] text-[#D32F2F] text-sm rounded-lg">{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="bg-white rounded-2xl p-8 shadow-sm mb-4">
             <h2 className="text-base font-medium text-[#2F3A34] mb-4 flex items-center justify-start gap-3">
               <div className="flex justify-center items-center rounded-full bg-[#F0F3ED] text-[#5F6F65] w-6 h-6">
@@ -142,12 +109,14 @@ export default function CreateTaskPage() {
                     <input
                       id="title"
                       type="text"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
                       placeholder="Введите название задачи"
                       className="w-full pl-12 pr-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
+                      {...register('title')}
                     />
                   </div>
+                  {errors.title && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.title.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -165,17 +134,19 @@ export default function CreateTaskPage() {
                     />
                     <textarea
                       id="description"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
                       placeholder="Кратко напишите, о чем ваша задача"
                       rows={2}
                       maxLength={500}
                       className="w-full pl-12 pr-11 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all resize-none"
+                      {...register('description')}
                     />
                     <span className="absolute bottom-3 right-3 text-xs text-[#A0AEC0]">
-                      {description.length}/500
+                      {watch('description')?.length || 0}/500
                     </span>
                   </div>
+                  {errors.description && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.description.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -183,53 +154,40 @@ export default function CreateTaskPage() {
                     Приоритет
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPriority('high')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
-                        priority === 'high'
-                          ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]'
-                          : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      <img src="/highPriority-icon.svg" alt="" className="w-5 h-5" />
-                      <span className="text-xs font-medium">Высокий</span>
-                      <span className="text-[0.625rem] opacity-75 text-[#6F7D75]">
-                        Важная задача
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setPriority('medium')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
-                        priority === 'medium'
-                          ? 'border-[#FFC65C] bg-[#FFF4E5] text-[#FFC65C]'
-                          : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      <img src="/mediumPriority-icon.svg" alt="" className="w-5 h-5" />
-                      <span className="text-xs font-medium ">Средний</span>
-                      <span className="text-[0.625rem] opacity-75 text-[#6F7D75]">
-                        Стандартный приоритет
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setPriority('low')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
-                        priority === 'low'
-                          ? 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]'
-                          : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      <img src="/lowPriority-icon.svg" alt="" className="w-5 h-5" />
-                      <span className="text-xs font-medium">Низкий</span>
-                      <span className="text-[0.625rem] opacity-75 text-[#6F7D75]">
-                        Выполняй в спокойном темпе
-                      </span>
-                    </button>
+                    {[
+                      {
+                        val: 'high',
+                        label: 'Высокий',
+                        icon: '/highPriority-icon.svg',
+                        active: 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]',
+                      },
+                      {
+                        val: 'medium',
+                        label: 'Средний',
+                        icon: '/mediumPriority-icon.svg',
+                        active: 'border-[#FFC65C] bg-[#FFF4E5] text-[#FFC65C]',
+                      },
+                      {
+                        val: 'low',
+                        label: 'Низкий',
+                        icon: '/lowPriority-icon.svg',
+                        active: 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]',
+                      },
+                    ].map((p) => (
+                      <button
+                        key={p.val}
+                        type="button"
+                        onClick={() => setValue('priority', p.val as any)}
+                        className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
+                          watch('priority') === p.val
+                            ? p.active
+                            : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
+                        }`}
+                      >
+                        <img src={p.icon} alt="" className="w-5 h-5" />
+                        <span className="text-xs font-medium">{p.label}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -238,44 +196,40 @@ export default function CreateTaskPage() {
                     Тип дедлайна
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setDeadlineType('hard')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
-                        deadlineType === 'hard'
-                          ? 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]'
-                          : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      <img src="/hardDeadlineType-icon.svg" alt="" className="w-5 h-5 mb-1" />
-                      <span className="text-xs font-medium">Жeсткий</span>
-                      <span className="text-[0.625rem] opacity-75">Лучше выполнить в срок</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeadlineType('soft')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
-                        deadlineType === 'soft'
-                          ? 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]'
-                          : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      <img src="/softDeadlineType-icon.svg" alt="" className="w-5 h-5 mb-1" />
-                      <span className="text-xs font-medium">Мягкий</span>
-                      <span className="text-[0.625rem] opacity-75">Можно отложить</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeadlineType('none')}
-                      className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
-                        deadlineType === 'none'
-                          ? 'border-[#a1b0a8] bg-[#F3F4F6] text-[#6F7D75]'
-                          : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
-                    >
-                      <img src="/noDeadline-icon.svg" alt="" className="w-5 h-5 mb-1" />
-                      <span className="text-xs font-medium">Без срока</span>
-                    </button>
+                    {[
+                      {
+                        val: 'hard',
+                        label: 'Жёсткий',
+                        icon: '/hardDeadlineType-icon.svg',
+                        active: 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]',
+                      },
+                      {
+                        val: 'soft',
+                        label: 'Мягкий',
+                        icon: '/softDeadlineType-icon.svg',
+                        active: 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]',
+                      },
+                      {
+                        val: 'none',
+                        label: 'Без срока',
+                        icon: '/noDeadline-icon.svg',
+                        active: 'border-[#a1b0a8] bg-[#F3F4F6] text-[#6F7D75]',
+                      },
+                    ].map((dt) => (
+                      <button
+                        key={dt.val}
+                        type="button"
+                        onClick={() => setValue('deadlineType', dt.val as any)}
+                        className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
+                          watch('deadlineType') === dt.val
+                            ? dt.active
+                            : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
+                        }`}
+                      >
+                        <img src={dt.icon} alt="" className="w-5 h-5 mb-1" />
+                        <span className="text-xs font-medium">{dt.label}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -290,9 +244,8 @@ export default function CreateTaskPage() {
                       className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
                     />
                     <select
-                      value={projectId || ''}
-                      onChange={(e) => setProjectId(e.target.value || undefined)}
                       className="w-full pl-12 pr-10 py-3 bg-white border-2 border-[#F0F1F2] text-[#767676] rounded-xl text-sm appearance-none focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all cursor-pointer"
+                      {...register('projectId')}
                     >
                       <option value="">Выберите проект</option>
                       {projects.map((project: any) => (
@@ -313,7 +266,10 @@ export default function CreateTaskPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-[#2F3A34] mb-1.5">
+                  <label
+                    htmlFor="deadline"
+                    className="block text-sm font-medium text-[#2F3A34] mb-1.5"
+                  >
                     Дедлайн
                   </label>
                   <div className="relative">
@@ -323,14 +279,16 @@ export default function CreateTaskPage() {
                       className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
                     />
                     <input
-                      id="date"
+                      id="deadline"
                       type="datetime-local"
-                      value={deadline}
-                      onChange={(e) => setDeadline(e.target.value)}
                       disabled={deadlineType === 'none'}
-                      className={`w-full pl-12 pr-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className="w-full pl-12 pr-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      {...register('deadline')}
                     />
                   </div>
+                  {errors.deadline && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.deadline.message}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -343,8 +301,6 @@ export default function CreateTaskPage() {
             </h2>
 
             <div className="space-y-3 pl-10">
-              <p className="text-sm text-[#6F7D75] ml-1 mb-2">Внесите подзадачи</p>
-
               {subtasks.map((subtask, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#8CA693] text-white text-xs font-medium flex-shrink-0">
@@ -379,7 +335,6 @@ export default function CreateTaskPage() {
                   </div>
                 </div>
               ))}
-
               <button
                 type="button"
                 onClick={handleAddSubtaskInput}
@@ -392,6 +347,11 @@ export default function CreateTaskPage() {
           </div>
 
           <div className="flex justify-end gap-4">
+            {apiError && (
+              <div className="mb-4 p-3 bg-[#FFEDEE] text-[#D32F2F] text-sm rounded-lg">
+                {apiError}
+              </div>
+            )}
             <button
               type="button"
               onClick={() => navigate('/tasks')}

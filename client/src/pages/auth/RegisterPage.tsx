@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useRegisterMutation } from '../../features/auth/authApi';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema } from '../../entities/auth/validation';
+import { registerSchema } from '../../entities/validation';
 import type { RegisterFormValues } from '../../types';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/authSlice';

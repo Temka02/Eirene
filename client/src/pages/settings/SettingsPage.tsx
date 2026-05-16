@@ -4,56 +4,53 @@ import { useGetMeQuery, useUpdateMeMutation, useLogoutMutation } from '../../fea
 import { logout as logoutAction } from '../../store/authSlice';
 import { useDispatch } from 'react-redux';
 import { api } from '../../store/api';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileSchema, type ProfileFormData } from '../../entities/validation';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { data: meData, isLoading: loadingMe } = useGetMeQuery();
   const user = meData?.user;
 
   const [updateMe, { isLoading: isUpdating }] = useUpdateMeMutation();
   const [logoutApi] = useLogoutMutation();
 
-  const [form, setForm] = useState({
-    name: '',
-    surname: '',
-    email: '',
-  });
-
   const [emailNotifs, setEmailNotifs] = useState(false);
-
-  const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState(false);
   const [notifLoading, setNotifLoading] = useState(false);
+  const [formSuccess, setFormSuccess] = useState(false);
+  const [apiError, setApiError] = useState('');
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { name: '', surname: '', email: '' },
+  });
 
   useEffect(() => {
     if (user) {
-      setForm({
+      reset({
         name: user.name,
         surname: user.surname,
         email: user.email,
       });
       setEmailNotifs(user.emailNotifications ?? true);
     }
-  }, [user]);
+  }, [user, reset]);
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError('');
-    setFormSuccess(false);
-
-    if (!form.name.trim() || !form.surname.trim()) {
-      setFormError('Имя и фамилия обязательны');
-      return;
-    }
-
+  const onSubmit = async (data: ProfileFormData) => {
+    setApiError('');
     try {
-      await updateMe(form).unwrap();
+      await updateMe(data).unwrap();
       setFormSuccess(true);
       setTimeout(() => setFormSuccess(false), 3000);
     } catch (err: any) {
-      setFormError(err.data?.error || 'Ошибка обновления');
+      setApiError(err.data?.error || 'Не удалось сохранить изменения');
     }
   };
 
@@ -92,18 +89,13 @@ export default function SettingsPage() {
           <div className="bg-white rounded-2xl px-10 py-6 shadow-sm">
             <h2 className="text-base font-medium text-[#2F3A34] mb-4">Профиль</h2>
 
-            {formError && (
-              <div className="mb-4 p-3 bg-[#FFEDEE] text-[#D32F2F] text-sm rounded-lg">
-                {formError}
-              </div>
-            )}
             {formSuccess && (
               <div className="mb-4 p-3 bg-[#E4F0E5] text-[#8CA693] text-sm rounded-lg">
                 Профиль обновлен
               </div>
             )}
 
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-[#2F3A34] mb-1.5" htmlFor="name">
@@ -112,12 +104,14 @@ export default function SettingsPage() {
                   <input
                     id="name"
                     type="text"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full px-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
-                    required
+                    {...register('name')}
                   />
+                  {errors.name && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.name.message}</p>
+                  )}
                 </div>
+
                 <div>
                   <label
                     className="block text-xs font-medium text-[#2F3A34] mb-1.5"
@@ -128,12 +122,14 @@ export default function SettingsPage() {
                   <input
                     id="surname"
                     type="text"
-                    value={form.surname}
-                    onChange={(e) => setForm({ ...form, surname: e.target.value })}
                     className="w-full px-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
-                    required
+                    {...register('surname')}
                   />
+                  {errors.surname && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.surname.message}</p>
+                  )}
                 </div>
+
                 <div>
                   <label
                     className="block text-xs font-medium text-[#2F3A34] mb-1.5"
@@ -144,18 +140,23 @@ export default function SettingsPage() {
                   <input
                     id="email"
                     type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full px-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
-                    required
+                    {...register('email')}
                   />
+                  {errors.email && (
+                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.email.message}</p>
+                  )}
                 </div>
               </div>
-
+              {apiError && (
+                <div className="mb-4 p-3 bg-[#FFEDEE] text-[#D32F2F] text-sm rounded-lg">
+                  {apiError}
+                </div>
+              )}
               <div className="flex justify-end pt-2">
                 <button
                   type="submit"
-                  disabled={isUpdating}
+                  disabled={isUpdating || isSubmitting}
                   className="px-6 py-2.5 bg-[#8CA693] text-white rounded-xl text-sm font-medium hover:bg-[#7A9181] disabled:opacity-50"
                 >
                   {isUpdating ? 'Сохранение...' : 'Сохранить изменения'}
