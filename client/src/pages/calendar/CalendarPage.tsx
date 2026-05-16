@@ -1,7 +1,393 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useGetCalendarTasksQuery } from '../../features/calendar/calendarApi';
+import type { Task } from '../../entities/task/model';
+
+const monthNames = [
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
+];
+
+const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+const getPriorityConfig = (p: Task['priority']) => {
+  switch (p) {
+    case 'high':
+      return {
+        label: 'В',
+        color: 'text-[#D32F2F]',
+        icon: '/highPriority-icon.svg',
+        bg: 'bg-[#FFEDEE]',
+      };
+    case 'medium':
+      return {
+        label: 'С',
+        color: 'text-[#F59E0B]',
+        icon: '/mediumPriority-icon.svg',
+        bg: 'bg-[#FFF4E5]',
+      };
+    case 'low':
+      return {
+        label: 'Н',
+        color: 'text-[#10B981]',
+        icon: '/lowPriority-icon.svg',
+        bg: 'bg-[#E6F9F1]',
+      };
+    default:
+      return { label: '', color: '', icon: '', bg: '' };
+  }
+};
+
+const getDeadlineTypeConfig = (dt: Task['deadlineType']) => {
+  switch (dt) {
+    case 'hard':
+      return {
+        label: 'Ж',
+        icon: '/hardDeadlineType-icon.svg',
+        color: 'text-[#D32F2F]',
+        bg: 'bg-[#FFEDEE]',
+      };
+    case 'soft':
+      return {
+        label: 'М',
+        icon: '/softDeadlineType-icon.svg',
+        color: 'text-[#10B981]',
+        bg: 'bg-[#E6F9F1]',
+      };
+    case 'none':
+      return {
+        label: '—',
+        icon: '/noDeadline-icon.svg',
+        color: 'text-[#6F7D75]',
+        bg: 'bg-[#F3F4F6]',
+      };
+    default:
+      return { label: '', color: '', icon: '', bg: '' };
+  }
+};
+
 export default function CalendarPage() {
+  const navigate = useNavigate();
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const { data: tasks = [], isLoading } = useGetCalendarTasksQuery({
+    year: currentDate.getFullYear(),
+    month: currentDate.getMonth() + 1,
+  });
+
+  const tasksByDate: Record<string, Task[]> = {};
+  tasks.forEach((task) => {
+    if (task.deadline) {
+      const dateStr = task.deadline.split('T')[0];
+      if (!tasksByDate[dateStr]) tasksByDate[dateStr] = [];
+      tasksByDate[dateStr].push(task);
+    }
+  });
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const startDayIndex = (firstDayOfMonth.getDay() + 6) % 7;
+  const totalDays = lastDayOfMonth.getDate();
+
+  const sortTasks = (tasks: Task[]) => {
+    // Вес для статусов (меньше = выше)
+    const statusWeight: Record<Task['status'], number> = {
+      in_progress: 1,
+      todo: 2,
+      done: 3,
+    };
+
+    // Вес для типа дедлайна (жесткий важнее)
+    const typeWeight: Record<Task['deadlineType'], number> = {
+      hard: 1,
+      soft: 2,
+      none: 3,
+    };
+
+    // Вес для приоритета
+    const priorityWeight: Record<Task['priority'], number> = {
+      high: 1,
+      medium: 2,
+      low: 3,
+    };
+
+    return [...tasks].sort((a, b) => {
+      const statusDiff = (statusWeight[a.status] || 4) - (statusWeight[b.status] || 4);
+      if (statusDiff !== 0) return statusDiff;
+
+      const typeDiff = (typeWeight[a.deadlineType] || 3) - (typeWeight[b.deadlineType] || 3);
+      if (typeDiff !== 0) return typeDiff;
+
+      const timeA = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const timeB = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      const timeDiff = timeA - timeB;
+      if (timeDiff !== 0) return timeDiff;
+
+      const priorityDiff = (priorityWeight[a.priority] || 3) - (priorityWeight[b.priority] || 3);
+      return priorityDiff;
+    });
+  };
+
+  const getTasksForDate = (day: number) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return sortTasks(tasksByDate[dateStr] || []);
+  };
+
+  const isToday = (day: number) => {
+    return day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+  };
+
+  const getSelectedDateTasks = () => {
+    if (!selectedDate) return [];
+    return getTasksForDate(parseInt(selectedDate));
+  };
+
+  const getStatusStyle = (status: Task['status']) => {
+    switch (status) {
+      case 'todo':
+        return 'bg-[#E9F0F9] border-[#4C95E9]/25';
+      case 'in_progress':
+        return 'bg-[#FFEFD3] border-[#FFC65C]/25';
+      case 'done':
+        return 'bg-[#E4F0E5] border-[#8CA693]/25';
+      default:
+        return 'bg-[#F8FAFC] border-[#D9D9D9]/25';
+    }
+  };
+
+  const TaskMiniCard = ({ task }: { task: Task }) => {
+    const p = getPriorityConfig(task.priority);
+    const dt = getDeadlineTypeConfig(task.deadlineType);
+    const isCompleted = task.status === 'done';
+
+    return (
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/tasks/${task._id}`);
+        }}
+        className={`flex items-center gap-1.5 p-1.5 rounded-[0.625rem] border border-[#D9D9D9]/20 cursor-pointer hover:shadow-sm transition-all ${
+          isCompleted ? 'opacity-60' : ''
+        } ${getStatusStyle(task.status)}`}
+        title={task.title}
+      >
+        <img src={p.icon} alt="" className={`w-3 h-3 flex-shrink-0 ${p.color}`} />
+
+        <span
+          className={`text-[0.625rem] font-medium truncate ${isCompleted ? 'line-through' : 'text-[#2F3A34]'}`}
+        >
+          {task.title}
+        </span>
+
+        {task.deadlineType !== 'none' && (
+          <img src={dt.icon} alt="" className={`w-3 h-3 flex-shrink-0 ${dt.color}`} />
+        )}
+      </div>
+    );
+  };
+
   return (
-    <>
-      <h1>Calendar page</h1>
-    </>
+    <div className="px-4 md:px-6 lg:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl text-[#2F3A34] mb-2">Календарь</h1>
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 bg-white rounded-2xl p-6 shadow-sm border border-[#F0F1F2]">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
+                  className="w-8 h-8 rounded-lg hover:bg-[#F0F3ED] flex items-center justify-center transition-colors"
+                >
+                  <img src="/sortArrow-icon.svg" alt="" className="w-4 h-4 -rotate-90" />
+                </button>
+                <h2 className="text-xl font-medium text-[#5F6F65] text-center">
+                  {monthNames[month]} {year}
+                </h2>
+                <button
+                  onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
+                  className="w-8 h-8 rounded-lg hover:bg-[#F0F3ED] flex items-center justify-center transition-colors"
+                >
+                  <img src="/sortArrow-icon.svg" alt="" className="w-4 h-4 rotate-90" />
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1));
+                  setSelectedDate(String(today.getDate()));
+                }}
+                className="px-4 py-1 text-sm font-medium text-[#6F7D75] bg-[#F0F3ED] border border-[#D9D9D9] rounded-xl hover:bg-[#E0E5DD] transition-colors"
+              >
+                Сегодня
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 mb-2 bg-[#F0F3ED] border border-[#D9D9D9] rounded-lg">
+              {weekDays.map((day) => (
+                <div key={day} className="text-center text-xs font-medium text-[#6F7D75] py-2">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-2">
+              {Array.from({ length: startDayIndex }).map((_, i) => (
+                <div key={`empty-${i}`} className="h-32 md:h-40" />
+              ))}
+
+              {Array.from({ length: totalDays }).map((_, i) => {
+                const day = i + 1;
+                const dayTasks = getTasksForDate(day);
+                const isCurrentDay = isToday(day);
+                const isSelected = selectedDate === String(day);
+
+                return (
+                  <div
+                    key={day}
+                    onClick={() => setSelectedDate(isSelected ? null : String(day))}
+                    className={`min-h-[120px] md:min-h-[140px] rounded-xl border-2 p-2 cursor-pointer transition-all flex flex-col gap-1 ${
+                      isCurrentDay
+                        ? 'border-[#8CA693] bg-[#F0F3ED]'
+                        : isSelected
+                          ? 'border-[#8CA693] bg-white'
+                          : 'border-[#F0F1F2] hover:border-[#8CA693]/50 hover:bg-[#FAFBFC]'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span
+                        className={`text-sm font-medium ${isCurrentDay ? 'text-[#8CA693]' : 'text-[#2F3A34]'}`}
+                      >
+                        {day}
+                      </span>
+                      {dayTasks.length > 0 && (
+                        <span className="text-[0.625rem] text-[#6F7D75] bg-white px-1.5 rounded-full">
+                          {dayTasks.length}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 overflow-hidden flex flex-col gap-1">
+                      {dayTasks.slice(0, 3).map((task) => (
+                        <TaskMiniCard key={task._id} task={task} />
+                      ))}
+                      {dayTasks.length > 3 && (
+                        <div className="text-[0.625rem] text-[#6F7D75] pl-1">
+                          +{dayTasks.length - 3} ещe
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="w-full lg:w-64 bg-white rounded-2xl p-6 shadow-sm border border-[#F0F1F2] h-fit sticky top-0">
+            <h3 className="font-medium text-[#2F3A34] mb-4">
+              {selectedDate
+                ? `${selectedDate} ${monthNames[month]}`
+                : `Сегодня, ${today.getDate()} ${monthNames[today.getMonth()]}`}
+            </h3>
+
+            {isLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-12 bg-[#F8FAFC] rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : getSelectedDateTasks().length > 0 ? (
+              <div className="space-y-3">
+                {getSelectedDateTasks().map((task) => {
+                  const p = getPriorityConfig(task.priority);
+                  const dt = getDeadlineTypeConfig(task.deadlineType);
+                  const isCompleted = task.status === 'done';
+
+                  return (
+                    <div
+                      key={task._id}
+                      onClick={() => navigate(`/tasks/${task._id}`)}
+                      className={`p-3 rounded-[0.625rem] border border-[#D9D9D9] bg-white cursor-pointer hover:bg-[#FAFBFC] transition-colors ${
+                        isCompleted ? 'line-through opacity-70' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-2 mb-2">
+                        <img src={p.icon} alt="" className={`w-4 h-4 mt-0.5 ${p.color}`} />
+                        <h4 className="text-sm font-medium text-[#2F3A34] truncate flex-1">
+                          {task.title}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded ${dt.bg} ${dt.color}`}
+                        >
+                          <img src={dt.icon} alt="" className="w-3 h-3" />
+                          {dt.label === 'Ж' ? 'Жeсткий' : dt.label === 'М' ? 'Мягкий' : 'Без срока'}
+                        </span>
+                        <span
+                          className={`text-xs font-medium ${
+                            task.status === 'done'
+                              ? 'text-[#8CA693]'
+                              : task.status === 'in_progress'
+                                ? 'text-[#FFC65C]'
+                                : 'text-[#4C95E9]'
+                          }`}
+                        >
+                          {task.status === 'done'
+                            ? 'Выполнено'
+                            : task.status === 'in_progress'
+                              ? 'В работе'
+                              : 'Ожидает'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-10 text-[#6F7D75]">
+                <img
+                  src="/empty-projects-icon.svg"
+                  alt=""
+                  className="w-12 h-12 mx-auto mb-3 opacity-50"
+                />
+                <p className="text-sm">Нет задач на этот день</p>
+              </div>
+            )}
+
+            <button
+              onClick={() =>
+                navigate('/tasks/create', {
+                  state: {
+                    deadline: selectedDate
+                      ? `${year}-${String(month + 1).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`
+                      : undefined,
+                  },
+                })
+              }
+              className="w-full mt-6 py-3 bg-[#8CA693] rounded-[0.625rem] text-sm text-white transition-colors flex items-center justify-center gap-2"
+            >
+              <img src="/add-icon.svg" alt="" className="w-3.5 h-3.5" />
+              Добавить задачу
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

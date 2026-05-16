@@ -14,6 +14,7 @@ import taskRoutes from './routes/taskRoutes';
 import projectRoutes from './routes/projectRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import calendarRoutes from './routes/calendarRoutes';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/calendar', calendarRoutes);
 app.use(errorHandler);
 
 const startServer = async () => {
