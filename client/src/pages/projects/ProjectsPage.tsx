@@ -69,8 +69,8 @@ export default function ProjectsPage() {
         <p className="text-sm text-[#6F7D75] mb-4">Проектов всего: {projects.length}</p>
 
         <div className="mb-4">
-          <div className="flex flex-col md:flex-row gap-24">
-            <div className="flex-1 relative">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-24 items-start">
+            <div className="w-full flex-1 relative">
               <img
                 src="/search2-icon.svg"
                 alt=""

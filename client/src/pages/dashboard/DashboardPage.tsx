@@ -97,28 +97,28 @@ const TaskRow = ({ task }: { task: Task }) => {
   return (
     <div
       onClick={() => navigate(`/tasks/${task._id}`)}
-      className="grid grid-cols-[2.7fr_1.1fr_1.1fr_1.1fr] gap-4 px-6 py-3 items-center border border-[#D9D9D9] hover:bg-[#FAFBFC] cursor-pointer transition-colors text-[#6F7D75] bg-white"
+      className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-3 items-center border border-[#D9D9D9] hover:bg-[#FAFBFC] cursor-pointer transition-colors text-[#6F7D75] bg-white"
     >
       <div className="flex items-center gap-2 min-w-0">
-        <span className="text-sm font-medium text-[#2F3A34] truncate" title={task.title}>
+        <span className="text-xs sm:text-sm font-medium text-[#2F3A34] truncate" title={task.title}>
           {task.title}
         </span>
       </div>
 
       <div className="flex justify-center">
         <span
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
+          className={`inline-flex items-center gap-[3px] xl:gap-1.5 xl:px-2.5 p-1 rounded-md text-[0.625rem] sm:text-xs font-medium ${p.bg} ${p.color}`}
         >
-          <img src={p.icon} alt="" className="w-3.5 h-3.5" />
+          <img src={p.icon} alt="" className="w-3 h-3 xl:w-3.5 xl:h-3.5" />
           {p.label}
         </span>
       </div>
 
       <div className="flex justify-center">
         <span
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
+          className={`inline-flex items-center gap-[3px] xl:gap-1.5 xl:px-2.5 p-1 rounded-md text-[0.625rem] sm:text-xs text-center font-medium ${dt.bg} ${dt.color}`}
         >
-          <img src={dt.icon} alt="" className="w-3.5 h-3.5" />
+          <img src={dt.icon} alt="" className="w-3 h-3 xl:w-3.5 xl:h-3.5" />
           {dt.label}
         </span>
       </div>
@@ -127,7 +127,7 @@ const TaskRow = ({ task }: { task: Task }) => {
         {task.deadline ? (
           <div className="flex flex-col items-center gap-0.5">
             <span
-              className={`text-xs font-medium ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+              className={`text-[0.625rem] sm:text-xs font-medium ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
             >
               {d.text}
             </span>
@@ -169,7 +169,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="min-w-0">
             <h1
-              className="text-3xl font-medium text-[#2F3A34] truncate max-w-2xl"
+              className="text-xl sm:text-2xl md:text-3xl xl:text-[2.1rem] font-medium text-[#2F3A34] truncate max-w-2xl"
               title={`Привет, ${name}`}
             >
               {getGreeting()}, {name}
@@ -178,57 +178,59 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl shadow-sm border border-[#F0F1F2] flex gap-6 overflow-hidden">
-            <div className="rounded-full bg-[#FFEFD3] w-14 h-14 flex items-center justify-center flex-shrink-0">
-              <img src="/dashboard-tasksInProgress-icon.svg" alt="" className="w-7 h-7" />
-            </div>
-            <div className="min-w-0 flex flex-col justify-center">
-              <p className="text-xl font-medium text-[#FFC65C] mb-1 truncate">В работе</p>
-              <div className="flex items-baseline gap-2 ml-1">
-                <span className="text-[1.25rem] font-medium text-[#FFC65C]">
-                  {stats.inProgress}
-                </span>
-                <span className="text-xs text-[#6F7D75] whitespace-nowrap">/ 5 макс.</span>
+          <div className="h-fit bg-white  p-3 rounded-2xl shadow-sm border border-[#F0F1F2] flex flex-col items-center gap-1 overflow-hidden">
+            <p className="text-xl xl:text-2xl font-medium text-[#FFC65C] truncate">В работе</p>
+            <div className="flex gap-4 items-center">
+              <div className="rounded-full bg-[#FFEFD3] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
+                <img
+                  src="/dashboard-tasksInProgress-icon.svg"
+                  alt=""
+                  className="h-5 w-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                />
               </div>
+              <span className="text-3xl font-medium text-[#FFC65C]">{stats.inProgress}</span>
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl shadow-sm border border-[#F0F1F2] flex gap-6 overflow-hidden">
-            <div className="rounded-full bg-[#E9F0F9] w-16 h-16 flex items-center justify-center flex-shrink-0">
-              <img src="/dashboard-tasksTodo-icon.svg" alt="" className="w-7 h-7" />
-            </div>
-            <div className="min-w-0 flex flex-col justify-center">
-              <p className="text-xl font-medium text-[#4C95E9] mb-1 truncate">Ожидают</p>
-              <span className="ml-1 text-[1.25rem] font-medium text-[#4C95E9]">
-                {stats.pending}
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl shadow-sm border border-[#F0F1F2] flex gap-6 overflow-hidden">
-            <div className="rounded-full bg-[#F0F3ED] w-16 h-16 flex items-center justify-center flex-shrink-0">
-              <img src="/dashboard-tasksCompleted-icon.svg" alt="" className="w-7 h-7" />
-            </div>
-            <div className="min-w-0 flex flex-col justify-center">
-              <p className="text-xl font-medium text-[#8CA693] mb-1 truncate">Завершено</p>
-              <div className="flex items-baseline gap-2 ml-1">
-                <span className="text-[1.25rem] font-medium text-[#8CA693]">
-                  {stats.completedThisWeek}
-                </span>
-                <span className="text-xs text-[#6F7D75] whitespace-nowrap">за неделю</span>
+          <div className="h-fit bg-white  p-3 rounded-2xl shadow-sm border border-[#F0F1F2] flex flex-col items-center gap-1 overflow-hidden">
+            <p className="text-xl xl:text-2xl font-medium text-[#4C95E9] truncate">Ожидают</p>
+            <div className="flex gap-4 items-center">
+              <div className="rounded-full bg-[#E9F0F9] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
+                <img
+                  src="/dashboard-tasksTodo-icon.svg"
+                  alt=""
+                  className="h-5 w-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                />
               </div>
+              <span className="text-3xl font-medium text-[#4C95E9]">{stats.pending}</span>
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl shadow-sm border border-[#F0F1F2] flex gap-6 overflow-hidden">
-            <div className="rounded-full bg-[#F1EBF4] w-16 h-16 flex items-center justify-center flex-shrink-0">
-              <img src="/dashboard-projects-icon.svg" alt="" className="w-7 h-7" />
+          <div className="h-fit bg-white  p-3 rounded-2xl shadow-sm border border-[#F0F1F2] flex flex-col items-center gap-1 overflow-hidden">
+            <p className="text-xl xl:text-2xl font-medium text-[#8CA693] truncate">Завершено</p>
+            <div className="flex gap-4 items-center">
+              <div className="rounded-full bg-[#F0F3ED] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
+                <img
+                  src="/dashboard-tasksCompleted-icon.svg"
+                  alt=""
+                  className="h-5 w-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                />
+              </div>
+              <span className="text-3xl font-medium text-[#8CA693]">{stats.completedThisWeek}</span>
             </div>
-            <div className="min-w-0 flex flex-col justify-center">
-              <p className="text-xl font-medium text-[#954BA8] mb-1 truncate">Мои проекты</p>
-              <span className="ml-1 text-[1.25rem] font-medium text-[#954BA8]">
-                {stats.projectCount}
-              </span>
+          </div>
+
+          <div className="h-fit bg-white p-3 rounded-2xl shadow-sm border border-[#F0F1F2] flex flex-col items-center gap-1 overflow-hidden">
+            <p className="text-xl xl:text-2xl font-medium text-[#954BA8] truncate">Мои проекты</p>
+            <div className="flex gap-4 items-center">
+              <div className="rounded-full bg-[#F1EBF4] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 flex items-center justify-center flex-shrink-0">
+                <img
+                  src="/dashboard-projects-icon.svg"
+                  alt=""
+                  className="h-5 w-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                />
+              </div>
+              <span className="text-3xl font-medium text-[#954BA8]">{stats.projectCount}</span>
             </div>
           </div>
         </div>
@@ -251,7 +253,7 @@ export default function DashboardPage() {
               <div className="bg-[#8CA693] rounded-[0.625rem] overflow-hidden shadow-sm border border-[#D9D9D9]">
                 {top3Tasks.length > 0 ? (
                   <>
-                    <div className="grid grid-cols-[2.7fr_1.1fr_1.1fr_1.1fr] gap-4 px-6 py-2.5 text-sm text-white items-center">
+                    <div className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-2.5 text-xs sm:text-sm text-white items-center">
                       <div className="text-left">Наименование</div>
                       <div className="text-center">Приоритет</div>
                       <div className="text-center">Тип дедлайна</div>
@@ -284,7 +286,7 @@ export default function DashboardPage() {
               <div className="bg-[#F0F3ED] rounded-[0.625rem] overflow-hidden shadow-sm border border-[#D9D9D9]">
                 {activeTasks.length > 0 ? (
                   <>
-                    <div className="grid grid-cols-[2.7fr_1.1fr_1.1fr_1.1fr] gap-4 px-6 py-2.5 text-sm text-[#5F6F65] items-center">
+                    <div className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-2.5 text-xs sm:text-sm text-[#5F6F65] items-center">
                       <div className="text-left">Наименование</div>
                       <div className="text-center">Приоритет</div>
                       <div className="text-center">Тип дедлайна</div>
@@ -349,7 +351,7 @@ export default function DashboardPage() {
                           >
                             {project.title}
                           </h3>
-                          <div className="w-full flex gap-8 items-center text-xs text-[#6F7D75]">
+                          <div className="w-full flex gap-3 sm:gap-8 items-center text-xs text-[#6F7D75]">
                             <span className="whitespace-nowrap flex-shrink-0">
                               {project.completedTasks || 0} из {project.totalTasks || 0}
                             </span>

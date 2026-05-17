@@ -40,21 +40,27 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-[url('/auth-bg.webp')] bg-cover bg-top bg-no-repeat opacity-80 -z-10" />
 
       <div className="relative py-[1.7rem] px-[1.6rem] text-[#2F3A34]">
-        <HeaderForUnauthorized />
-        <img src="/logo-eirene.webp" alt="Eirene logo" className="w-[11rem] h-[3.5rem] mx-auto" />
+        <div className="hidden md:block">
+          <HeaderForUnauthorized />
+        </div>
+        <img
+          src="/logo-eirene.webp"
+          alt="Eirene logo"
+          className="w-[11rem] h-[3.5rem] mx-auto md:mt-2"
+        />
 
-        <div className="min-h-[14rem] w-full max-w-[36rem] bg-white mx-auto px-4 md:px-14 pt-4 pb-6 rounded-[1.25rem] mt-4 shadow-[0_4px_4px_0_rgba(0,0,0,0.05)]">
+        <div className="min-h-[10rem] md:min-h-[14rem] w-full max-w-[28rem] sm:max-w-[32rem] md:max-w-[36rem] bg-white mx-auto px-10 md:px-14 pt-4 pb-6 rounded-[1.25rem] mt-6 shadow-[0_4px_4px_0_rgba(0,0,0,0.05)]">
           <form onSubmit={handleSubmit(onSubmit)} className="w-[100%]" noValidate>
             <h1 className="text-[1.65rem] mb-[0.75rem] text-center">Вход</h1>
             <div className="flex flex-col mb-4">
-              <label htmlFor="email" className="ml-[0.5rem] text-base font-medium">
+              <label htmlFor="email" className="ml-[0.5rem] text-sm md:text-base font-medium">
                 E-mail
               </label>
               <div className="relative">
                 <img
                   src="/email-icon.svg"
                   alt=""
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 pointer-events-none"
                 />
 
                 <input
@@ -62,43 +68,45 @@ export default function LoginPage() {
                   type="email"
                   placeholder="Введите вашу почту"
                   {...register('email')}
-                  className="border-[#F0F1F2] border-2 rounded-[0.5rem] h-11 w-full pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
+                  className="border-[#F0F1F2] border-2 rounded-[0.5rem] h-10 md:h-11 w-full pl-12 pr-4 placeholder-[#767676] text-sm md:text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-xs md:text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
             <div className="flex flex-col">
-              <label htmlFor="password" className="ml-[0.5rem] text-base font-medium">
+              <label htmlFor="password" className="ml-[0.5rem] text-sm md:text-base font-medium">
                 Пароль
               </label>
               <div className="relative">
                 <img
                   src="/password-icon.svg"
                   alt=""
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 pointer-events-none"
                 />
                 <input
                   id="password"
                   type="password"
                   placeholder="Введите ваш пароль"
                   {...register('password')}
-                  className="border-[#F0F1F2] border-2 rounded-[0.5rem] w-full h-11 pl-12 pr-4 placeholder-[#767676] text-base focus:outline-none focus:border-[#8CA693] transition"
+                  className="border-[#F0F1F2] border-2 rounded-[0.5rem] w-full h-10 md:h-11 pl-12 pr-4 placeholder-[#767676] text-sm md:text-base focus:outline-none focus:border-[#8CA693] transition"
                 />
               </div>
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <p className="text-red-500 text-xs md:text-sm mt-1">{errors.password.message}</p>
               )}
             </div>
             <button
               type="submit"
               disabled={isLoading || isSubmitting}
-              className="w-[100%] mt-8 mb-10 text-lg flex items-center font-medium justify-center h-[3rem] text-white bg-[#8CA693] rounded-[0.625rem]"
+              className="w-[100%] mt-8 mb-10 text-base md:text-lg flex items-center font-medium justify-center h-[2.5rem] md:h-[3rem] text-white bg-[#8CA693] rounded-[0.625rem]"
             >
               {isLoading ? 'Вход...' : 'Войти'}
             </button>
           </form>
           {submitError && (
-            <p className="text-red-500 text-sm text-center mb-4 animate-pulse">
+            <p className="text-red-500 text-xs md:text-sm text-center mb-4 animate-pulse">
               {submitError === 'Invalid credentials'
                 ? 'Такого пользователя не существует'
                 : submitError}

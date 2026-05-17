@@ -84,12 +84,12 @@ export default function SettingsPage() {
   if (loadingMe) return <div className="p-10 text-center">Загрузка...</div>;
 
   return (
-    <div className="px-5 md:px-8 lg:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
-      <div className="w-full max-w-[800px] mx-auto">
+    <div className="px-5 sm:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
+      <div className="w-full max-w-3xl mx-auto">
         <h1 className="text-2xl text-[#2F3A34] mb-6">Настройки</h1>
 
         <div className="space-y-6 mb-4">
-          <div className="bg-white rounded-2xl px-10 py-6 shadow-sm">
+          <div className="bg-white rounded-2xl px-6 md:px-10 py-6 shadow-sm">
             <h2 className="text-base font-medium text-[#2F3A34] mb-4">Профиль</h2>
 
             {formSuccess && (
@@ -107,7 +107,7 @@ export default function SettingsPage() {
                   <input
                     id="name"
                     type="text"
-                    className="w-full px-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
+                    className="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
                     {...register('name')}
                   />
                   {errors.name && (
@@ -125,7 +125,7 @@ export default function SettingsPage() {
                   <input
                     id="surname"
                     type="text"
-                    className="w-full px-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
+                    className="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
                     {...register('surname')}
                   />
                   {errors.surname && (
@@ -143,7 +143,7 @@ export default function SettingsPage() {
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
+                    className="w-full px-3 py-2.5 sm:px-4 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693]"
                     {...register('email')}
                   />
                   {errors.email && (
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                 <button
                   type="submit"
                   disabled={isUpdating || isSubmitting}
-                  className="px-6 py-2.5 bg-[#8CA693] text-white rounded-xl text-sm font-medium hover:bg-[#7A9181] disabled:opacity-50"
+                  className="px-3 sm:px-6 py-2.5 bg-[#8CA693] text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-[#7A9181] disabled:opacity-50"
                 >
                   {isUpdating ? 'Сохранение...' : 'Сохранить изменения'}
                 </button>
@@ -168,21 +168,23 @@ export default function SettingsPage() {
             </form>
           </div>
 
-          <div className="bg-white rounded-2xl px-10 py-6 shadow-sm">
+          <div className="bg-white rounded-2xl px-4 md:px-10 py-6 shadow-sm">
             <h2 className="text-base font-medium text-[#2F3A34] mb-4">Уведомления</h2>
 
-            <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-xl border border-[#F0F1F2]">
+            <div className="flex items-center justify-between px-2 py-3 sm:p-4 bg-[#F8FAFC] rounded-xl border border-[#F0F1F2]">
               <div>
-                <p className="text-sm font-medium text-[#2F3A34]">Email-рассылка</p>
-                <p className="text-xs text-[#6F7D75] mt-0.5">Напоминания о дедлайнах на почту</p>
+                <p className="text-xs sm:text-sm font-medium text-[#2F3A34]">Email-рассылка</p>
+                <p className="text-[0.625rem] sm:text-xs text-[#6F7D75] mt-0.5">
+                  Напоминания о дедлайнах на почту
+                </p>
               </div>
               <button
                 onClick={handleEmailToggle}
                 disabled={notifLoading}
-                className={`w-12 h-6 rounded-full transition-colors relative ${emailNotifs ? 'bg-[#8CA693]' : 'bg-[#D9D9D9]'}`}
+                className={`w-8 sm:w-12 h-[16.25px] sm:h-6 rounded-full transition-colors relative ${emailNotifs ? 'bg-[#8CA693]' : 'bg-[#D9D9D9]'}`}
               >
                 <span
-                  className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${emailNotifs ? 'translate-x-6' : 'translate-x-0'}`}
+                  className={`absolute top-0.5 left-0.5 w-3 h-3 sm:top-1 sm:left-1 sm:w-4 sm:h-4 bg-white rounded-full transition-transform shadow-sm ${emailNotifs ? 'translate-x-3 sm:translate-x-6' : 'translate-x-0'}`}
                 />
               </button>
             </div>
@@ -192,7 +194,7 @@ export default function SettingsPage() {
             <div className="bg-white rounded-xl">
               <button
                 onClick={handleLogout}
-                className="px-6 py-2.5 border bg-[#FFC9C9]/70 text-[#D32F2F] rounded-xl text-sm font-medium hover:bg-[#FFC9C9]/10 transition-colors"
+                className="px-3 sm:px-6 py-2.5 text-xs sm:text-sm border bg-[#FFC9C9]/70 text-[#D32F2F] rounded-xl font-medium hover:bg-[#FFC9C9]/10 transition-colors"
               >
                 Выйти из аккаунта
               </button>

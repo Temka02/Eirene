@@ -181,119 +181,142 @@ export default function ProjectDetailsPage() {
     navigate('/tasks/create', { state: { projectId: id } });
   };
 
-  if (loadingProject) return <div className="flex justify-center p-10">Загрузка...</div>;
-  if (errorProject || !project)
-    return <div className="flex justify-center p-10 text-[#D32F2F]">Проект не найден</div>;
+  if (loadingProject) return <div className="flex justify-center p-10 text-sm">Загрузка...</div>;
+  if (errorProject || !project) {
+    return (
+      <div className="flex flex-col gap-4 items-center justify-center h-[calc(100vh-8rem)]">
+        <div className="text-[#6F7D75] text-xs sm:text-sm">Проект не найден</div>
+        <button
+          onClick={() => navigate('/projects')}
+          className="px-6 sm:px-8 py-2 sm:py-3 bg-[#8CA693] text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-[#7A9181] transition-all shadow-[0_6px_20px_0_rgba(140,166,147,0.3)] active:scale-95"
+        >
+          К проектам
+        </button>
+      </div>
+    );
+  }
 
   const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
 
   return (
-    <div className="px-5 md:px-8 lg:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
-      <div className="w-full max-w-[1280px] mx-auto">
-        <div className="flex items-center gap-2 mb-6">
+    <div className="px-4 sm:px-5 md:px-8 lg:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
+      <div className="w-full max-w-7xl mx-auto">
+        <div className="flex items-center gap-2 mb-4 sm:mb-6">
           <button
             onClick={() => navigate('/projects')}
-            className="w-10 h-7 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
+            className="w-8 h-6 sm:w-10 sm:h-7 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
           >
-            <img src="/sortArrow-icon.svg" alt="Назад" className="w-3.5 h-3.5 -rotate-90" />
+            <img
+              src="/sortArrow-icon.svg"
+              alt="Назад"
+              className="w-3 h-3 sm:w-3.5 sm:h-3.5 -rotate-90"
+            />
           </button>
-          <h2 className="text-lg text-[#6F7D75]">Назад к проектам</h2>
+          <h2 className="text-base sm:text-lg text-[#6F7D75]">Назад к проектам</h2>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.75fr] gap-14 mb-4">
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 md:p-7 shadow-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.75fr] gap-3 sm:gap-6 md:gap-8 mb-4">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="bg-white rounded-2xl p-5 sm:p-6 md:p-7 shadow-sm">
               <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1px_1fr] lg:gap-9 gap-1 items-stretch mb-6">
                 <div className="flex flex-col items-start">
-                  <div className="flex items-start gap-4 flex-1 mb-4">
+                  <div className="flex items-start gap-3 sm:gap-4 flex-1 mb-3 sm:mb-4">
                     <div
-                      className={`w-12 h-12 rounded-xl ${iconData.iconBg} flex items-center justify-center flex-shrink-0`}
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${iconData.iconBg} flex items-center justify-center flex-shrink-0`}
                     >
-                      <img src={iconData.src} alt="" className="w-7 h-7" />
+                      <img src={iconData.src} alt="" className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
                     <div className="min-w-0">
-                      <h2 className="text-lg text-[#5F6F65] break-all leading-snug overflow-hidden">
+                      <h2 className="text-base sm:text-lg text-[#5F6F65] break-all leading-snug overflow-hidden">
                         Проект:
                         <span className="ml-1 font-medium text-[#2F3A34]">{project.title}</span>
                       </h2>
                       {project.updatedAt && (
-                        <p className="text-xs text-[#6F7D75] mt-1">
+                        <p className="text-[0.7rem] sm:text-xs text-[#6F7D75] mt-1">
                           Последнее обновление: {formatDate(project.updatedAt).text}
                         </p>
                       )}
                     </div>
                   </div>
                   {project.description && (
-                    <h3 className="text-sm text-[#5F6F65] leading-relaxed break-all overflow-hidden">
+                    <h3 className="text-xs sm:text-sm text-[#5F6F65] leading-relaxed break-all overflow-hidden">
                       Описание:
                       <span className="text-[#2F3A34] font-medium ml-1">{project.description}</span>
                     </h3>
                   )}
                 </div>
 
-                <div className="lg:w-[1px] lg:block hidden w-0 self-stretch bg-[#F0F1F2]"></div>
+                <div className="lg:w-[1px] lg:block hidden w-0 self-stretch bg-[#F0F1F2]" />
 
                 <div className="mt-2 flex-1 text-left">
-                  <h3 className="text-sm font-medium text-[#2F3A34] mb-3">Прогресс проекта</h3>
-                  <p className="text-xs text-[#6F7D75] mb-3">
+                  <h3 className="text-xs sm:text-sm font-medium text-[#2F3A34] mb-2 sm:mb-3">
+                    Прогресс проекта
+                  </h3>
+                  <p className="text-[0.7rem] sm:text-xs text-[#6F7D75] mb-2 sm:mb-3">
                     {completedTasks} из {totalTasks} задач
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-2 bg-[#F0F1F2] rounded-full overflow-hidden max-w-[18rem]">
+                    <div className="flex-1 h-2 bg-[#F0F1F2] rounded-full overflow-hidden">
                       <div
                         className="h-full bg-[#8CA693] rounded-full transition-all duration-500"
                         style={{ width: `${progressPercent}%` }}
                       />
                     </div>
-                    <span className="text-xs font-medium text-[#6F7D75]">{progressPercent}%</span>
+                    <span className="text-[0.7rem] sm:text-xs font-medium text-[#6F7D75]">
+                      {progressPercent}%
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => navigate(`/projects/${id}/edit`)}
-                  className="px-4 py-1.5 bg-[#8CA693] text-white rounded-lg text-sm font-medium hover:bg-[#7A9181] transition-colors flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1 sm:py-1.5 bg-[#8CA693] text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-[#7A9181] transition-colors flex items-center gap-2"
                 >
-                  <img src="/edit-icon.svg" alt="" className="w-3.5 h-3.5 -translate-y-[1.5px]" />
+                  <img
+                    src="/edit-icon.svg"
+                    alt=""
+                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 -translate-y-[1.5px]"
+                  />
                   Редактировать
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-4 py-1.5 bg-[#FFC9C9]/70 text-[#D32F2F] rounded-lg text-sm font-medium hover:bg-[#D32F2F]/20 transition-colors flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1 sm:py-1.5 bg-[#FFC9C9]/70 text-[#D32F2F] rounded-lg text-xs sm:text-sm font-medium hover:bg-[#D32F2F]/20 transition-colors flex items-center gap-2"
                 >
-                  <img src="/delete-icon.svg" alt="" className="w-4 h-4" />
+                  <img src="/delete-icon.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4" />
                   Удалить проект
                 </button>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <div className="flex items-start justify-between mb-4">
-                <h2 className="text-base font-medium text-[#2F3A34]">Задачи</h2>
+            <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
+                <h2 className="text-sm sm:text-base font-medium text-[#2F3A34]">Задачи</h2>
                 <div className="relative w-full sm:w-64">
                   <img
                     src="/search2-icon.svg"
                     alt=""
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6F7D75]"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-[#6F7D75]"
                   />
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Поиск по задачам..."
-                    className="w-full pl-9 pr-3 py-2 bg-[#F8FAFC] border border-[#F0F1F2] rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
+                    className="w-full pl-8 sm:pl-9 pr-2 sm:pr-3 py-1.5 sm:py-2 bg-[#F8FAFC] border border-[#F0F1F2] rounded-lg text-[0.7rem] sm:text-xs focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
                 <div ref={priorityRef} className="relative">
                   <button
                     onClick={() => setIsPriorityOpen(!isPriorityOpen)}
-                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
+                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
-                    <span>
+                    <span className="truncate max-w-[80px] sm:max-w-none">
                       {priority
                         ? priority === 'high'
                           ? 'Высокий'
@@ -305,11 +328,11 @@ export default function ProjectDetailsPage() {
                     <img
                       src="/asideArrow-icon.svg"
                       alt=""
-                      className={`w-2 h-2 transition-transform ${isPriorityOpen ? '-rotate-180' : '-rotate-90'}`}
+                      className={`w-1.5 h-1.5 sm:w-2 sm:h-2 transition-transform ${isPriorityOpen ? '-rotate-180' : '-rotate-90'}`}
                     />
                   </button>
                   {isPriorityOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-32 bg-white border shadow-lg rounded-lg py-1 z-50 text-[#6F7D75]">
+                    <div className="absolute top-full left-0 mt-1 w-28 sm:w-32 bg-white border shadow-lg rounded-lg py-1 z-50 text-[#6F7D75]">
                       {(['high', 'medium', 'low'] as const).map((p) => (
                         <button
                           key={p}
@@ -317,7 +340,7 @@ export default function ProjectDetailsPage() {
                             setPriority(p);
                             setIsPriorityOpen(false);
                           }}
-                          className="w-full text-left px-3 py-1.5 text-xs hover:bg-[#F0F3ED]"
+                          className="w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]"
                         >
                           {p === 'high' ? 'Высокий' : p === 'medium' ? 'Средний' : 'Низкий'}
                         </button>
@@ -327,7 +350,7 @@ export default function ProjectDetailsPage() {
                           setPriority(undefined);
                           setIsPriorityOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
+                        className={`w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs transition-colors ${
                           !priority
                             ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
                             : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
@@ -342,9 +365,9 @@ export default function ProjectDetailsPage() {
                 <div ref={deadlineTypeRef} className="relative">
                   <button
                     onClick={() => setIsDeadlineTypeOpen(!isDeadlineTypeOpen)}
-                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
+                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
-                    <span>
+                    <span className="truncate max-w-[80px] sm:max-w-none">
                       {deadlineType
                         ? deadlineType === 'hard'
                           ? 'Жeсткий'
@@ -356,11 +379,11 @@ export default function ProjectDetailsPage() {
                     <img
                       src="/asideArrow-icon.svg"
                       alt=""
-                      className={`w-2 h-2 transition-transform ${isDeadlineTypeOpen ? '-rotate-180' : '-rotate-90'}`}
+                      className={`w-1.5 h-1.5 sm:w-2 sm:h-2 transition-transform ${isDeadlineTypeOpen ? '-rotate-180' : '-rotate-90'}`}
                     />
                   </button>
                   {isDeadlineTypeOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-32 bg-white border shadow-lg rounded-lg py-1 z-50 text-[#6F7D75]">
+                    <div className="absolute top-full left-0 mt-1 w-28 sm:w-32 bg-white border shadow-lg rounded-lg py-1 z-50 text-[#6F7D75]">
                       {(['hard', 'soft', 'none'] as const).map((dt) => (
                         <button
                           key={dt}
@@ -368,7 +391,7 @@ export default function ProjectDetailsPage() {
                             setDeadlineType(dt);
                             setIsDeadlineTypeOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[#F0F3ED] ${
+                          className={`w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED] ${
                             deadlineType === dt
                               ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
                               : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
@@ -382,7 +405,7 @@ export default function ProjectDetailsPage() {
                           setDeadlineType(undefined);
                           setIsDeadlineTypeOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
+                        className={`w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs transition-colors ${
                           !deadlineType
                             ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
                             : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
@@ -397,9 +420,9 @@ export default function ProjectDetailsPage() {
                 <div ref={statusRef} className="relative">
                   <button
                     onClick={() => setIsStatusOpen(!isStatusOpen)}
-                    className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
+                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
-                    <span>
+                    <span className="truncate max-w-[80px] sm:max-w-none">
                       {status
                         ? status === 'todo'
                           ? 'Ожидает'
@@ -411,11 +434,11 @@ export default function ProjectDetailsPage() {
                     <img
                       src="/asideArrow-icon.svg"
                       alt=""
-                      className={`w-2 h-2 transition-transform ${isStatusOpen ? '-rotate-180' : '-rotate-90'}`}
+                      className={`w-1.5 h-1.5 sm:w-2 sm:h-2 transition-transform ${isStatusOpen ? '-rotate-180' : '-rotate-90'}`}
                     />
                   </button>
                   {isStatusOpen && (
-                    <div className="absolute top-full left-0 mt-1 w-32 bg-white border shadow-lg rounded-lg py-1 z-50 text-[#6F7D75]">
+                    <div className="absolute top-full left-0 mt-1 w-28 sm:w-32 bg-white border shadow-lg rounded-lg py-1 z-50 text-[#6F7D75]">
                       {(['todo', 'in_progress', 'done'] as const).map((s) => (
                         <button
                           key={s}
@@ -423,7 +446,7 @@ export default function ProjectDetailsPage() {
                             setStatus(s);
                             setIsStatusOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
+                          className={`w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs transition-colors ${
                             status === s
                               ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
                               : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
@@ -441,7 +464,7 @@ export default function ProjectDetailsPage() {
                           setStatus(undefined);
                           setIsStatusOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
+                        className={`w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs transition-colors ${
                           !status
                             ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
                             : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
@@ -455,174 +478,207 @@ export default function ProjectDetailsPage() {
 
                 <button
                   onClick={() => setOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
-                  className="px-3.5 py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-xs hover:bg-[#F0F3ED]/70 transition-colors"
+                  className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                 >
                   <span>Дедлайн</span>
                   <img
                     src="/sortArrow-icon.svg"
                     alt=""
-                    className={`w-2 h-2 ${order === 'asc' ? 'rotate-0' : 'rotate-180'} `}
+                    className={`w-1.5 h-1.5 sm:w-2 sm:h-2 ${order === 'asc' ? 'rotate-0' : 'rotate-180'}`}
                   />
                 </button>
               </div>
-              <div className="bg-[#F0F3ED] rounded-[0.625rem] overflow-hidden border">
-                <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] items-center gap-4 px-4 py-2 bg-[#F0F3ED] rounded-t-lg text-xs font-medium text-[#6F7D75]">
-                  <div>Наименование задачи</div>
-                  <div className="text-center">Приоритет</div>
-                  <div className="text-center">Тип дедлайна</div>
-                  <div className="text-center">Статус</div>
-                  <div className="text-center">Дедлайн</div>
-                </div>
-                <div>
-                  {loadingTasks || fetchingTasks ? (
-                    <div className="flex justify-center py-6">
-                      <div className="animate-spin w-5 h-5 border-2 border-[#8CA693] border-t-transparent rounded-full"></div>
-                    </div>
-                  ) : tasks.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-[#6F7D75]">Нет задач</div>
-                  ) : (
-                    tasks.map((task) => {
-                      const p = getPriorityConfig(task.priority);
-                      const dt = getDeadlineTypeConfig(task.deadlineType);
-                      const st = getStatusConfig(task.status);
-                      const d = formatDate(task.deadline);
-                      const isCompleted = task.status === 'done';
 
-                      return (
-                        <div
-                          key={task._id}
-                          onClick={() => navigate(`/tasks/${task._id}`)}
-                          className={`grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-4 py-3 items-center border border-[#D9D9D9] rounded-lg hover:bg-[#FAFBFC] cursor-pointer transition-colors ${task.status === 'done' ? 'bg-[#E4F0E5]' : 'bg-white'}`}
-                        >
-                          <div className="flex items-center gap-2 min-w-0">
-                            {task.status === 'done' && (
-                              <img src="/taskDone-icon.svg" className="w-4 h-4 flex-shrink-0" />
-                            )}
-                            <span
-                              className={`text-xs truncate ${task.status === 'done' ? 'line-through text-[#6F7D75]' : 'text-[#2F3A34] font-medium'} ${d.isOverdue && !isCompleted ? 'text-[#D32F2F]' : ''}`}
-                            >
-                              {task.title}
-                            </span>
-                          </div>
-                          <div className="flex justify-center">
-                            <span
-                              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded ${p.color} ${p.bg}`}
-                            >
-                              <img src={`${p.icon}`} alt="" className="-translate-y-0.5 w-3 h-3" />
-                              {p.label}
-                            </span>
-                          </div>
-                          <div className="flex justify-center">
-                            <span
-                              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded ${dt.color} ${dt.bg}`}
-                            >
-                              <img src={`${dt.icon}`} alt="" className="-translate-y-0.5 w-3 h-3" />
-                              {dt.label}
-                            </span>
-                          </div>
-                          <div className="flex justify-center">
-                            <span className={`text-xs font-medium text-[#6F7D75]`}>{st.label}</span>
-                          </div>
-                          <div className="text-center">
-                            {task.deadline ? (
-                              <div className="flex flex-col items-center gap-0.5">
-                                <span
-                                  className={`text-xs font-medium ${d.isOverdue && !isCompleted ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
-                                >
-                                  {d.text}
-                                </span>
-                                {d.isOverdue && !isCompleted && (
-                                  <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
-                                    Просрочено
+              <div className="overflow-x-auto w-full">
+                <div className="min-w-[32rem] bg-[#F0F3ED] rounded-lg overflow-hidden border">
+                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr] items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2 bg-[#F0F3ED] text-[0.65rem] sm:text-xs font-medium text-[#6F7D75]">
+                    <div>Наименование задачи</div>
+                    <div className="text-center">Приоритет</div>
+                    <div className="text-center">Тип дедлайна</div>
+                    <div className="text-center">Статус</div>
+                    <div className="text-center">Дедлайн</div>
+                  </div>
+                  <div>
+                    {loadingTasks || fetchingTasks ? (
+                      <div className="flex justify-center py-6">
+                        <div className="animate-spin w-5 h-5 border-2 border-[#8CA693] border-t-transparent rounded-full"></div>
+                      </div>
+                    ) : tasks.length === 0 ? (
+                      <div className="text-center py-6 sm:py-8 text-xs sm:text-sm text-[#6F7D75]">
+                        Нет задач
+                      </div>
+                    ) : (
+                      tasks.map((task) => {
+                        const p = getPriorityConfig(task.priority);
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const st = getStatusConfig(task.status);
+                        const d = formatDate(task.deadline);
+                        const isCompleted = task.status === 'done';
+                        return (
+                          <div
+                            key={task._id}
+                            onClick={() => navigate(`/tasks/${task._id}`)}
+                            className={`grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2 md:gap-4 px-3 md:px-4 py-2 md:py-3 items-center border border-[#D9D9D9] rounded-lg hover:bg-[#FAFBFC] cursor-pointer transition-colors ${task.status === 'done' ? 'bg-[#E4F0E5]' : 'bg-white'}`}
+                          >
+                            <div className="flex items-center gap-1.5 md:gap-2 min-w-0">
+                              {task.status === 'done' && (
+                                <img
+                                  src="/taskDone-icon.svg"
+                                  className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0"
+                                />
+                              )}
+                              <span
+                                className={`text-[0.65rem] sm:text-xs truncate ${task.status === 'done' ? 'line-through text-[#6F7D75]' : 'text-[#2F3A34] font-medium'} ${d.isOverdue && !isCompleted ? 'text-[#D32F2F]' : ''}`}
+                              >
+                                {task.title}
+                              </span>
+                            </div>
+                            <div className="flex justify-center">
+                              <span
+                                className={`inline-flex items-center gap-1 md:gap-1.5 text-[0.6rem] md:text-xs font-medium px-1.5 md:px-2 py-0.5 sm:py-1 rounded ${p.color} ${p.bg}`}
+                              >
+                                <img src={p.icon} alt="" className="w-2 h-2 md:w-3 md:h-3" />
+                                {p.label}
+                              </span>
+                            </div>
+                            <div className="flex justify-center">
+                              <span
+                                className={`inline-flex items-center gap-1 md:gap-1.5 text-[0.6rem] md:text-xs font-medium px-1.5 md:px-2 py-0.5 md:py-1 rounded ${dt.color} ${dt.bg}`}
+                              >
+                                <img src={dt.icon} alt="" className="w-2 h-2 md:w-3 md:h-3" />
+                                {dt.label}
+                              </span>
+                            </div>
+                            <div className="flex justify-center">
+                              <span
+                                className={`text-[0.6rem] md:text-xs font-medium text-[#6F7D75]`}
+                              >
+                                {st.label}
+                              </span>
+                            </div>
+                            <div className="text-center">
+                              {task.deadline ? (
+                                <div className="flex flex-col items-center gap-0.5">
+                                  <span
+                                    className={`text-[0.6rem] md:text-xs font-medium ${d.isOverdue && !isCompleted ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+                                  >
+                                    {d.text}
                                   </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-xs text-[#6F7D75]">-</span>
-                            )}
+                                  {d.isOverdue && !isCompleted && (
+                                    <span className="text-[0.5rem] md:text-[0.55rem] font-medium text-[#D32F2F] leading-none">
+                                      Просрочено
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-[0.6rem] md:text-xs text-[#6F7D75]">-</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })
+                        );
+                      })
+                    )}
+                  </div>
+
+                  {!loadingTasks && totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F0F1F2] px-3 md:px-4">
+                      <span className="text-[0.6rem] md:text-xs text-[#6F7D75]">
+                        Страница {page} из {totalPages}
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          disabled={page === 1}
+                          onClick={() => setPage((p) => p - 1)}
+                          className="px-2 md:px-3 py-1 bg-white border rounded-lg text-[0.6rem] md:text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
+                        >
+                          Назад
+                        </button>
+                        <button
+                          disabled={page === totalPages}
+                          onClick={() => setPage((p) => p + 1)}
+                          className="px-2 md:px-3 py-1 bg-white border rounded-lg text-[0.6rem] md:text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
+                        >
+                          Вперeд
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
-
-                {!loadingTasks && totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F0F1F2]">
-                    <span className="text-xs text-[#6F7D75]">
-                      Страница {page} из {totalPages}
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        disabled={page === 1}
-                        onClick={() => setPage((p) => p - 1)}
-                        className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
-                      >
-                        Назад
-                      </button>
-                      <button
-                        disabled={page === totalPages}
-                        onClick={() => setPage((p) => p + 1)}
-                        className="px-3 py-1 bg-white border rounded-lg text-xs disabled:opacity-50 hover:bg-[#F0F3ED]/70"
-                      >
-                        Вперeд
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="mt-4">
                 <button
                   onClick={handleAddTask}
-                  className="px-4 py-1.5 bg-[#8CA693] text-white rounded-lg text-sm font-medium hover:bg-[#7A9181] transition-colors flex items-center gap-2"
+                  className="px-3 sm:px-4 py-1 sm:py-1.5 bg-[#8CA693] text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-[#7A9181] transition-colors flex items-center gap-2"
                 >
-                  <img src="/add-icon.svg" alt="" className="w-3.5 h-3.5 -translate-y-[1.5px]" />
+                  <img
+                    src="/add-icon.svg"
+                    alt=""
+                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 -translate-y-[1.5px]"
+                  />
                   Добавить задачу
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="bg-white rounded-2xl py-6 px-7 shadow-sm">
-              <h2 className="text-base font-medium text-[#2F3A34] mb-4">О проекте</h2>
+          <div className="space-y-4 min-w-56">
+            <div className="bg-white rounded-2xl py-5 sm:py-6 px-5 sm:px-7 shadow-sm">
+              <h2 className="text-sm sm:text-base font-medium text-[#2F3A34] mb-3 sm:mb-4">
+                О проекте
+              </h2>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-4 p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-[0.625rem]">
-                  <div className="w-10 h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
-                    <img src="/allTasks-icon.svg" className="w-5 h-5 text-[#8CA693]" />
+              <div className=" grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-1 lg:space-y-3 lg:mb-6">
+                <div className="flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-lg">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
+                    <img
+                      src="/allTasks-icon.svg"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-[#8CA693]"
+                    />
                   </div>
                   <div className="flex flex-1 flex-col text-center">
-                    <p className="text-lg font-medium text-[#2F3A34]">{totalTasks}</p>
-                    <p className="text-xs text-[#6F7D75]">Всего задач</p>
+                    <p className="text-base sm:text-lg font-medium text-[#2F3A34]">{totalTasks}</p>
+                    <p className="text-[0.6rem] sm:text-xs text-[#6F7D75]">Всего задач</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-[0.625rem]">
-                  <div className="w-10 h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
-                    <img src="/tasksInProgress-icon.svg" className="w-5 h-5 text-[#F59E0B]" />
+                <div className="flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-lg">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
+                    <img
+                      src="/tasksInProgress-icon.svg"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-[#F59E0B]"
+                    />
                   </div>
                   <div className="flex flex-1 flex-col text-center">
-                    <p className="text-lg font-medium text-[#2F3A34]">{inProgressTasks}</p>
-                    <p className="text-xs text-[#6F7D75]">В работе</p>
+                    <p className="text-base sm:text-lg font-medium text-[#2F3A34]">
+                      {inProgressTasks}
+                    </p>
+                    <p className="text-[0.6rem] sm:text-xs text-[#6F7D75]">В работе</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-[0.625rem]">
-                  <div className="w-10 h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
-                    <img src="/tasksTodo-icon.svg" className="w-5 h-5 text-[#6F7D75]" />
+                <div className="flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-lg">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
+                    <img
+                      src="/tasksTodo-icon.svg"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-[#6F7D75]"
+                    />
                   </div>
                   <div className="flex flex-1 flex-col text-center">
-                    <p className="text-lg font-medium text-[#2F3A34]">{todoTasks}</p>
-                    <p className="text-xs text-[#6F7D75]">Ожидают</p>
+                    <p className="text-base sm:text-lg font-medium text-[#2F3A34]">{todoTasks}</p>
+                    <p className="text-[0.6rem] sm:text-xs text-[#6F7D75]">Ожидают</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-[0.625rem]">
-                  <div className="w-10 h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
-                    <img src="/tasksDone-icon.svg" className="w-5 h-5 text-[#8CA693]" />
+                <div className="flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 shadow-[0_6px_20px_0_rgba(0,0,0,0.075)] rounded-lg">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F0F3ED] flex items-center justify-center shadow-sm">
+                    <img
+                      src="/tasksDone-icon.svg"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-[#8CA693]"
+                    />
                   </div>
                   <div className="flex flex-1 flex-col text-center">
-                    <p className="text-lg font-medium text-[#2F3A34]">{completedTasks}</p>
-                    <p className="text-xs text-[#6F7D75]">Выполнено</p>
+                    <p className="text-base sm:text-lg font-medium text-[#2F3A34]">
+                      {completedTasks}
+                    </p>
+                    <p className="text-[0.6rem] sm:text-xs text-[#6F7D75]">Выполнено</p>
                   </div>
                 </div>
               </div>

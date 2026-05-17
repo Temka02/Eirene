@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -27,19 +27,36 @@ const Icon = ({
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isNarrowScreen, setIsNarrowScreen] = useState(false);
   const location = useLocation();
+
+  const updateCollapseState = () => {
+    const narrow = window.innerWidth < 1024;
+    setIsNarrowScreen(narrow);
+    if (narrow) {
+      setIsCollapsed(true);
+    }
+  };
+
+  useEffect(() => {
+    updateCollapseState();
+    window.addEventListener('resize', updateCollapseState);
+    return () => window.removeEventListener('resize', updateCollapseState);
+  }, []);
+
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
     <aside
       className={`relative min-h-[calc(100vh-3.25rem)] h-full bg-white flex flex-col transition-all duration-300 ease-in-out pt-5 ${
-        isCollapsed ? 'w-20' : 'w-56'
+        isCollapsed ? 'w-18' : 'w-56'
       }`}
     >
       {!isCollapsed && (
         <img src="/logo-eirene.webp" alt="Eirene" className="mx-auto h-10 w-32 mb-5" />
       )}
 
-      <nav className="flex-1 py-2.5 px-5 space-y-2 overflow-y-auto">
+      <nav className={`flex-1 py-2.5 space-y-2 overflow-y-auto ${isCollapsed ? 'px-3' : 'px-5'}`}>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
 
@@ -76,21 +93,23 @@ export default function Sidebar() {
         </div>
       )}
 
-      <div className="px-4 pb-4">
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-[#5F6F65] hover:bg-[#F0F3ED]/70 ${
-            isCollapsed ? 'justify-center' : ''
-          }`}
-        >
-          <img
-            src="/asideArrow-icon.svg"
-            alt=""
-            className={`transition-transform duration-300 h-3 w-2 ${isCollapsed ? 'rotate-180' : ''} `}
-          />
-          {!isCollapsed && <span className="text-base h-5 leading-tight">Свернуть меню</span>}
-        </button>
-      </div>
+      {!isNarrowScreen && (
+        <div className="px-4 pb-4">
+          <button
+            onClick={toggleCollapse}
+            className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-xl text-[#5F6F65] hover:bg-[#F0F3ED]/70 ${
+              isCollapsed ? 'justify-center' : ''
+            }`}
+          >
+            <img
+              src="/asideArrow-icon.svg"
+              alt=""
+              className={`transition-transform duration-300 h-3 w-2 ${isCollapsed ? 'rotate-180' : ''} `}
+            />
+            {!isCollapsed && <span className="text-base h-5 leading-tight">Свернуть меню</span>}
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

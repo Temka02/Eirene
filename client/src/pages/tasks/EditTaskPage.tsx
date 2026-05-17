@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateTaskMutation, useGetTaskQuery } from '../../features/tasks/tasksApi';
 import { useGetProjectsQuery } from '../../features/projects/projectsApi';
@@ -11,6 +11,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema, type TaskFormData } from '../../entities/validation';
+
 interface LocalSubtask {
   id?: string;
   title: string;
@@ -29,6 +30,9 @@ export default function EditTaskPage() {
   const [updateSubtask] = useUpdateSubtaskMutation();
   const [deleteSubtask] = useDeleteSubtaskMutation();
 
+  const [isProjectOpen, setIsProjectOpen] = useState(false);
+  const projectRef = useRef<HTMLDivElement>(null);
+
   const {
     register,
     handleSubmit,
@@ -45,7 +49,6 @@ export default function EditTaskPage() {
   });
 
   const deadlineType = watch('deadlineType');
-
   const [localSubtasks, setLocalSubtasks] = useState<LocalSubtask[]>([]);
 
   useEffect(() => {
@@ -77,6 +80,16 @@ export default function EditTaskPage() {
       }
     }
   }, [task, reset]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (projectRef.current && !projectRef.current.contains(event.target as Node)) {
+        setIsProjectOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleAddSubtask = () => setLocalSubtasks([...localSubtasks, { title: '' }]);
 
@@ -140,39 +153,43 @@ export default function EditTaskPage() {
   if (isLoadingTask || !task) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-        <div className="text-[#6F7D75] text-sm">Загрузка данных...</div>
+        <div className="text-[#6F7D75] text-xs sm:text-sm">Загрузка данных...</div>
       </div>
     );
   }
 
   return (
-    <div className="px-5 md:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
+    <div className="px-4 sm:px-5 md:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full mx-auto">
-        <div className="flex items-center gap-4 mb-3">
+        <div className="flex items-center gap-3 sm:gap-4 mb-3">
           <button
             onClick={() => navigate('/tasks')}
-            className="w-12 h-9 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
+            className="w-10 h-8 sm:w-12 sm:h-9 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center justify-center hover:bg-[#F0F3ED]/70 transition-colors"
           >
-            <img src="/sortArrow-icon.svg" alt="Назад" className="w-4 h-4 -rotate-90" />
+            <img
+              src="/sortArrow-icon.svg"
+              alt="Назад"
+              className="w-3 h-3 sm:w-4 sm:h-4 -rotate-90"
+            />
           </button>
-          <h1 className="text-2xl text-[#2F3A34]">Редактировать задачу</h1>
+          <h1 className="text-xl sm:text-2xl text-[#2F3A34]">Редактировать задачу</h1>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="bg-white rounded-2xl p-8 shadow-sm mb-4">
-            <h2 className="text-base font-medium text-[#2F3A34] mb-4 flex items-center justify-start gap-3">
-              <div className="flex justify-center items-center rounded-full bg-[#F0F3ED] text-[#5F6F65] w-6 h-6">
+          <div className="bg-white rounded-2xl px-4 sm:px-5 md:px-8 py-6 sm:py-8 shadow-sm mb-4">
+            <h2 className="text-sm sm:text-base font-medium text-[#2F3A34] mb-3 sm:mb-4 flex items-center justify-start gap-3">
+              <div className="flex justify-center items-center rounded-full bg-[#F0F3ED] text-[#5F6F65] w-5 h-5 sm:w-6 sm:h-6 text-xs sm:text-sm">
                 1
               </div>
               Информация о задаче
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-16 pl-10">
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 sm:gap-12 md:gap-16 pl-2 sm:pl-10">
               <div className="space-y-3">
                 <div>
                   <label
                     htmlFor="title"
-                    className="block text-sm font-medium text-[#2F3A34] mb-1.5"
+                    className="block text-xs sm:text-sm font-medium text-[#2F3A34] mb-1.5"
                   >
                     Название задачи
                   </label>
@@ -180,25 +197,27 @@ export default function EditTaskPage() {
                     <img
                       src="/projects-icon.svg"
                       alt=""
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#6F7D75]"
                     />
                     <input
                       id="title"
                       type="text"
                       placeholder="Введите название задачи"
-                      className="w-full pl-12 pr-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
+                      className="w-full pl-10 sm:pl-12 pr-4 py-2 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
                       {...register('title')}
                     />
                   </div>
                   {errors.title && (
-                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.title.message}</p>
+                    <p className="text-[0.7rem] sm:text-xs text-[#D32F2F] mt-1 ml-2">
+                      {errors.title.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
                   <label
                     htmlFor="description"
-                    className="block text-sm font-medium text-[#2F3A34] mb-1.5"
+                    className="block text-xs sm:text-sm font-medium text-[#2F3A34] mb-1.5"
                   >
                     Описание
                   </label>
@@ -206,26 +225,29 @@ export default function EditTaskPage() {
                     <img
                       src="/projects-icon.svg"
                       alt=""
-                      className="absolute left-4 top-4 w-5 h-5 text-[#6F7D75]"
+                      className="absolute left-4 top-4 w-4 h-4 sm:w-5 sm:h-5 text-[#6F7D75]"
                     />
                     <textarea
                       id="description"
                       placeholder="Кратко напишите, о чем ваша задача"
                       rows={2}
                       maxLength={500}
-                      className="w-full pl-12 pr-11 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all resize-none"
+                      className="w-full pl-10 sm:pl-12 pr-11 py-2 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all resize-none"
                       {...register('description')}
                     />
-                    <span className="absolute bottom-3 right-3 text-xs text-[#A0AEC0]">
+                    <span className="absolute bottom-2 right-3 text-[0.6rem] sm:text-xs text-[#A0AEC0]">
                       {watch('description')?.length || 0}/500
                     </span>
                   </div>
                   {errors.description && (
-                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.description.message}</p>
+                    <p className="text-[0.7rem] sm:text-xs text-[#D32F2F] mt-1 ml-2">
+                      {errors.description.message}
+                    </p>
                   )}
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-[#2F3A34] mb-1.5">
+                  <label className="block text-xs sm:text-sm font-medium text-[#2F3A34] mb-1.5">
                     Приоритет
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -253,20 +275,21 @@ export default function EditTaskPage() {
                         key={p.val}
                         type="button"
                         onClick={() => setValue('priority', p.val as any)}
-                        className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
+                        className={`flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl transition-all border-2 ${
                           watch('priority') === p.val
                             ? p.active
                             : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                         }`}
                       >
-                        <img src={p.icon} alt="" className="w-5 h-5" />
-                        <span className="text-xs font-medium">{p.label}</span>
+                        <img src={p.icon} alt="" className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="text-[0.65rem] sm:text-xs font-medium">{p.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-[#2F3A34] mb-1.5">
+                  <label className="block text-xs sm:text-sm font-medium text-[#2F3A34] mb-1.5">
                     Тип дедлайна
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -294,14 +317,18 @@ export default function EditTaskPage() {
                         key={dt.val}
                         type="button"
                         onClick={() => setValue('deadlineType', dt.val as any)}
-                        className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border-2 ${
+                        className={`flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl transition-all border-2 ${
                           watch('deadlineType') === dt.val
                             ? dt.active
                             : 'border-[#F0F1F2] bg-white text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                         }`}
                       >
-                        <img src={dt.icon} alt="" className="w-5 h-5 mb-1" />
-                        <span className="text-xs font-medium">{dt.label}</span>
+                        <img
+                          src={dt.icon}
+                          alt=""
+                          className="w-4 h-4 sm:w-5 sm:h-5 mb-0.5 sm:mb-1"
+                        />
+                        <span className="text-[0.65rem] sm:text-xs font-medium">{dt.label}</span>
                       </button>
                     ))}
                   </div>
@@ -310,38 +337,71 @@ export default function EditTaskPage() {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#2F3A34] mb-1.5">Проект</label>
-                  <div className="relative">
+                  <label className="block text-xs sm:text-sm font-medium text-[#2F3A34] mb-1.5">
+                    Проект
+                  </label>
+                  <div ref={projectRef} className="relative">
                     <img
                       src="/projects-icon.svg"
                       alt=""
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#6F7D75] z-10"
                     />
-                    <select
-                      className="w-full pl-12 pr-10 py-3 bg-white border-2 border-[#F0F1F2] text-[#767676] rounded-xl text-sm appearance-none focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all cursor-pointer"
-                      {...register('projectId')}
+                    <button
+                      type="button"
+                      onClick={() => setIsProjectOpen(!isProjectOpen)}
+                      className="w-full pl-10 sm:pl-12 pr-10 py-2 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-xs sm:text-sm text-left focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all flex items-center justify-between"
                     >
-                      <option value="">Выберите проект</option>
-                      {projects.map((project: any) => (
-                        <option key={project._id} value={project._id}>
-                          {project.title}
-                        </option>
-                      ))}
-                    </select>
-                    <img
-                      src="/asideArrow-icon.svg"
-                      alt=""
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none -rotate-90"
-                    />
+                      <span className="truncate">
+                        {watch('projectId')
+                          ? projects.find((p: any) => p._id === watch('projectId'))?.title ||
+                            'Выберите проект'
+                          : 'Выберите проект'}
+                      </span>
+                      <img
+                        src="/asideArrow-icon.svg"
+                        alt=""
+                        className={`w-3 h-3 transition-transform ${isProjectOpen ? '-rotate-180' : '-rotate-90'}`}
+                      />
+                    </button>
+                    {isProjectOpen && (
+                      <div className="absolute z-20 left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        <div
+                          onClick={() => {
+                            setValue('projectId', '');
+                            setIsProjectOpen(false);
+                          }}
+                          className={`px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-sm cursor-pointer hover:bg-[#F0F3ED] ${!watch('projectId') ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75]'}`}
+                        >
+                          <span>Личное (без проекта)</span>
+                        </div>
+                        {projects.map((project: any) => (
+                          <div
+                            key={project._id}
+                            onClick={() => {
+                              setValue('projectId', project._id);
+                              setIsProjectOpen(false);
+                            }}
+                            className={`px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-sm cursor-pointer hover:bg-[#F0F3ED] ${
+                              watch('projectId') === project._id
+                                ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
+                                : 'text-[#6F7D75]'
+                            }`}
+                          >
+                            {project.title}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <p className="mt-1 ml-2 text-[0.625rem] text-[#767676]">
+                  <p className="mt-1 ml-2 text-[0.55rem] sm:text-[0.625rem] text-[#767676]">
                     Если не выбрать, задача будет помечена как "Личное"
                   </p>
                 </div>
+
                 <div>
                   <label
                     htmlFor="deadline"
-                    className="block text-sm font-medium text-[#2F3A34] mb-1.5"
+                    className="block text-xs sm:text-sm font-medium text-[#2F3A34] mb-1.5"
                   >
                     Дедлайн
                   </label>
@@ -349,48 +409,50 @@ export default function EditTaskPage() {
                     <img
                       src="/calendar-icon.svg"
                       alt=""
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#6F7D75]"
                     />
                     <input
                       id="deadline"
                       type="datetime-local"
                       disabled={deadlineType === 'none'}
-                      className="w-full pl-12 pr-4 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full pl-10 sm:pl-12 pr-4 py-2 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       {...register('deadline')}
                     />
                   </div>
                   {errors.deadline && (
-                    <p className="text-xs text-[#D32F2F] mt-1 ml-2">{errors.deadline.message}</p>
+                    <p className="text-[0.7rem] sm:text-xs text-[#D32F2F] mt-1 ml-2">
+                      {errors.deadline.message}
+                    </p>
                   )}
                 </div>
               </div>
             </div>
 
-            <h2 className="text-base font-medium text-[#2F3A34] mt-8 mb-4 flex items-center justify-start gap-3">
-              <div className="flex justify-center items-center rounded-full bg-[#F0F3ED] text-[#5F6F65] w-6 h-6">
+            <h2 className="text-sm sm:text-base font-medium text-[#2F3A34] mt-6 sm:mt-8 mb-3 sm:mb-4 flex items-center justify-start gap-3">
+              <div className="flex justify-center items-center rounded-full bg-[#F0F3ED] text-[#5F6F65] w-5 h-5 sm:w-6 sm:h-6 text-xs sm:text-sm">
                 2
               </div>
               Подзадачи
             </h2>
 
-            <div className="space-y-3 pl-10">
+            <div className="space-y-3 pl-2 sm:pl-10">
               {localSubtasks.map((subtask, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#8CA693] text-white text-xs font-medium flex-shrink-0">
+                  <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#8CA693] text-white text-[0.6rem] sm:text-xs font-medium flex-shrink-0">
                     {index + 1}
                   </div>
                   <div className="relative flex-1">
                     <img
                       src="/subtask-icon.svg"
                       alt=""
-                      className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6F7D75]"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-[#6F7D75]"
                     />
                     <input
                       type="text"
                       value={subtask.title}
                       onChange={(e) => handleSubtaskChange(index, e.target.value)}
                       placeholder={`Подзадача ${index + 1}`}
-                      className="w-full pl-12 pr-10 py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
+                      className="w-full pl-10 sm:pl-12 pr-10 py-2 sm:py-3 bg-white border-2 border-[#F0F1F2] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
                     />
                     {localSubtasks.length > 1 && (
                       <button
@@ -401,7 +463,7 @@ export default function EditTaskPage() {
                         <img
                           src="/delete-icon.svg"
                           alt="Удалить"
-                          className="w-4 h-4 opacity-50 hover:opacity-100"
+                          className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hover:opacity-100"
                         />
                       </button>
                     )}
@@ -411,26 +473,26 @@ export default function EditTaskPage() {
               <button
                 type="button"
                 onClick={handleAddSubtask}
-                className="flex items-center gap-2 text-[#8CA693] font-medium text-sm hover:text-[#7A9181] transition-colors ml-9 mt-2"
+                className="flex items-center gap-2 text-[#8CA693] font-medium text-xs sm:text-sm hover:text-[#7A9181] transition-colors ml-9 mt-2"
               >
-                <img src="/add-icon.svg" alt="" className="w-4 h-4" />
+                <img src="/add-icon.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4" />
                 Добавить подзадачу
               </button>
             </div>
           </div>
 
-          <div className="flex justify-end gap-4 mb-2">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mb-2">
             <button
               type="button"
               onClick={() => navigate('/tasks')}
-              className="w-[13.5rem] text-center py-3 bg-white text-[#8CA693] rounded-xl text-sm font-medium hover:bg-[#F0F3ED]/70 transition-colors"
+              className="w-full sm:w-[13.5rem] text-center py-2 sm:py-3 bg-white text-[#8CA693] rounded-xl text-xs sm:text-sm font-medium hover:bg-[#F0F3ED]/70 transition-colors"
             >
               Отменить
             </button>
             <button
               type="submit"
               disabled={isUpdating}
-              className="w-[13.5rem] text-center py-3 bg-[#8CA693] text-white rounded-xl text-sm font-medium hover:bg-[#7A9181] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_6px_20px_0_rgba(140,166,147,0.4)] transition-all"
+              className="w-full sm:w-[13.5rem] text-center py-2 sm:py-3 bg-[#8CA693] text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-[#7A9181] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_6px_20px_0_rgba(140,166,147,0.4)] transition-all"
             >
               {isUpdating ? 'Сохранение...' : 'Сохранить изменения'}
             </button>
