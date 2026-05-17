@@ -43,7 +43,7 @@ lint_frontend:
   script:
     - cd client
     - if [ ! -d "node_modules" ]; then npm ci; fi
-    - npm run lint || echo "Frontend lint warnings"
+    - npm run lint
   needs: [install_frontend]
   cache:
     policy: pull
@@ -55,7 +55,7 @@ lint_backend:
   script:
     - cd server
     - if [ ! -d "node_modules" ]; then npm ci; fi
-    - npm run lint || echo "Backend lint warnings"
+    - npm run lint
   needs: [install_backend]
   cache:
     policy: pull
