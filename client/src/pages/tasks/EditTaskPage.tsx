@@ -296,7 +296,7 @@ export default function EditTaskPage() {
                     {[
                       {
                         val: 'hard',
-                        label: 'Жёсткий',
+                        label: 'Жесткий',
                         icon: '/hardDeadlineType-icon.svg',
                         active: 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]',
                       },

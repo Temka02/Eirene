@@ -61,7 +61,7 @@ const renderWithProviders = (ui: React.ReactElement, store = createMockStore()) 
 describe('SettingsPage', () => {
   const mockUser = {
     _id: 'user-123',
-    name: 'Артём',
+    name: 'Артем',
     surname: 'Иванов',
     email: 'artem@example.com',
     emailNotifications: true,
@@ -92,7 +92,7 @@ describe('SettingsPage', () => {
     });
 
     renderWithProviders(<SettingsPage />);
-    expect(screen.getByLabelText(/имя/i)).toHaveValue('Артём');
+    expect(screen.getByLabelText(/имя/i)).toHaveValue('Артем');
     expect(screen.getByLabelText(/фамилия/i)).toHaveValue('Иванов');
     expect(screen.getByLabelText(/email/i)).toHaveValue('artem@example.com');
   });

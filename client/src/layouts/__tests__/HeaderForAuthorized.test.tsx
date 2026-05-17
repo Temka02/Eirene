@@ -42,7 +42,7 @@ const renderWithProviders = (ui: React.ReactElement, user: any) => {
 };
 
 describe('HeaderForAuthorized', () => {
-  const mockUser = { name: 'Артём', surname: 'Иванов', email: 'artem@test.com' };
+  const mockUser = { name: 'Артем', surname: 'Иванов', email: 'artem@test.com' };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -55,7 +55,7 @@ describe('HeaderForAuthorized', () => {
 
   it('renders user name and avatar placeholder', () => {
     renderWithProviders(<HeaderForAuthorized />, mockUser);
-    expect(screen.getByText('Артём')).toBeInTheDocument();
+    expect(screen.getByText('Артем')).toBeInTheDocument();
     expect(screen.getByText('АИ')).toBeInTheDocument();
   });
 
