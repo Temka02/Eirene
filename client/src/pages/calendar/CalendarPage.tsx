@@ -357,7 +357,7 @@ export default function CalendarPage() {
             ) : (
               <div className="text-center py-10 text-[#6F7D75]">
                 <img
-                  src="/empty-projects-icon.svg"
+                  src="/allTasks-icon.svg"
                   alt=""
                   className="w-12 h-12 mx-auto mb-3 opacity-50"
                 />
