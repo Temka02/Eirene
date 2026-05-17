@@ -1,12 +1,11 @@
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetNotificationsQuery } from '../features/notifications/notificationsApi';
-import type { RootState } from '../store';
-import type { User } from '../entities/user/model';
+import { useGetMeQuery } from '../features/auth/authApi';
 
 export default function HeaderForAuthorized() {
   const navigate = useNavigate();
-  const user = useSelector((state: RootState) => state.auth.user) as User | null;
+  const { data: meData } = useGetMeQuery();
+  const user = meData?.user;
 
   const { data: unreadNotifications } = useGetNotificationsQuery({
     isRead: false,
