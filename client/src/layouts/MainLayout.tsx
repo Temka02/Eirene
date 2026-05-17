@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import HeaderForAuthorized from './HeaderForAuthorized';
+import { Suspense } from 'react';
 
 export default function MainLayout() {
   return (
@@ -10,7 +11,11 @@ export default function MainLayout() {
         <Sidebar />
         <main className="flex-1 w-full flex flex-col overflow-hidden">
           <HeaderForAuthorized />
-          <Outlet />
+          <Suspense
+            fallback={<div className="flex justify-center p-10 text-[#2F3A34]">Загрузка...</div>}
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

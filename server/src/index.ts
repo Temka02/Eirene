@@ -30,7 +30,7 @@ Sentry.setupExpressErrorHandler(app);
 
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: [env.CLIENT_URL, env.PREVIEW_PROD_CLIENT_URL],
     credentials: true,
   })
 );

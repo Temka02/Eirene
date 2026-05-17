@@ -1,24 +1,27 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import ProtectedRoute from '../../components/ProtectedRoute';
-import PublicRoute from '../../components/PublicRoute';
+import { lazy } from 'react';
 
-import MainLayout from '../../layouts/MainLayout';
-import DashboardPage from '../../pages/dashboard/DashboardPage';
-import NotFoundPage from '../../pages/NotFoundPage';
-import NotificationsPage from '../../pages/notifications/NotificationsPage';
-
-import { LandingPage, LoginPage, RegisterPage } from '../../pages/auth';
-import {
-  ProjectsPage,
-  CreateProjectPage,
-  EditProjectPage,
-  ProjectDetailsPage,
-} from '../../pages/projects';
-import { TasksPage, CreateTaskPage, EditTaskPage, TaskDetailsPage } from '../../pages/tasks';
-import FocusModePage from '../../pages/focus/FocusModePage';
-import SettingsPage from '../../pages/settings/SettingsPage';
-import CalendarPage from '../../pages/calendar/CalendarPage';
+const DashboardPage = lazy(() => import('../../pages/dashboard/DashboardPage'));
+const ProjectsPage = lazy(() => import('../../pages/projects/ProjectsPage'));
+const ProjectDetailsPage = lazy(() => import('../../pages/projects/ProjectDetailsPage'));
+const CreateProjectPage = lazy(() => import('../../pages/projects/CreateProjectPage'));
+const EditProjectPage = lazy(() => import('../../pages/projects/EditProjectPage'));
+const TasksPage = lazy(() => import('../../pages/tasks/TasksPage'));
+const TaskDetailsPage = lazy(() => import('../../pages/tasks/TaskDetailsPage'));
+const CreateTaskPage = lazy(() => import('../../pages/tasks/CreateTaskPage'));
+const EditTaskPage = lazy(() => import('../../pages/tasks/EditTaskPage'));
+const NotificationsPage = lazy(() => import('../../pages/notifications/NotificationsPage'));
+const SettingsPage = lazy(() => import('../../pages/settings/SettingsPage'));
+const CalendarPage = lazy(() => import('../../pages/calendar/CalendarPage'));
+const FocusModePage = lazy(() => import('../../pages/focus/FocusModePage'));
+const NotFoundPage = lazy(() => import('../../pages/NotFoundPage'));
+const LoginPage = lazy(() => import('../../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../../pages/auth/RegisterPage'));
+const LandingPage = lazy(() => import('../../pages/auth/LandingPage'));
+const ProtectedRoute = lazy(() => import('../../components/ProtectedRoute'));
+const PublicRoute = lazy(() => import('../../components/PublicRoute'));
+const MainLayout = lazy(() => import('../../layouts/MainLayout'));
 
 const routes = [
   {

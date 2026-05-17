@@ -9,7 +9,7 @@ export default function LandingPage() {
       <div className="relative py-[1.7rem] px-[1.6rem]">
         <HeaderForUnauthorized />
         <main className="flex items-center justify-center mt-2 flex-col text-[#2F3A34]">
-          <img src="/logo-eirene.svg" alt="Eirene logo" className="w-[11.5rem] h-[4.8rem]" />
+          <img src="/logo-eirene.webp" alt="Eirene logo" className="w-[11rem] h-[3.5rem]" />
           <h1 className="mt-1 text-[2.1rem]">Управляйте задачами со спокойствием</h1>
           <section className="max-w-[26rem] flex flex-col items-start gap-6 mt-3 mx-auto">
             <div className="h-[3.8rem] flex gap-6">

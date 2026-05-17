@@ -1,4 +1,3 @@
-import { Box } from '@mui/material';
 import HeaderForUnauthorized from '../../layouts/HeaderForUnauthorized';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { LoginCredentials } from '../../entities/auth/model';
@@ -42,9 +41,9 @@ export default function LoginPage() {
 
       <div className="relative py-[1.7rem] px-[1.6rem] text-[#2F3A34]">
         <HeaderForUnauthorized />
-        <img src="/logo-eirene.svg" alt="Eirene logo" className="w-[11.5rem] h-[4.8rem] mx-auto" />
+        <img src="/logo-eirene.webp" alt="Eirene logo" className="w-[11rem] h-[3.5rem] mx-auto" />
 
-        <Box className="min-h-[14rem] w-full max-w-[36rem] bg-white mx-auto px-4 md:px-14 pt-4 pb-6 rounded-[1.25rem] mt-4">
+        <div className="min-h-[14rem] w-full max-w-[36rem] bg-white mx-auto px-4 md:px-14 pt-4 pb-6 rounded-[1.25rem] mt-4 shadow-[0_4px_4px_0_rgba(0,0,0,0.05)]">
           <form onSubmit={handleSubmit(onSubmit)} className="w-[100%]" noValidate>
             <h1 className="text-[1.65rem] mb-[0.75rem] text-center">Вход</h1>
             <div className="flex flex-col mb-4">
@@ -114,7 +113,7 @@ export default function LoginPage() {
               </Link>
             </span>
           </div>
-        </Box>
+        </div>
       </div>
     </div>
   );

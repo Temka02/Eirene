@@ -35,7 +35,9 @@ export default function Sidebar() {
         isCollapsed ? 'w-20' : 'w-56'
       }`}
     >
-      {!isCollapsed && <img src="/logo-eirene.svg" alt="Eirene" className="mx-auto h-10 mb-5" />}
+      {!isCollapsed && (
+        <img src="/logo-eirene.webp" alt="Eirene" className="mx-auto h-10 w-32 mb-5" />
+      )}
 
       <nav className="flex-1 py-2.5 px-5 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
@@ -59,7 +61,7 @@ export default function Sidebar() {
       </nav>
 
       {!isCollapsed && (
-        <div className="h-48 mx-4 mb-6 rounded-[1.25rem] bg-cover bg-center relative overflow-hidden bg-[url('/mountains-bg.jpg')]">
+        <div className="h-48 mx-4 mb-6 rounded-[1.25rem] bg-cover bg-center relative overflow-hidden bg-[url('/mountains-bg.webp')]">
           <div className="flex flex-col h-[50%] top-[50%] absolute w-full bg-gradient-to-t from-[#DCE6DD] to-[#E8F0E9] opacity-80">
             <div className="p-3 ">
               <p className="text-[#8CA693] text-[0.95rem] font-medium">
