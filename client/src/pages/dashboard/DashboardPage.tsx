@@ -250,25 +250,29 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              <div className="bg-[#8CA693] rounded-[0.625rem] overflow-hidden shadow-sm border border-[#D9D9D9]">
-                {top3Tasks.length > 0 ? (
-                  <>
-                    <div className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-2.5 text-xs sm:text-sm text-white items-center">
-                      <div className="text-left">Наименование</div>
-                      <div className="text-center">Приоритет</div>
-                      <div className="text-center">Тип дедлайна</div>
-                      <div className="text-center">Дедлайн</div>
-                    </div>
-                    {top3Tasks.map((task) => (
-                      <TaskRow key={task._id} task={task} />
-                    ))}
-                  </>
-                ) : (
-                  <div className="p-10 text-center text-[#6F7D75] bg-[#F8FAFC]">
-                    <p>Нет срочных задач</p>
-                    <p>Отличное время для отдыха или планирования</p>
+              <div className="overflow-x-auto">
+                <div className="min-w-[36rem]">
+                  <div className="bg-[#8CA693] rounded-[0.625rem] overflow-hidden shadow-sm border border-[#D9D9D9]">
+                    {top3Tasks.length > 0 ? (
+                      <>
+                        <div className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-2.5 text-xs sm:text-sm text-white items-center">
+                          <div className="text-left">Наименование</div>
+                          <div className="text-center">Приоритет</div>
+                          <div className="text-center">Тип дедлайна</div>
+                          <div className="text-center">Дедлайн</div>
+                        </div>
+                        {top3Tasks.map((task) => (
+                          <TaskRow key={task._id} task={task} />
+                        ))}
+                      </>
+                    ) : (
+                      <div className="p-10 text-center text-[#6F7D75] bg-[#F8FAFC]">
+                        <p>Нет срочных задач</p>
+                        <p>Отличное время для отдыха или планирования</p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </section>
 
@@ -283,26 +287,31 @@ export default function DashboardPage() {
                 </button>
               </div>
 
-              <div className="bg-[#F0F3ED] rounded-[0.625rem] overflow-hidden shadow-sm border border-[#D9D9D9]">
-                {activeTasks.length > 0 ? (
-                  <>
-                    <div className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-2.5 text-xs sm:text-sm text-[#5F6F65] items-center">
-                      <div className="text-left">Наименование</div>
-                      <div className="text-center">Приоритет</div>
-                      <div className="text-center">Тип дедлайна</div>
-                      <div className="text-center">Дедлайн</div>
-                    </div>
-                    {activeTasks.map((task) => (
-                      <TaskRow key={task._id} task={task} />
-                    ))}
-                  </>
-                ) : (
-                  <div className="p-10 text-center text-[#6F7D75] bg-[#F8FAFC]">
-                    <p>Нет активных задач</p>
-                    <p>Добавь новую задачу или выбери из списка</p>
+              <div className="overflow-x-auto">
+                <div className="min-w-[36rem]">
+                  <div className="bg-[#F0F3ED] rounded-[0.625rem] overflow-hidden shadow-sm border border-[#D9D9D9]">
+                    {activeTasks.length > 0 ? (
+                      <>
+                        <div className="grid grid-cols-[2.4fr_1.2fr_1.2fr_1.2fr] gap-3 px-4 py-2.5 text-xs sm:text-sm text-[#5F6F65] items-center">
+                          <div className="text-left">Наименование</div>
+                          <div className="text-center">Приоритет</div>
+                          <div className="text-center">Тип дедлайна</div>
+                          <div className="text-center">Дедлайн</div>
+                        </div>
+                        {activeTasks.map((task) => (
+                          <TaskRow key={task._id} task={task} />
+                        ))}
+                      </>
+                    ) : (
+                      <div className="p-10 text-center text-[#6F7D75] bg-[#F8FAFC]">
+                        <p>Нет активных задач</p>
+                        <p>Добавь новую задачу или выбери из списка</p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
+
               <button
                 onClick={() => navigate('/tasks/create')}
                 className="mt-4 rounded-xl text-sm font-medium text-[#5F6F65] bg-transparent hover:text-[#2F3A34] transition-colors flex items-center justify-center gap-2"
