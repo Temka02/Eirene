@@ -28,12 +28,18 @@ const app = express();
 
 Sentry.setupExpressErrorHandler(app);
 
+const allowedOrigins = [env.CLIENT_URL];
+if (env.PREVIEW_PROD_CLIENT_URL) {
+  allowedOrigins.push(env.PREVIEW_PROD_CLIENT_URL);
+}
+
 app.use(
   cors({
-    origin: [env.CLIENT_URL, env.PREVIEW_PROD_CLIENT_URL],
+    origin: allowedOrigins,
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
