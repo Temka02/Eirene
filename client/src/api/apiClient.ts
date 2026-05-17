@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import { logout, updateAccessToken } from '../store/authSlice';
 import { store } from '../store';
+import { API_BASE_URL } from '../config';
 
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
@@ -10,7 +11,7 @@ declare module 'axios' {
 }
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  baseURL: API_BASE_URL,
   timeout: Number(import.meta.env.VITE_API_TIMEOUT) || 10000,
   withCredentials: true,
 });
