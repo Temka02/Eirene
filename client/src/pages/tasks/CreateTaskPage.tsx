@@ -6,6 +6,7 @@ import { useAddSubtaskMutation } from '../../features/tasks/subtasksApi';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema, type TaskFormData } from '../../entities/validation';
+import { localDateTimeToUTC } from '../../utils/dateHelper';
 
 export default function CreateTaskPage() {
   const navigate = useNavigate();
@@ -59,13 +60,18 @@ export default function CreateTaskPage() {
   const onSubmit = async (data: TaskFormData) => {
     setApiError('');
     try {
+      let deadlineToSend = data.deadlineType !== 'none' ? data.deadline : undefined;
+      if (deadlineToSend) {
+        deadlineToSend = localDateTimeToUTC(deadlineToSend);
+      }
+
       const createdTask = await createTask({
         title: data.title,
         description: data.description,
         projectId: data.projectId || undefined,
         priority: data.priority,
         deadlineType: data.deadlineType,
-        deadline: data.deadlineType !== 'none' ? data.deadline : undefined,
+        deadline: deadlineToSend,
       }).unwrap();
 
       const validSubtasks = subtasks.filter((s) => s.trim() !== '');
