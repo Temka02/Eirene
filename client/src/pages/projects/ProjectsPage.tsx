@@ -99,7 +99,7 @@ export default function ProjectsPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8CA693]"></div>
           </div>
         ) : displayedProjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {displayedProjects.map((project) => {
               const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
               const lastUpdate = project.updatedAt
@@ -110,7 +110,7 @@ export default function ProjectsPage() {
                 <div
                   key={project._id}
                   onClick={() => navigate(`/projects/${project._id}`)}
-                  className="group bg-white py-5 px-7 rounded-[1.5rem] shadow-[0_6px_20px_rgb(0,0,0,0.05)] transition-all cursor-pointer flex flex-col border border-transparent hover:border-[#8CA693]/25"
+                  className="group bg-white py-5 px-4 sm:px-7 rounded-[1.5rem] shadow-[0_6px_20px_rgb(0,0,0,0.05)] transition-all cursor-pointer flex flex-col border border-transparent hover:border-[#8CA693]/25"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4 min-w-0">
@@ -161,15 +161,15 @@ export default function ProjectsPage() {
                   <div className="grid grid-cols-3 gap-2 text-xs mb-4">
                     <div className="text-center p-2 font-medium text-[#4C95E9] border border-[#4C95E9] rounded-lg">
                       <div className="truncate text-base">{project.todoTasks || 0}</div>
-                      <div className="text-xs">Ожидают</div>
+                      <div className="text-[0.625rem] sm:text-xs">Ожидают</div>
                     </div>
                     <div className="text-center p-2 font-medium text-[#FFC65C] border border-[#FFC65C] rounded-lg">
                       <div className="truncate text-base">{project.inProgressTasks || 0}</div>
-                      <div className="text-xs">В работе</div>
+                      <div className="text-[0.625rem] sm:text-xs">В работе</div>
                     </div>
                     <div className="text-center p-2 font-medium text-[#8CA693] border border-[#8CA693] rounded-lg">
                       <div className="truncate text-base">{project.completedTasks || 0}</div>
-                      <div className="text-xs">Завершено</div>
+                      <div className="text-[0.625rem] sm:text-xs">Завершено</div>
                     </div>
                   </div>
 
