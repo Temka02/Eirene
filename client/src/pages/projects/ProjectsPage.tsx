@@ -2,15 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetProjectsQuery } from '../../features/projects/projectsApi';
 import type { Project } from '../../entities/project/model';
-
-const projectIconConfig = {
-  plant: { src: '/project-plant-icon.svg', iconBg: 'bg-[#F0F1F2]' },
-  sun: { src: '/project-sun-icon.svg', iconBg: 'bg-[#FFEFD3]' },
-  waves: { src: '/project-waves-icon.svg', iconBg: 'bg-[#E9F0F9]' },
-  star: { src: '/project-star-icon.svg', iconBg: 'bg-[#F5F3FF]' },
-  mountains: { src: '/project-mountains-icon.svg', iconBg: 'bg-[#EDD7C9]' },
-  flower: { src: '/project-flower-icon.svg', iconBg: 'bg-[#FFC9C9]' },
-};
+import { getProjectIconConfig } from '../../utils/projectIcons';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -101,7 +93,7 @@ export default function ProjectsPage() {
         ) : displayedProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {displayedProjects.map((project) => {
-              const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
+              const iconData = getProjectIconConfig(project.icon);
               const lastUpdate = project.updatedAt
                 ? new Date(project.updatedAt).toLocaleDateString('ru-RU')
                 : '...';

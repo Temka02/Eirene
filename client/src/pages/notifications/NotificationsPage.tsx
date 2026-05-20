@@ -8,6 +8,7 @@ import {
   useMarkAsReadMutation,
 } from '../../features/notifications/notificationsApi';
 import type { Notification as NotificationItem } from '../../entities/notification/model';
+import { formatDeadlineFull } from '../../utils/taskDisplay';
 
 type TabType = 'all' | 'unread';
 type NotificationType = 'all' | 'deadline' | 'achievement';
@@ -51,6 +52,19 @@ export default function NotificationsPage() {
         );
       }
       Sentry.captureException(error);
+    }
+  };
+
+  const getNotificationTypeLabel = (type: NotificationType) => {
+    switch (type) {
+      case 'all':
+        return 'Все';
+      case 'deadline':
+        return 'Напоминания';
+      case 'achievement':
+        return 'Завершенные';
+      default:
+        return 'Все';
     }
   };
 
@@ -204,13 +218,7 @@ export default function NotificationsPage() {
               className="flex w-36 sm:w-44 items-center justify-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[#6F7D75] hover:bg-[#F0F3ED]/50 transition-colors"
             >
               <span className="text-xs sm:text-sm font-medium">
-                {selectedType === 'all'
-                  ? 'Все'
-                  : selectedType === 'deadline'
-                    ? 'Напоминания'
-                    : selectedType === 'achievement'
-                      ? 'Завершенные'
-                      : 'Системные'}
+                {getNotificationTypeLabel(selectedType)}
               </span>
               <img
                 src="/asideArrow-icon.svg"
@@ -234,13 +242,7 @@ export default function NotificationsPage() {
                         : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                     }`}
                   >
-                    {type === 'all'
-                      ? 'Все'
-                      : type === 'deadline'
-                        ? 'Напоминания'
-                        : type === 'achievement'
-                          ? 'Завершенные'
-                          : 'Системные'}
+                    {getNotificationTypeLabel(type)}
                   </button>
                 ))}
               </div>
@@ -307,14 +309,9 @@ export default function NotificationsPage() {
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <img src="/calendar-icon.svg" alt="" className="w-3 h-3" />
-                                    <span>
-                                      Дедлайн:{' '}
-                                      {new Date(notification.deadline!).toLocaleString('ru-RU', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })}
+                                    <span className="translate-y-[1px]">
+                                      <span className="hidden sm:inline">Дедлайн: </span>
+                                      {formatDeadlineFull(notification.deadline).text}
                                     </span>
                                   </div>
                                 </>
@@ -337,12 +334,7 @@ export default function NotificationsPage() {
                                     <img src="/calendar-icon.svg" alt="" className="w-3 h-3" />
                                     <span className="translate-y-[1px]">
                                       <span className="hidden sm:inline">Дедлайн: </span>
-                                      {new Date(notification.deadline!).toLocaleString('ru-RU', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })}
+                                      {formatDeadlineFull(notification.deadline).text}
                                     </span>
                                   </div>
                                 </>

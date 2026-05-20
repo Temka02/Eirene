@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetCalendarTasksQuery } from '../../features/calendar/calendarApi';
 import type { Task } from '../../entities/task/model';
+import { getPriorityConfig, getDeadlineTypeConfig, getStatusConfig } from '../../utils/taskDisplay';
+import { getDayCellClass, getDayNumberClass, getStatusColorClass } from '../../utils/uiHelpers';
 
 const monthNames = [
   'Январь',
@@ -19,62 +21,6 @@ const monthNames = [
 ];
 
 const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-
-const getPriorityConfig = (p: Task['priority']) => {
-  switch (p) {
-    case 'high':
-      return {
-        label: 'В',
-        color: 'text-[#D32F2F]',
-        icon: '/highPriority-icon.svg',
-        bg: 'bg-[#FFEDEE]',
-      };
-    case 'medium':
-      return {
-        label: 'С',
-        color: 'text-[#F59E0B]',
-        icon: '/mediumPriority-icon.svg',
-        bg: 'bg-[#FFF4E5]',
-      };
-    case 'low':
-      return {
-        label: 'Н',
-        color: 'text-[#10B981]',
-        icon: '/lowPriority-icon.svg',
-        bg: 'bg-[#E6F9F1]',
-      };
-    default:
-      return { label: '', color: '', icon: '', bg: '' };
-  }
-};
-
-const getDeadlineTypeConfig = (dt: Task['deadlineType']) => {
-  switch (dt) {
-    case 'hard':
-      return {
-        label: 'Ж',
-        icon: '/hardDeadlineType-icon.svg',
-        color: 'text-[#D32F2F]',
-        bg: 'bg-[#FFEDEE]',
-      };
-    case 'soft':
-      return {
-        label: 'М',
-        icon: '/softDeadlineType-icon.svg',
-        color: 'text-[#10B981]',
-        bg: 'bg-[#E6F9F1]',
-      };
-    case 'none':
-      return {
-        label: '—',
-        icon: '/noDeadline-icon.svg',
-        color: 'text-[#6F7D75]',
-        bg: 'bg-[#F3F4F6]',
-      };
-    default:
-      return { label: '', color: '', icon: '', bg: '' };
-  }
-};
 
 export default function CalendarPage() {
   const navigate = useNavigate();
@@ -244,22 +190,10 @@ export default function CalendarPage() {
                   <div
                     key={day}
                     onClick={() => setSelectedDate(isSelected ? null : String(day))}
-                    className={`min-h-[3rem] md:min-h-[120px] lg:min-h-[140px] rounded-lg md:rounded-xl border md:border-2 p-1 md:p-2 cursor-pointer transition-all flex flex-col gap-1 ${
-                      isCurrentDay
-                        ? 'border-[#8CA693] bg-[#F0F3ED]'
-                        : isSelected
-                          ? 'border-[#8CA693] bg-white'
-                          : 'hover:border-[#8CA693]/50 hover:bg-[#FAFBFC]'
-                    }`}
+                    className={`min-h-[3rem] md:min-h-[120px] lg:min-h-[140px] rounded-lg md:rounded-xl border md:border-2 p-1 md:p-2 cursor-pointer transition-all flex flex-col gap-1 ${getDayCellClass(isCurrentDay, isSelected)}`}
                   >
                     <div className="flex justify-center md:justify-between items-center">
-                      <span
-                        className={`text-xs md:text-sm font-medium ${
-                          isCurrentDay ? 'text-[#8CA693]' : 'text-[#2F3A34]'
-                        } ${isSelected && !isCurrentDay ? 'bg-[#8CA693] text-white w-5 h-5 md:w-auto md:h-auto md:bg-transparent md:text-[#2F3A34] rounded-full flex items-center justify-center' : ''}`}
-                      >
-                        {day}
-                      </span>
+                      <span className={getDayNumberClass(isCurrentDay, isSelected)}>{day}</span>
 
                       {dayTasks.length > 0 && (
                         <span className="hidden md:block text-[0.625rem] text-[#6F7D75] bg-[#F0F3ED] px-1.5 rounded-full">
@@ -334,22 +268,12 @@ export default function CalendarPage() {
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded ${dt.bg} ${dt.color}`}
                         >
                           <img src={dt.icon} alt="" className="w-3 h-3" />
-                          {dt.label === 'Ж' ? 'Жeсткий' : dt.label === 'М' ? 'Мягкий' : 'Без срока'}
+                          {dt.label}
                         </span>
                         <span
-                          className={`text-xs font-medium truncate ${
-                            task.status === 'done'
-                              ? 'text-[#8CA693]'
-                              : task.status === 'in_progress'
-                                ? 'text-[#FFC65C]'
-                                : 'text-[#4C95E9]'
-                          }`}
+                          className={`text-xs font-medium truncate ${getStatusColorClass(task.status)}`}
                         >
-                          {task.status === 'done'
-                            ? 'Выполнено'
-                            : task.status === 'in_progress'
-                              ? 'В работе'
-                              : 'Ожидает'}
+                          {getStatusConfig(task.status).label}
                         </span>
                       </div>
                     </div>

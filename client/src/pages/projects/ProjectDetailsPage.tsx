@@ -5,18 +5,15 @@ import {
   useDeleteProjectMutation,
   useGetProjectTasksQuery,
 } from '../../features/projects/projectsApi';
-import type { Task } from '../../entities/task/model';
+import {
+  getPriorityConfig,
+  getDeadlineTypeConfig,
+  getStatusConfig,
+  formatDeadline,
+} from '../../utils/taskDisplay';
+import { getProjectIconConfig } from '../../utils/projectIcons';
 
 const LIMIT = 5;
-
-const projectIconConfig = {
-  plant: { src: '/project-plant-icon.svg', iconBg: 'bg-[#F0F1F2]' },
-  sun: { src: '/project-sun-icon.svg', iconBg: 'bg-[#FFEFD3]' },
-  waves: { src: '/project-waves-icon.svg', iconBg: 'bg-[#E9F0F9]' },
-  star: { src: '/project-star-icon.svg', iconBg: 'bg-[#F5F3FF]' },
-  mountains: { src: '/project-mountains-icon.svg', iconBg: 'bg-[#EDD7C9]' },
-  flower: { src: '/project-flower-icon.svg', iconBg: 'bg-[#FFC9C9]' },
-};
 
 export default function ProjectDetailsPage() {
   const navigate = useNavigate();
@@ -66,6 +63,42 @@ export default function ProjectDetailsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const getPriorityFilterLabel = (priority?: 'high' | 'medium' | 'low') => {
+    if (!priority) return 'Приоритет: Все';
+    switch (priority) {
+      case 'high':
+        return 'Высокий';
+      case 'medium':
+        return 'Средний';
+      case 'low':
+        return 'Низкий';
+    }
+  };
+
+  const getDeadlineTypeFilterLabel = (deadlineType?: 'hard' | 'soft' | 'none') => {
+    if (!deadlineType) return 'Тип дедлайна: Все';
+    switch (deadlineType) {
+      case 'hard':
+        return 'Жесткий';
+      case 'soft':
+        return 'Мягкий';
+      case 'none':
+        return 'Без срока';
+    }
+  };
+
+  const getStatusFilterLabel = (status?: 'todo' | 'in_progress' | 'done') => {
+    if (!status) return 'Статус: Все';
+    switch (status) {
+      case 'todo':
+        return 'Ожидает';
+      case 'in_progress':
+        return 'В работе';
+      case 'done':
+        return 'Выполнено';
+    }
+  };
+
   const {
     data: tasksResponse,
     isLoading: loadingTasks,
@@ -90,85 +123,6 @@ export default function ProjectDetailsPage() {
   const inProgressTasks = tasks.filter((t) => t.status === 'in_progress').length;
   const todoTasks = tasks.filter((t) => t.status === 'todo').length;
   const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return { text: '—', isOverdue: false };
-    const date = new Date(dateStr);
-    const now = new Date();
-    const isOverdue = date < now;
-    return {
-      text: date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isOverdue,
-    };
-  };
-
-  const getPriorityConfig = (p: Task['priority']) => {
-    switch (p) {
-      case 'high':
-        return {
-          label: 'Высокий',
-          color: 'text-[#D32F2F]',
-          icon: '/highPriority-icon.svg',
-          bg: 'bg-[#FFEDEE]',
-        };
-      case 'medium':
-        return {
-          label: 'Средний',
-          color: 'text-[#F59E0B]',
-          icon: '/mediumPriority-icon.svg',
-          bg: 'bg-[#FFF4E5]',
-        };
-      case 'low':
-        return {
-          label: 'Низкий',
-          color: 'text-[#10B981]',
-          icon: '/lowPriority-icon.svg',
-          bg: 'bg-[#E6F9F1]',
-        };
-    }
-  };
-
-  const getDeadlineTypeConfig = (dt: Task['deadlineType']) => {
-    switch (dt) {
-      case 'hard':
-        return {
-          label: 'Жeсткий',
-          icon: '/hardDeadlineType-icon.svg',
-          color: 'text-[#D32F2F]',
-          bg: 'bg-[#FFEDEE]',
-        };
-      case 'soft':
-        return {
-          label: 'Мягкий',
-          icon: '/softDeadlineType-icon.svg',
-          color: 'text-[#10B981]',
-          bg: 'bg-[#E6F9F1]',
-        };
-      case 'none':
-        return {
-          label: 'Без срока',
-          icon: '/noDeadline-icon.svg',
-          color: 'text-[#6F7D75]',
-          bg: 'bg-[#F3F4F6]',
-        };
-    }
-  };
-
-  const getStatusConfig = (s: Task['status']) => {
-    switch (s) {
-      case 'todo':
-        return { label: 'Ожидает', color: 'text-[#3B82F6]' };
-      case 'in_progress':
-        return { label: 'В работе', color: 'text-[#FFC65C]' };
-      case 'done':
-        return { label: 'Выполнено', color: 'text-[#8CA693]' };
-    }
-  };
 
   const handleDelete = async () => {
     if (window.confirm('Вы уверены, что хотите удалить проект и все его задачи?')) {
@@ -196,7 +150,7 @@ export default function ProjectDetailsPage() {
     );
   }
 
-  const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
+  const iconData = getProjectIconConfig(project.icon);
 
   return (
     <div className="px-4 sm:px-5 md:px-8 lg:px-11 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
@@ -233,7 +187,7 @@ export default function ProjectDetailsPage() {
                       </h2>
                       {project.updatedAt && (
                         <p className="text-[0.7rem] sm:text-xs text-[#6F7D75] mt-1">
-                          Последнее обновление: {formatDate(project.updatedAt).text}
+                          Последнее обновление: {formatDeadline(project.updatedAt).text}
                         </p>
                       )}
                     </div>
@@ -317,13 +271,7 @@ export default function ProjectDetailsPage() {
                     className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
                     <span className="truncate max-w-[80px] sm:max-w-none">
-                      {priority
-                        ? priority === 'high'
-                          ? 'Высокий'
-                          : priority === 'medium'
-                            ? 'Средний'
-                            : 'Низкий'
-                        : 'Приоритет'}
+                      {getPriorityFilterLabel(priority)}
                     </span>
                     <img
                       src="/asideArrow-icon.svg"
@@ -342,7 +290,7 @@ export default function ProjectDetailsPage() {
                           }}
                           className="w-full text-left px-2 sm:px-3 py-1.5 text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]"
                         >
-                          {p === 'high' ? 'Высокий' : p === 'medium' ? 'Средний' : 'Низкий'}
+                          {getPriorityFilterLabel(p)}
                         </button>
                       ))}
                       <button
@@ -368,13 +316,7 @@ export default function ProjectDetailsPage() {
                     className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
                     <span className="truncate max-w-[80px] sm:max-w-none">
-                      {deadlineType
-                        ? deadlineType === 'hard'
-                          ? 'Жeсткий'
-                          : deadlineType === 'soft'
-                            ? 'Мягкий'
-                            : 'Без срока'
-                        : 'Тип дедлайна'}
+                      {getDeadlineTypeFilterLabel(deadlineType)}
                     </span>
                     <img
                       src="/asideArrow-icon.svg"
@@ -397,7 +339,7 @@ export default function ProjectDetailsPage() {
                               : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                           }`}
                         >
-                          {dt === 'hard' ? 'Жeсткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
+                          {getDeadlineTypeFilterLabel(dt)}
                         </button>
                       ))}
                       <button
@@ -423,13 +365,7 @@ export default function ProjectDetailsPage() {
                     className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[#6F7D75] bg-white border shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] flex items-center gap-1.5 rounded-lg text-[0.65rem] sm:text-xs hover:bg-[#F0F3ED]/70 transition-colors"
                   >
                     <span className="truncate max-w-[80px] sm:max-w-none">
-                      {status
-                        ? status === 'todo'
-                          ? 'Ожидает'
-                          : status === 'in_progress'
-                            ? 'В работе'
-                            : 'Выполнено'
-                        : 'Статус'}
+                      {getStatusFilterLabel(status)}
                     </span>
                     <img
                       src="/asideArrow-icon.svg"
@@ -452,11 +388,7 @@ export default function ProjectDetailsPage() {
                               : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                           }`}
                         >
-                          {s === 'todo'
-                            ? 'Ожидает'
-                            : s === 'in_progress'
-                              ? 'В работе'
-                              : 'Выполнено'}
+                          {getStatusFilterLabel(s)}
                         </button>
                       ))}
                       <button
@@ -512,7 +444,7 @@ export default function ProjectDetailsPage() {
                         const p = getPriorityConfig(task.priority);
                         const dt = getDeadlineTypeConfig(task.deadlineType);
                         const st = getStatusConfig(task.status);
-                        const d = formatDate(task.deadline);
+                        const d = formatDeadline(task.deadline);
                         const isCompleted = task.status === 'done';
                         return (
                           <div

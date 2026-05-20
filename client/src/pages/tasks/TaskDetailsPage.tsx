@@ -12,16 +12,13 @@ import {
   useDeleteSubtaskMutation,
 } from '../../features/tasks/subtasksApi';
 import { useGetProjectsQuery } from '../../features/projects/projectsApi';
-import type { Task } from '../../entities/task/model';
-
-const projectIconConfig = {
-  plant: { src: '/project-plant-icon.svg', iconBg: 'bg-[#F0F1F2]' },
-  sun: { src: '/project-sun-icon.svg', iconBg: 'bg-[#FFEFD3]' },
-  waves: { src: '/project-waves-icon.svg', iconBg: 'bg-[#E9F0F9]' },
-  star: { src: '/project-star-icon.svg', iconBg: 'bg-[#F5F3FF]' },
-  mountains: { src: '/project-mountains-icon.svg', iconBg: 'bg-[#EDD7C9]' },
-  flower: { src: '/project-flower-icon.svg', iconBg: 'bg-[#FFC9C9]' },
-};
+import {
+  getPriorityConfig,
+  getDeadlineTypeConfig,
+  getStatusConfig,
+  formatDeadlineFull,
+} from '../../utils/taskDisplay';
+import { getProjectIconConfig } from '../../utils/projectIcons';
 
 export default function TaskDetailsPage() {
   const navigate = useNavigate();
@@ -41,59 +38,10 @@ export default function TaskDetailsPage() {
   const [error, setError] = useState('');
   const [limitWarning, setLimitWarning] = useState('');
 
-  const getDeadlineInfo = (dateStr?: string) => {
-    if (!dateStr) return { text: '—', isOverdue: false };
-    const date = new Date(dateStr);
-    const now = new Date();
-    const isOverdue = date < now;
-    return {
-      text: date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isOverdue,
-    };
-  };
-
   const getProjectName = (projectId?: string) => {
     if (!projectId) return 'Личное';
     const project = projects.find((p: any) => p._id === projectId);
     return project?.title || 'Проект';
-  };
-
-  const getPriorityInfo = (priority: Task['priority']) => {
-    switch (priority) {
-      case 'high':
-        return { label: 'Высокий', color: 'text-[#D32F2F]', icon: '/highPriority-icon.svg' };
-      case 'medium':
-        return { label: 'Средний', color: 'text-[#F59E0B]', icon: '/mediumPriority-icon.svg' };
-      case 'low':
-        return { label: 'Низкий', color: 'text-[#10B981]', icon: '/lowPriority-icon.svg' };
-    }
-  };
-
-  const getDeadlineTypeInfo = (type: Task['deadlineType']) => {
-    switch (type) {
-      case 'hard':
-        return { label: 'Жeсткий', color: 'text-[#D32F2F]', icon: '/hardDeadlineType-icon.svg' };
-      case 'soft':
-        return { label: 'Мягкий', color: 'text-[#10B981]', icon: '/softDeadlineType-icon.svg' };
-      case 'none':
-        return { label: 'Без срока', color: 'text-[#6F7D75]', icon: '/noDeadline-icon.svg' };
-    }
-  };
-
-  const getStatusInfo = (status: Task['status']) => {
-    switch (status) {
-      case 'todo':
-        return { label: 'Ожидает', color: 'text-[#3B82F6]', dot: 'bg-[#3B82F6]' };
-      case 'in_progress':
-        return { label: 'В работе', color: 'text-[#FFC65C]', dot: 'bg-[#FFC65C]' };
-      case 'done':
-        return { label: 'Выполнено', color: 'text-[#8CA693]', dot: 'bg-[#8CA693]' };
-    }
   };
 
   const handleToggleSubtask = async (subtaskId: string, currentCompleted: boolean) => {
@@ -200,10 +148,10 @@ export default function TaskDetailsPage() {
     );
   }
 
-  const priorityInfo = getPriorityInfo(task.priority);
-  const deadlineTypeInfo = getDeadlineTypeInfo(task.deadlineType);
-  const statusInfo = getStatusInfo(task.status);
-  const deadlineInfo = getDeadlineInfo(task.deadline as string);
+  const priorityInfo = getPriorityConfig(task.priority);
+  const deadlineTypeInfo = getDeadlineTypeConfig(task.deadlineType);
+  const statusInfo = getStatusConfig(task.status);
+  const deadlineInfo = formatDeadlineFull(task.deadline as string);
   const isCompleted = task.status === 'done';
   const canManageSubtasks = task.status === 'in_progress';
 
@@ -238,12 +186,10 @@ export default function TaskDetailsPage() {
               <div className="flex items-start gap-3 sm:gap-4 mb-4">
                 {task.projectId && typeof task.projectId === 'object' ? (
                   <div
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${projectIconConfig[task.projectId.icon as keyof typeof projectIconConfig].iconBg} flex items-center justify-center flex-shrink-0`}
+                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${getProjectIconConfig(task.projectId.icon).iconBg} flex items-center justify-center flex-shrink-0`}
                   >
                     <img
-                      src={
-                        projectIconConfig[task.projectId.icon as keyof typeof projectIconConfig].src
-                      }
+                      src={getProjectIconConfig(task.projectId.icon).src}
                       alt=""
                       className="w-6 h-6 sm:w-7 sm:h-7"
                     />
@@ -478,7 +424,7 @@ export default function TaskDetailsPage() {
                   <div className="flex items-center gap-2">
                     <img src="/calendar-icon.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span className="text-[0.7rem] sm:text-xs text-[#6F7D75]">
-                      {getDeadlineInfo(task.createdAt as string).text}
+                      {formatDeadlineFull(task.createdAt as string).text}
                     </span>
                   </div>
                 </div>

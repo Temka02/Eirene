@@ -4,15 +4,8 @@ import { useSelector } from 'react-redux';
 import type { Task } from '../../entities/task/model';
 import type { User } from '../../entities/user/model';
 import type { RootState } from '../../store';
-
-const projectIconConfig: Record<string, { src: string; iconBg: string }> = {
-  plant: { src: '/project-plant-icon.svg', iconBg: 'bg-[#F0F3ED]' },
-  sun: { src: '/project-sun-icon.svg', iconBg: 'bg-[#FFF4E5]' },
-  waves: { src: '/project-waves-icon.svg', iconBg: 'bg-[#E9F0F9]' },
-  star: { src: '/project-star-icon.svg', iconBg: 'bg-[#F5F3FF]' },
-  mountains: { src: '/project-mountains-icon.svg', iconBg: 'bg-[#EDD7C9]' },
-  flower: { src: '/project-flower-icon.svg', iconBg: 'bg-[#FFC9C9]' },
-};
+import { getPriorityConfig, getDeadlineTypeConfig, formatDeadline } from '../../utils/taskDisplay';
+import { getProjectIconConfig } from '../../utils/projectIcons';
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -21,78 +14,11 @@ const getGreeting = () => {
   return 'Добрый вечер';
 };
 
-const formatDate = (dateStr?: string) => {
-  if (!dateStr) return { text: '—', isOverdue: false };
-  const date = new Date(dateStr);
-  const now = new Date();
-  const isOverdue = date < now;
-  return {
-    text: date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }),
-    isOverdue,
-  };
-};
-
-const getPriorityConfig = (p: Task['priority']) => {
-  switch (p) {
-    case 'high':
-      return {
-        label: 'Высокий',
-        color: 'text-[#D32F2F]',
-        icon: '/highPriority-icon.svg',
-        bg: 'bg-[#FFEDEE]',
-      };
-    case 'medium':
-      return {
-        label: 'Средний',
-        color: 'text-[#F59E0B]',
-        icon: '/mediumPriority-icon.svg',
-        bg: 'bg-[#FFF4E5]',
-      };
-    case 'low':
-      return {
-        label: 'Низкий',
-        color: 'text-[#10B981]',
-        icon: '/lowPriority-icon.svg',
-        bg: 'bg-[#E6F9F1]',
-      };
-    default:
-      return { label: '', color: '', icon: '', bg: '' };
-  }
-};
-
-const getDeadlineTypeConfig = (dt: Task['deadlineType']) => {
-  switch (dt) {
-    case 'hard':
-      return {
-        label: 'Жeсткий',
-        color: 'text-[#D32F2F]',
-        icon: '/hardDeadlineType-icon.svg',
-        bg: 'bg-[#FFEDEE]',
-      };
-    case 'soft':
-      return {
-        label: 'Мягкий',
-        color: 'text-[#10B981]',
-        icon: '/softDeadlineType-icon.svg',
-        bg: 'bg-[#E6F9F1]',
-      };
-    case 'none':
-      return {
-        label: 'Без срока',
-        color: 'text-[#6F7D75]',
-        icon: '/noDeadline-icon.svg',
-        bg: 'bg-[#F3F4F6]',
-      };
-    default:
-      return { label: '', color: '', icon: '', bg: '' };
-  }
-};
-
 const TaskRow = ({ task }: { task: Task }) => {
   const navigate = useNavigate();
   const p = getPriorityConfig(task.priority);
   const dt = getDeadlineTypeConfig(task.deadlineType);
-  const d = formatDate(task.deadline);
+  const d = formatDeadline(task.deadline);
 
   return (
     <div
@@ -340,7 +266,7 @@ export default function DashboardPage() {
 
               <div className="space-y-3">
                 {projects.slice(0, 4).map((project) => {
-                  const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
+                  const iconData = getProjectIconConfig(project.icon);
                   return (
                     <div
                       key={project._id}

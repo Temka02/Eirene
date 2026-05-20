@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetTasksQuery } from '../../features/tasks/tasksApi';
-import type { Task } from '../../entities/task/model';
+import {
+  getPriorityConfig,
+  getDeadlineTypeConfig,
+  getStatusConfig,
+  formatDeadlineFull,
+} from '../../utils/taskDisplay';
 
 const LIMIT = 5;
 
@@ -68,85 +73,6 @@ export default function TasksPage() {
   const tasks = tasksResponse?.data || [];
   const totalPages = tasksResponse?.totalPages || 1;
 
-  const getPriorityConfig = (p: Task['priority']) => {
-    switch (p) {
-      case 'high':
-        return {
-          label: 'Высокий',
-          color: 'text-[#D32F2F]',
-          bg: 'bg-[#FFEDEE]',
-          icon: '/highPriority-icon.svg',
-        };
-      case 'medium':
-        return {
-          label: 'Средний',
-          color: 'text-[#F59E0B]',
-          bg: 'bg-[#FFF4E5]',
-          icon: '/mediumPriority-icon.svg',
-        };
-      case 'low':
-        return {
-          label: 'Низкий',
-          color: 'text-[#10B981]',
-          bg: 'bg-[#E6F9F1]',
-          icon: '/lowPriority-icon.svg',
-        };
-    }
-  };
-
-  const getDeadlineConfig = (dt: Task['deadlineType']) => {
-    switch (dt) {
-      case 'hard':
-        return {
-          label: 'Жесткий',
-          color: 'text-[#D32F2F]',
-          bg: 'bg-[#FFEDEE]',
-          icon: '/hardDeadlineType-icon.svg',
-        };
-      case 'soft':
-        return {
-          label: 'Мягкий',
-          color: 'text-[#10B981]',
-          bg: 'bg-[#E6F9F1]',
-          icon: '/softDeadlineType-icon.svg',
-        };
-      case 'none':
-        return {
-          label: 'Без срока',
-          color: 'text-[#6F7D75]',
-          bg: 'bg-[#F3F4F6]',
-          icon: '/noDeadline-icon.svg',
-        };
-    }
-  };
-
-  const getStatusConfig = (s: Task['status']) => {
-    switch (s) {
-      case 'todo':
-        return { label: 'Ожидает' };
-      case 'in_progress':
-        return { label: 'В работе' };
-      case 'done':
-        return { label: 'Выполнено' };
-    }
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return { text: '—', isOverdue: false };
-    const date = new Date(dateStr);
-    const now = new Date();
-    const isOverdue = date < now;
-    return {
-      text: date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isOverdue,
-    };
-  };
-
   const getDeadlineProgress = (deadline?: string) => {
     if (!deadline) return null;
 
@@ -169,6 +95,42 @@ export default function TasksPage() {
 
     const percent = Math.max(0, 25 - (diffHours - 168) * 0.5);
     return { percent, color: '#10B981' };
+  };
+
+  const getPriorityFilterLabel = (priority?: 'high' | 'medium' | 'low') => {
+    if (!priority) return 'Приоритет: Все';
+    switch (priority) {
+      case 'high':
+        return 'Высокий';
+      case 'medium':
+        return 'Средний';
+      case 'low':
+        return 'Низкий';
+    }
+  };
+
+  const getDeadlineTypeFilterLabel = (deadlineType?: 'hard' | 'soft' | 'none') => {
+    if (!deadlineType) return 'Тип дедлайна: Все';
+    switch (deadlineType) {
+      case 'hard':
+        return 'Жесткий';
+      case 'soft':
+        return 'Мягкий';
+      case 'none':
+        return 'Без срока';
+    }
+  };
+
+  const getStatusFilterLabel = (status?: 'todo' | 'in_progress' | 'done') => {
+    if (!status) return 'Статус: Все';
+    switch (status) {
+      case 'todo':
+        return 'Ожидает';
+      case 'in_progress':
+        return 'В работе';
+      case 'done':
+        return 'Выполнено';
+    }
   };
 
   return (
@@ -238,15 +200,7 @@ export default function TasksPage() {
                 onClick={() => setIsPriorityOpen(!isPriorityOpen)}
                 className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
               >
-                <span>
-                  {priority
-                    ? priority === 'high'
-                      ? 'Высокий'
-                      : priority === 'medium'
-                        ? 'Средний'
-                        : 'Низкий'
-                    : 'Приоритет: Все'}
-                </span>
+                <span>{getPriorityFilterLabel(priority)}</span>
                 <img
                   src="/asideArrow-icon.svg"
                   alt=""
@@ -264,7 +218,7 @@ export default function TasksPage() {
                       }}
                       className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${priority === p ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
-                      {p === 'high' ? 'Высокий' : p === 'medium' ? 'Средний' : 'Низкий'}
+                      {getPriorityFilterLabel(p)}
                     </button>
                   ))}
                   <button
@@ -285,15 +239,7 @@ export default function TasksPage() {
                 onClick={() => setIsDeadlineTypeOpen(!isDeadlineTypeOpen)}
                 className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
               >
-                <span>
-                  {deadlineType
-                    ? deadlineType === 'hard'
-                      ? 'Жесткий'
-                      : deadlineType === 'soft'
-                        ? 'Мягкий'
-                        : 'Без срока'
-                    : 'Тип дедлайна: Все'}
-                </span>
+                <span>{getDeadlineTypeFilterLabel(deadlineType)}</span>
                 <img
                   src="/asideArrow-icon.svg"
                   alt=""
@@ -311,7 +257,7 @@ export default function TasksPage() {
                       }}
                       className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${deadlineType === dt ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
-                      {dt === 'hard' ? 'Жесткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
+                      {getDeadlineTypeFilterLabel(dt)}
                     </button>
                   ))}
                   <button
@@ -333,15 +279,7 @@ export default function TasksPage() {
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
                   className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
                 >
-                  <span>
-                    {status
-                      ? status === 'todo'
-                        ? 'Ожидает'
-                        : status === 'in_progress'
-                          ? 'В работе'
-                          : 'Выполнено'
-                      : 'Статус: Все'}
-                  </span>
+                  <span>{getStatusFilterLabel(status)}</span>
                   <img
                     src="/asideArrow-icon.svg"
                     alt=""
@@ -359,7 +297,7 @@ export default function TasksPage() {
                         }}
                         className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${status === s ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                       >
-                        {s === 'todo' ? 'Ожидает' : s === 'in_progress' ? 'В работе' : 'Выполнено'}
+                        {getStatusFilterLabel(s)}
                       </button>
                     ))}
                     <button
@@ -419,9 +357,9 @@ export default function TasksPage() {
                   <div>
                     {tasks.map((task) => {
                       const p = getPriorityConfig(task.priority);
-                      const dt = getDeadlineConfig(task.deadlineType);
+                      const dt = getDeadlineTypeConfig(task.deadlineType);
                       const st = getStatusConfig(task.status);
-                      const d = formatDate(task.deadline);
+                      const d = formatDeadlineFull(task.deadline);
                       const isCompleted = task.status === 'done';
                       return (
                         <div
@@ -509,7 +447,7 @@ export default function TasksPage() {
                         onClick={() => setPage((p) => p + 1)}
                         className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50"
                       >
-                        Вперёд
+                        Вперед
                       </button>
                     </div>
                   </div>
@@ -550,8 +488,8 @@ export default function TasksPage() {
                       .filter((task) => task.status === 'todo')
                       .map((task) => {
                         const p = getPriorityConfig(task.priority);
-                        const dt = getDeadlineConfig(task.deadlineType);
-                        const d = formatDate(task.deadline);
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const d = formatDeadlineFull(task.deadline);
                         const isCompleted = task.status === 'done';
                         const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
                         return (
@@ -688,8 +626,8 @@ export default function TasksPage() {
                       .filter((task) => task.status === 'in_progress')
                       .map((task) => {
                         const p = getPriorityConfig(task.priority);
-                        const dt = getDeadlineConfig(task.deadlineType);
-                        const d = formatDate(task.deadline);
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const d = formatDeadlineFull(task.deadline);
                         const isCompleted = task.status === 'done';
                         const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
                         return (
@@ -826,8 +764,8 @@ export default function TasksPage() {
                       .filter((task) => task.status === 'done')
                       .map((task) => {
                         const p = getPriorityConfig(task.priority);
-                        const dt = getDeadlineConfig(task.deadlineType);
-                        const d = formatDate(task.deadline);
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const d = formatDeadlineFull(task.deadline);
                         return (
                           <div
                             key={task._id}

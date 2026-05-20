@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { taskSchema, type TaskFormData } from '../../entities/validation';
 import { localDateTimeToUTC } from '../../utils/dateHelper';
+import { PRIORITY_BUTTON_OPTIONS, DEADLINE_TYPE_BUTTON_OPTIONS } from '../../utils/taskDisplay';
 
 export default function CreateTaskPage() {
   const navigate = useNavigate();
@@ -180,26 +181,7 @@ export default function CreateTaskPage() {
                     Приоритет
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {[
-                      {
-                        val: 'high',
-                        label: 'Высокий',
-                        icon: '/highPriority-icon.svg',
-                        active: 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]',
-                      },
-                      {
-                        val: 'medium',
-                        label: 'Средний',
-                        icon: '/mediumPriority-icon.svg',
-                        active: 'border-[#FFC65C] bg-[#FFF4E5] text-[#FFC65C]',
-                      },
-                      {
-                        val: 'low',
-                        label: 'Низкий',
-                        icon: '/lowPriority-icon.svg',
-                        active: 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]',
-                      },
-                    ].map((p) => (
+                    {PRIORITY_BUTTON_OPTIONS.map((p) => (
                       <button
                         key={p.val}
                         type="button"
@@ -222,26 +204,7 @@ export default function CreateTaskPage() {
                     Тип дедлайна
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {[
-                      {
-                        val: 'hard',
-                        label: 'Жесткий',
-                        icon: '/hardDeadlineType-icon.svg',
-                        active: 'border-[#D9636B] bg-[#FFEDEE] text-[#D32F2F]',
-                      },
-                      {
-                        val: 'soft',
-                        label: 'Мягкий',
-                        icon: '/softDeadlineType-icon.svg',
-                        active: 'border-[#8CA693] bg-[#E6F9F1] text-[#10B981]',
-                      },
-                      {
-                        val: 'none',
-                        label: 'Без срока',
-                        icon: '/noDeadline-icon.svg',
-                        active: 'border-[#a1b0a8] bg-[#F3F4F6] text-[#6F7D75]',
-                      },
-                    ].map((dt) => (
+                    {DEADLINE_TYPE_BUTTON_OPTIONS.map((dt) => (
                       <button
                         key={dt.val}
                         type="button"
