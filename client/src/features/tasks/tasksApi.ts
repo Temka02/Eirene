@@ -59,7 +59,7 @@ export const tasksApi = api.injectEndpoints({
         method: 'PUT',
         data: updateData,
       }),
-      invalidatesTags: ['Task', 'Dashboard'],
+      invalidatesTags: ['Task', 'Dashboard', 'Notifications'],
     }),
     deleteTask: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({

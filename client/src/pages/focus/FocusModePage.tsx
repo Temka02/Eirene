@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetTaskQuery, useUpdateTaskMutation } from '../../features/tasks/tasksApi';
 import { useUpdateSubtaskMutation } from '../../features/tasks/subtasksApi';
+import { formatDeadlineFull } from '../../utils/taskDisplay';
 
 export default function FocusModePage() {
   const navigate = useNavigate();
@@ -92,13 +93,7 @@ export default function FocusModePage() {
 
             {task.deadline && (
               <p className="text-sm text-[#6F7D75] mb-4 flex items-center gap-2">
-                Дедлайн:{' '}
-                {new Date(task.deadline).toLocaleString('ru-RU', {
-                  day: 'numeric',
-                  month: 'long',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                Дедлайн: {formatDeadlineFull(task.deadline).text}
               </p>
             )}
 

@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetTasksQuery } from '../../features/tasks/tasksApi';
-import type { Task } from '../../entities/task/model';
+import {
+  getPriorityConfig,
+  getDeadlineTypeConfig,
+  getStatusConfig,
+  formatDeadlineFull,
+} from '../../utils/taskDisplay';
 
 const LIMIT = 5;
 
@@ -68,55 +73,6 @@ export default function TasksPage() {
   const tasks = tasksResponse?.data || [];
   const totalPages = tasksResponse?.totalPages || 1;
 
-  const getPriorityConfig = (p: Task['priority']) => {
-    switch (p) {
-      case 'high':
-        return { label: 'Высокий', color: 'text-[#D32F2F]', bg: 'bg-[#FFEDEE]' };
-      case 'medium':
-        return { label: 'Средний', color: 'text-[#F59E0B]', bg: 'bg-[#FFF4E5]' };
-      case 'low':
-        return { label: 'Низкий', color: 'text-[#10B981]', bg: 'bg-[#E6F9F1]' };
-    }
-  };
-
-  const getDeadlineConfig = (dt: Task['deadlineType']) => {
-    switch (dt) {
-      case 'hard':
-        return { label: 'Жeсткий', color: 'text-[#D32F2F]', bg: 'bg-[#FFEDEE]' };
-      case 'soft':
-        return { label: 'Мягкий', color: 'text-[#10B981]', bg: 'bg-[#E6F9F1]' };
-      case 'none':
-        return { label: 'Без срока', color: 'text-[#6F7D75]', bg: 'bg-[#F3F4F6]' };
-    }
-  };
-
-  const getStatusConfig = (s: Task['status']) => {
-    switch (s) {
-      case 'todo':
-        return { label: 'Ожидает' };
-      case 'in_progress':
-        return { label: 'В работе' };
-      case 'done':
-        return { label: 'Выполнено' };
-    }
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return { text: '—', isOverdue: false };
-    const date = new Date(dateStr);
-    const now = new Date();
-    const isOverdue = date < now;
-    return {
-      text: date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      isOverdue,
-    };
-  };
-
   const getDeadlineProgress = (deadline?: string) => {
     if (!deadline) return null;
 
@@ -141,32 +97,68 @@ export default function TasksPage() {
     return { percent, color: '#10B981' };
   };
 
+  const getPriorityFilterLabel = (priority?: 'high' | 'medium' | 'low') => {
+    if (!priority) return 'Приоритет: Все';
+    switch (priority) {
+      case 'high':
+        return 'Высокий';
+      case 'medium':
+        return 'Средний';
+      case 'low':
+        return 'Низкий';
+    }
+  };
+
+  const getDeadlineTypeFilterLabel = (deadlineType?: 'hard' | 'soft' | 'none') => {
+    if (!deadlineType) return 'Тип дедлайна: Все';
+    switch (deadlineType) {
+      case 'hard':
+        return 'Жесткий';
+      case 'soft':
+        return 'Мягкий';
+      case 'none':
+        return 'Без срока';
+    }
+  };
+
+  const getStatusFilterLabel = (status?: 'todo' | 'in_progress' | 'done') => {
+    if (!status) return 'Статус: Все';
+    switch (status) {
+      case 'todo':
+        return 'Ожидает';
+      case 'in_progress':
+        return 'В работе';
+      case 'done':
+        return 'Выполнено';
+    }
+  };
+
   return (
     <div className="px-5 md:px-8 pb-4 h-[calc(100vh-8rem)] overflow-y-auto">
       <div className="w-full">
         <h1 className="text-2xl text-[#2F3A34] mb-3">Мои задачи</h1>
 
         <div className="mb-4">
-          <div className="flex flex-col md:flex-row gap-24">
-            <div className="flex-1 relative">
+          <div className="flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-24 items-start">
+            <div className="w-full flex-1 relative">
               <img
                 src="/search2-icon.svg"
                 alt=""
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5"
+                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5"
               />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Поиск задач"
-                className="w-full pl-14 pr-4 py-3 bg-white rounded-[0.625rem] border-2 border-[#F0F1F2] text-sm placeholder-[#767676] focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
+                className="w-full pl-10 sm:pl-14 pr-4 py-2 sm:py-3 bg-white rounded-[0.625rem] border-2 border-[#F0F1F2] text-xs sm:text-sm placeholder-[#767676] focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition-all"
               />
             </div>
             <button
               onClick={() => navigate('/tasks/create')}
-              className="px-8 py-2.5 bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)] text-white rounded-xl text-sm font-medium hover:bg-[#7A9181] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+              className="px-4 sm:px-8 py-2 sm:py-2.5 bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)] text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-[#7A9181] transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
             >
-              <img src="/add-icon.svg" alt="" className="w-3.5 h-3.5" />
+              <img src="/add-icon.svg" alt="" className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               Добавить задачу
             </button>
           </div>
@@ -182,11 +174,9 @@ export default function TasksPage() {
                 setStatus(undefined);
                 setOrder('asc');
               }}
-              className={`px-4 py-2 w-1/2 rounded-[0.625rem] text-xs font-medium transition-all flex justify-center items-center gap-2 ${
-                view === 'list' ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/90'
-              }`}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 w-1/2 rounded-[0.625rem] text-[0.7rem] sm:text-xs font-medium transition-all flex justify-center items-center gap-2 ${view === 'list' ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/90'}`}
             >
-              <img src="/tasksList-icon.svg" alt="" className="w-3 h-3" />
+              <img src="/tasksList-icon.svg" alt="" className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               Список
             </button>
             <button
@@ -197,11 +187,9 @@ export default function TasksPage() {
                 setStatus(undefined);
                 setOrder('asc');
               }}
-              className={`px-4 py-2 w-1/2 rounded-[0.625rem] text-xs font-medium transition-all flex justify-center items-center gap-2 ${
-                view === 'kanban' ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/90'
-              }`}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 w-1/2 rounded-[0.625rem] text-[0.7rem] sm:text-xs font-medium transition-all flex justify-center items-center gap-2 ${view === 'kanban' ? 'bg-[#F0F3ED]' : 'hover:bg-[#F0F3ED]/90'}`}
             >
-              <img src="/tasksKanban-icon.svg" alt="" className="w-3 h-3" />
+              <img src="/tasksKanban-icon.svg" alt="" className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               Канбан
             </button>
           </div>
@@ -210,25 +198,17 @@ export default function TasksPage() {
             <div ref={priorityRef} className="relative">
               <button
                 onClick={() => setIsPriorityOpen(!isPriorityOpen)}
-                className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
+                className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
               >
-                <span>
-                  {priority
-                    ? priority === 'high'
-                      ? 'Высокий'
-                      : priority === 'medium'
-                        ? 'Средний'
-                        : 'Низкий'
-                    : 'Приоритет: Все'}
-                </span>
+                <span>{getPriorityFilterLabel(priority)}</span>
                 <img
                   src="/asideArrow-icon.svg"
                   alt=""
-                  className={`w-3 h-3 transition-transform ${isPriorityOpen ? '-rotate-180' : '-rotate-90'}`}
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform ${isPriorityOpen ? '-rotate-180' : '-rotate-90'}`}
                 />
               </button>
               {isPriorityOpen && (
-                <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-xl shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] border border-gray-100 py-1 z-50">
+                <div className="absolute top-full left-0 mt-2 w-36 sm:w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
                   {(['high', 'medium', 'low'] as const).map((p) => (
                     <button
                       key={p}
@@ -236,13 +216,9 @@ export default function TasksPage() {
                         setPriority(p);
                         setIsPriorityOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                        priority === p
-                          ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                          : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
+                      className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${priority === p ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
-                      {p === 'high' ? 'Высокий' : p === 'medium' ? 'Средний' : 'Низкий'}
+                      {getPriorityFilterLabel(p)}
                     </button>
                   ))}
                   <button
@@ -250,11 +226,7 @@ export default function TasksPage() {
                       setPriority(undefined);
                       setIsPriorityOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                      !priority
-                        ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                        : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                    }`}
+                    className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${!priority ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                   >
                     Все
                   </button>
@@ -265,25 +237,17 @@ export default function TasksPage() {
             <div ref={deadlineTypeRef} className="relative">
               <button
                 onClick={() => setIsDeadlineTypeOpen(!isDeadlineTypeOpen)}
-                className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
+                className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
               >
-                <span>
-                  {deadlineType
-                    ? deadlineType === 'hard'
-                      ? 'Жeсткий'
-                      : deadlineType === 'soft'
-                        ? 'Мягкий'
-                        : 'Без срока'
-                    : 'Тип дедлайна: Все'}
-                </span>
+                <span>{getDeadlineTypeFilterLabel(deadlineType)}</span>
                 <img
                   src="/asideArrow-icon.svg"
                   alt=""
-                  className={`w-3 h-3 transition-transform ${isDeadlineTypeOpen ? '-rotate-180' : '-rotate-90'}`}
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform ${isDeadlineTypeOpen ? '-rotate-180' : '-rotate-90'}`}
                 />
               </button>
               {isDeadlineTypeOpen && (
-                <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-xl shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] border border-gray-100 py-1 z-50">
+                <div className="absolute top-full left-0 mt-2 w-36 sm:w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
                   {(['hard', 'soft', 'none'] as const).map((dt) => (
                     <button
                       key={dt}
@@ -291,13 +255,9 @@ export default function TasksPage() {
                         setDeadlineType(dt);
                         setIsDeadlineTypeOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                        deadlineType === dt
-                          ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                          : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
+                      className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${deadlineType === dt ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
-                      {dt === 'hard' ? 'Жeсткий' : dt === 'soft' ? 'Мягкий' : 'Без срока'}
+                      {getDeadlineTypeFilterLabel(dt)}
                     </button>
                   ))}
                   <button
@@ -305,11 +265,7 @@ export default function TasksPage() {
                       setDeadlineType(undefined);
                       setIsDeadlineTypeOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                      !deadlineType
-                        ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                        : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                    }`}
+                    className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${!deadlineType ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                   >
                     Все
                   </button>
@@ -321,25 +277,17 @@ export default function TasksPage() {
               <div ref={statusRef} className="relative">
                 <button
                   onClick={() => setIsStatusOpen(!isStatusOpen)}
-                  className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
+                  className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
                 >
-                  <span>
-                    {status
-                      ? status === 'todo'
-                        ? 'Ожидает'
-                        : status === 'in_progress'
-                          ? 'В работе'
-                          : 'Выполнено'
-                      : 'Статус: Все'}
-                  </span>
+                  <span>{getStatusFilterLabel(status)}</span>
                   <img
                     src="/asideArrow-icon.svg"
                     alt=""
-                    className={`w-3 h-3 transition-transform ${isStatusOpen ? '-rotate-180' : '-rotate-90'}`}
+                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 transition-transform ${isStatusOpen ? '-rotate-180' : '-rotate-90'}`}
                   />
                 </button>
                 {isStatusOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-xl shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] border border-gray-100 py-1 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-36 sm:w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
                     {(['todo', 'in_progress', 'done'] as const).map((s) => (
                       <button
                         key={s}
@@ -347,13 +295,9 @@ export default function TasksPage() {
                           setStatus(s);
                           setIsStatusOpen(false);
                         }}
-                        className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                          status === s
-                            ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                            : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                        }`}
+                        className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${status === s ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                       >
-                        {s === 'todo' ? 'Ожидает' : s === 'in_progress' ? 'В работе' : 'Выполнено'}
+                        {getStatusFilterLabel(s)}
                       </button>
                     ))}
                     <button
@@ -361,11 +305,7 @@ export default function TasksPage() {
                         setStatus(undefined);
                         setIsStatusOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-2.5 text-xs transition-colors ${
-                        !status
-                          ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
-                          : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
-                      }`}
+                      className={`w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-[0.7rem] sm:text-xs transition-colors ${!status ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium' : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'}`}
                     >
                       Все
                     </button>
@@ -376,270 +316,241 @@ export default function TasksPage() {
 
             <button
               onClick={() => setOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
-              className="w-44 px-5 py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
+              className="w-36 sm:w-44 px-3 sm:px-5 py-2 sm:py-3 bg-white rounded-[0.625rem] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[0.7rem] sm:text-xs flex items-center justify-between hover:bg-[#F0F3ED]/70 transition-colors"
             >
               <span>Дедлайн:</span>
               <img
                 src="/sortArrow-icon.svg"
                 alt=""
-                className={`w-3 h-3 ${order === 'asc' ? 'rotate-0' : 'rotate-180'} `}
+                className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${order === 'asc' ? 'rotate-0' : 'rotate-180'}`}
               />
             </button>
           </div>
         </div>
 
         {view === 'list' && (
-          <div className="px-7 py-3 bg-white rounded-xl">
-            <h2 className="text-[#2F3A34] font-medium mb-3">Задачи</h2>
-            <div className="bg-[#F0F3ED] rounded-[0.625rem] overflow-hidden border">
-              <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-2.5 bg-[#F0F3ED] text-sm font-medium text-[#6F7D75]">
-                <div className="text-left">Наименование задачи</div>
-                <div className="text-center">Приоритет</div>
-                <div className="text-center">Тип дедлайна</div>
-                <div className="text-center">Статус</div>
-                <div className="text-center">Проект</div>
-                <div className="text-center">Дедлайн</div>
-              </div>
-
-              {isLoading ? (
-                <div className="p-6 space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-14 bg-[#F8FAFC] rounded-lg animate-pulse" />
-                  ))}
+          <div className="px-4 sm:px-7 py-2 sm:py-3 bg-white rounded-xl">
+            <h2 className="text-[#2F3A34] font-medium mb-2 sm:mb-3 text-sm sm:text-base">Задачи</h2>
+            <div className="overflow-x-auto w-full">
+              <div className="min-w-[56rem] bg-[#F0F3ED] rounded-[0.625rem] overflow-hidden border">
+                <div className="grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-2.5 bg-[#F0F3ED] text-[0.7rem] sm:text-sm font-medium text-[#6F7D75]">
+                  <div className="text-left">Наименование задачи</div>
+                  <div className="text-center">Приоритет</div>
+                  <div className="text-center">Тип дедлайна</div>
+                  <div className="text-center">Статус</div>
+                  <div className="text-center">Проект</div>
+                  <div className="text-center">Дедлайн</div>
                 </div>
-              ) : tasks.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-[#6F7D75]">
-                  <img src="/allTasks-icon.svg" alt="" className="w-16 h-16 mb-3 opacity-70" />
-                  <p className="text-lg font-medium">Задач не найдено</p>
-                </div>
-              ) : (
-                <div>
-                  {tasks.map((task) => {
-                    const p = getPriorityConfig(task.priority);
-                    const dt = getDeadlineConfig(task.deadlineType);
-                    const st = getStatusConfig(task.status);
-                    const d = formatDate(task.deadline);
-                    const isCompleted = task.status === 'done';
 
-                    return (
-                      <div
-                        key={task._id}
-                        className={`grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-3 items-center border border-[#D9D9D9] rounded-[0.625rem] hover:bg-[#FAFBFC] transition-colors cursor-pointer text-[#2F3A34] ${
-                          isCompleted ? 'bg-[#E4F0E5]' : 'bg-white'
-                        } ${d.isOverdue && !isCompleted ? 'text-[#D32F2F] font-medium' : 'text-[#6F7D75]'}`}
-                        onClick={() => navigate(`/tasks/${task._id}`)}
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          {isCompleted && (
-                            <img
-                              src="/taskDone-icon.svg"
-                              alt=""
-                              className="w-4 h-4 flex-shrink-0"
-                            />
-                          )}
-                          <span
-                            className={`font-medium text-xs truncate ${isCompleted && 'line-through'}`}
-                          >
-                            {task.title}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-center">
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
-                          >
-                            {task.priority === 'high' && (
-                              <img src="/highPriority-icon.svg" alt="" className="w-3.5 h-3.5" />
-                            )}
-                            {task.priority === 'medium' && (
-                              <img src="/mediumPriority-icon.svg" alt="" className="w-3.5 h-3.5" />
-                            )}
-                            {task.priority === 'low' && (
-                              <img src="/lowPriority-icon.svg" alt="" className="w-3.5 h-3.5" />
-                            )}
-                            {p.label}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-center">
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
-                          >
-                            {task.deadlineType === 'hard' && (
-                              <img
-                                src="/hardDeadlineType-icon.svg"
-                                alt=""
-                                className="w-3.5 h-3.5"
-                              />
-                            )}
-                            {task.deadlineType === 'soft' && (
-                              <img
-                                src="/softDeadlineType-icon.svg"
-                                alt=""
-                                className="w-3.5 h-3.5"
-                              />
-                            )}
-                            {task.deadlineType === 'none' && (
-                              <img src="/noDeadline-icon.svg" alt="" className="w-3.5 h-3.5" />
-                            )}
-                            {dt.label}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-center">
-                          <span className="text-xs font-medium">{st.label}</span>
-                        </div>
-
-                        <div className="text-center">
-                          <span className="text-xs font-medium">
-                            {task.projectId ? 'Проект' : 'Личное'}
-                          </span>
-                        </div>
-
-                        <div className="text-center">
-                          {task.deadline ? (
-                            <div className="flex flex-col items-center gap-0.5">
-                              <span
-                                className={`text-xs font-medium ${d.isOverdue && !isCompleted ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
-                              >
-                                {d.text}
-                              </span>
-                              {d.isOverdue && !isCompleted && (
-                                <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
-                                  Просрочено
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-xs text-[#6F7D75]">-</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {!isLoading && tasks.length > 0 && (
-                <div className="flex items-center justify-between px-6 py-3 border-t border-[#F0F1F2]">
-                  <span className="text-xs text-[#6F7D75]">
-                    Страница {page} из {totalPages}
-                  </span>
-                  <div className="flex gap-2">
-                    <button
-                      disabled={page === 1 || isFetching}
-                      onClick={() => setPage((p) => p - 1)}
-                      className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      Назад
-                    </button>
-                    <button
-                      disabled={page === totalPages || isFetching}
-                      onClick={() => setPage((p) => p + 1)}
-                      className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      Вперeд
-                    </button>
+                {isLoading ? (
+                  <div className="p-6 space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-14 bg-[#F8FAFC] rounded-lg animate-pulse" />
+                    ))}
                   </div>
-                </div>
-              )}
+                ) : tasks.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-[#6F7D75]">
+                    <img src="/allTasks-icon.svg" alt="" className="w-16 h-16 mb-3 opacity-70" />
+                    <p className="text-lg font-medium">Задач не найдено</p>
+                  </div>
+                ) : (
+                  <div>
+                    {tasks.map((task) => {
+                      const p = getPriorityConfig(task.priority);
+                      const dt = getDeadlineTypeConfig(task.deadlineType);
+                      const st = getStatusConfig(task.status);
+                      const d = formatDeadlineFull(task.deadline);
+                      const isCompleted = task.status === 'done';
+                      return (
+                        <div
+                          key={task._id}
+                          onClick={() => navigate(`/tasks/${task._id}`)}
+                          className={`grid grid-cols-[3fr_1fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-3 items-center border border-[#D9D9D9] rounded-[0.625rem] hover:bg-[#FAFBFC] transition-colors cursor-pointer text-[#2F3A34] ${isCompleted ? 'bg-[#E4F0E5]' : 'bg-white'}`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            {isCompleted && (
+                              <img
+                                src="/taskDone-icon.svg"
+                                alt=""
+                                className="w-4 h-4 flex-shrink-0"
+                              />
+                            )}
+                            <span
+                              className={`font-medium text-xs truncate ${isCompleted && 'line-through'}`}
+                            >
+                              {task.title}
+                            </span>
+                          </div>
+                          <div className="flex justify-center">
+                            <span
+                              className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${p.bg} ${p.color}`}
+                            >
+                              <img src={p.icon} alt="" className="w-2 h-2 sm:w-3 sm:h-3" />
+                              {p.label}
+                            </span>
+                          </div>
+                          <div className="flex justify-center">
+                            <span
+                              className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${dt.bg} ${dt.color}`}
+                            >
+                              <img src={dt.icon} alt="" className="w-2 h-2 sm:w-3 sm:h-3" />
+                              {dt.label}
+                            </span>
+                          </div>
+                          <div className="flex justify-center">
+                            <span className="text-xs font-medium">{st.label}</span>
+                          </div>
+                          <div className="text-center">
+                            <span className="text-xs font-medium">
+                              {task.projectId ? 'Проект' : 'Личное'}
+                            </span>
+                          </div>
+                          <div className="text-center">
+                            {task.deadline ? (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span
+                                  className={`text-xs font-medium ${d.isOverdue && !isCompleted ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+                                >
+                                  {d.text}
+                                </span>
+                                {d.isOverdue && !isCompleted && (
+                                  <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
+                                    Просрочено
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-[#6F7D75]">-</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {!isLoading && tasks.length > 0 && (
+                  <div className="flex items-center justify-between px-6 py-3 border-t border-[#F0F1F2]">
+                    <span className="text-xs text-[#6F7D75]">
+                      Страница {page} из {totalPages}
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        disabled={page === 1 || isFetching}
+                        onClick={() => setPage((p) => p - 1)}
+                        className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50"
+                      >
+                        Назад
+                      </button>
+                      <button
+                        disabled={page === totalPages || isFetching}
+                        onClick={() => setPage((p) => p + 1)}
+                        className="text-[#6F7D75] px-3 py-1.5 text-xs bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED]/70 disabled:opacity-50"
+                      >
+                        Вперед
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         {view === 'kanban' && (
-          <div className="h-full overflow-x-auto">
-            <div className="flex max-w-full gap-4 h-full pb-4">
-              <div className="w-[32%] rounded-xl flex flex-col bg-white p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#4C95E9]"></div>
-                    <h3 className="text-sm font-medium text-[#2F3A34]">Ожидает</h3>
+          <div className="overflow-x-auto pb-4">
+            <div
+              className="flex gap-2 sm:gap-3 md:gap-4 h-full"
+              style={{ minWidth: 'min-content' }}
+            >
+              <div className="min-w-[260px] sm:min-w-[280px] md:w-[32%] rounded-xl flex flex-col bg-white p-2 sm:p-4">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#4C95E9]" />
+                    <h3 className="text-[0.7rem] sm:text-sm font-medium text-[#2F3A34]">Ожидает</h3>
                   </div>
-                  <span className="text-xs text-[#6F7D75] bg-[#F0F3ED] px-2 py-1 rounded-md">
+                  <span className="text-[0.6rem] sm:text-xs text-[#6F7D75] bg-[#F0F3ED] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md">
                     {tasks.filter((t) => t.status === 'todo').length}
                   </span>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 space-y-2">
                   {tasks.filter((t) => t.status === 'todo').length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-32 text-[#6F7D75]">
-                      <img src="/allTasks-icon.svg" alt="" className="w-8 h-8 mb-3 opacity-70" />
-                      <p className="font-medium text-center">Нет задач</p>
+                    <div className="flex flex-col items-center justify-center h-28 sm:h-32 text-[#6F7D75]">
+                      <img
+                        src="/allTasks-icon.svg"
+                        alt=""
+                        className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-3 opacity-70"
+                      />
+                      <p className="font-medium text-center text-[0.65rem] sm:text-sm">Нет задач</p>
                     </div>
                   ) : (
                     tasks
                       .filter((task) => task.status === 'todo')
                       .map((task) => {
                         const p = getPriorityConfig(task.priority);
-                        const dt = getDeadlineConfig(task.deadlineType);
-                        const d = formatDate(task.deadline);
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const d = formatDeadlineFull(task.deadline);
                         const isCompleted = task.status === 'done';
                         const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
-
                         return (
                           <div
                             key={task._id}
                             onClick={() => navigate(`/tasks/${task._id}`)}
-                            className="bg-white rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
+                            className="bg-white rounded-lg p-1.5 sm:p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-1.5 sm:gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow"
                           >
                             <div className="flex flex-col justify-between min-w-0">
-                              <div className="flex items-center gap-1 mb-2 min-w-0">
-                                <div className="w-2 h-2 bg-[#4C95E9] rounded-full flex-shrink-0" />
-                                <h4
-                                  className="text-xs font-medium text-[#2F3A34] truncate w-full"
-                                  title={task.title}
-                                >
+                              <div className="flex items-center gap-1 mb-1">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#4C95E9]" />
+                                <h4 className="text-[0.65rem] sm:text-xs font-medium text-[#2F3A34] truncate">
                                   {task.title}
                                 </h4>
                               </div>
-
-                              <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
-                                <div className="flex gap-1 items-center min-w-0">
+                              <div className="flex flex-col items-start gap-0.5 text-[0.6rem] sm:text-xs text-[#6F7D75]">
+                                <div className="flex gap-1 items-center">
                                   <img
                                     src="/projects-icon.svg"
                                     alt=""
-                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                    className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                   />
                                   <span className="truncate">
                                     {task.projectId ? 'Проект' : 'Личное'}
                                   </span>
                                 </div>
                                 {task.deadline ? (
-                                  <div className="flex flex-col items-start min-w-0">
-                                    <div className="flex gap-1 items-center min-w-0">
+                                  <div className="flex flex-col items-start">
+                                    <div className="flex gap-1 items-center">
                                       <img
                                         src="/calendar-icon.svg"
                                         alt=""
-                                        className="w-2.5 h-2.5 flex-shrink-0"
+                                        className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                       />
                                       <span
-                                        className={`text-xs font-medium truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+                                        className={`truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
                                       >
                                         {d.text}
                                       </span>
                                     </div>
                                     {d.isOverdue && (
-                                      <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
+                                      <span className="text-[0.5rem] sm:text-[0.55rem] font-medium text-[#D32F2F] leading-none">
                                         Просрочено
                                       </span>
                                     )}
                                   </div>
                                 ) : (
-                                  <div className="flex gap-1 items-center min-w-0">
+                                  <div className="flex gap-1 items-center">
                                     <img
                                       src="/calendar-icon.svg"
                                       alt=""
-                                      className="w-2.5 h-2.5 flex-shrink-0"
+                                      className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                     />
-                                    <span className="text-xs text-[#6F7D75]">-</span>
+                                    <span className="text-[0.6rem] sm:text-xs">-</span>
                                   </div>
                                 )}
                               </div>
                             </div>
-
                             <div className="flex flex-col justify-center items-center">
                               {task.deadline && !isCompleted && progress && (
-                                <div className="relative w-10 h-10">
+                                <div className="relative w-6 h-6 sm:w-8 sm:h-8">
                                   <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                                     <circle
                                       cx="18"
@@ -667,59 +578,18 @@ export default function TasksPage() {
                                 </div>
                               )}
                             </div>
-
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-1">
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
+                                className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${p.bg} ${p.color}`}
                               >
-                                {task.priority === 'high' && (
-                                  <img
-                                    src="/highPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.priority === 'medium' && (
-                                  <img
-                                    src="/mediumPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.priority === 'low' && (
-                                  <img
-                                    src="/lowPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                <span className="truncate">{p.label}</span>
+                                <img src={p.icon} alt="" className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+                                {p.label}
                               </span>
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
+                                className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${dt.bg} ${dt.color}`}
                               >
-                                {task.deadlineType === 'hard' && (
-                                  <img
-                                    src="/hardDeadlineType-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.deadlineType === 'soft' && (
-                                  <img
-                                    src="/softDeadlineType-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.deadlineType === 'none' && (
-                                  <img
-                                    src="/noDeadline-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                <span className="truncate">{dt.label}</span>
+                                <img src={dt.icon} alt="" className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+                                {dt.label}
                               </span>
                             </div>
                           </div>
@@ -729,95 +599,96 @@ export default function TasksPage() {
                 </div>
               </div>
 
-              <div className="w-[32%] rounded-xl flex flex-col bg-white p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#FFC65C]"></div>
-                    <h3 className="text-sm font-medium text-[#2F3A34]">В работе</h3>
+              <div className="min-w-[260px] sm:min-w-[280px] md:w-[32%] rounded-xl flex flex-col bg-white p-2 sm:p-4">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#FFC65C]" />
+                    <h3 className="text-[0.7rem] sm:text-sm font-medium text-[#2F3A34]">
+                      В работе
+                    </h3>
                   </div>
-                  <span className="text-xs text-[#6F7D75] bg-[#F0F3ED] px-2 py-1 rounded-md">
+                  <span className="text-[0.6rem] sm:text-xs text-[#6F7D75] bg-[#F0F3ED] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md">
                     {tasks.filter((t) => t.status === 'in_progress').length}
                   </span>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 space-y-2">
                   {tasks.filter((t) => t.status === 'in_progress').length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-32 text-[#6F7D75]">
-                      <img src="/allTasks-icon.svg" alt="" className="w-8 h-8 mb-3 opacity-70" />
-                      <p className="font-medium text-center">Нет задач</p>
+                    <div className="flex flex-col items-center justify-center h-28 sm:h-32 text-[#6F7D75]">
+                      <img
+                        src="/allTasks-icon.svg"
+                        alt=""
+                        className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-3 opacity-70"
+                      />
+                      <p className="font-medium text-center text-[0.65rem] sm:text-sm">Нет задач</p>
                     </div>
                   ) : (
                     tasks
                       .filter((task) => task.status === 'in_progress')
                       .map((task) => {
                         const p = getPriorityConfig(task.priority);
-                        const dt = getDeadlineConfig(task.deadlineType);
-                        const d = formatDate(task.deadline);
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const d = formatDeadlineFull(task.deadline);
                         const isCompleted = task.status === 'done';
                         const progress = task.deadline ? getDeadlineProgress(task.deadline) : null;
-
                         return (
                           <div
                             key={task._id}
                             onClick={() => navigate(`/tasks/${task._id}`)}
-                            className="bg-white rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
+                            className="bg-white rounded-lg p-1.5 sm:p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-1.5 sm:gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow"
                           >
                             <div className="flex flex-col justify-between min-w-0">
-                              <div className="flex items-center gap-1 mb-2 min-w-0">
-                                <div className="w-2 h-2 bg-[#FFC65C] rounded-full flex-shrink-0" />
-                                <h4
-                                  className="text-xs font-medium text-[#2F3A34] truncate w-full"
-                                  title={task.title}
-                                >
+                              <div className="flex items-center gap-1 mb-1">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#FFC65C]" />
+                                <h4 className="text-[0.65rem] sm:text-xs font-medium text-[#2F3A34] truncate">
                                   {task.title}
                                 </h4>
                               </div>
-                              <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
-                                <div className="flex gap-1 items-center min-w-0">
+                              <div className="flex flex-col items-start gap-0.5 text-[0.6rem] sm:text-xs text-[#6F7D75]">
+                                <div className="flex gap-1 items-center">
                                   <img
                                     src="/projects-icon.svg"
                                     alt=""
-                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                    className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                   />
                                   <span className="truncate">
                                     {task.projectId ? 'Проект' : 'Личное'}
                                   </span>
                                 </div>
                                 {task.deadline ? (
-                                  <div className="flex flex-col items-start min-w-0">
-                                    <div className="flex gap-1 items-center min-w-0">
+                                  <div className="flex flex-col items-start">
+                                    <div className="flex gap-1 items-center">
                                       <img
                                         src="/calendar-icon.svg"
                                         alt=""
-                                        className="w-2.5 h-2.5 flex-shrink-0"
+                                        className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                       />
                                       <span
-                                        className={`text-xs font-medium truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
+                                        className={`truncate ${d.isOverdue ? 'text-[#D32F2F]' : 'text-[#6F7D75]'}`}
                                       >
                                         {d.text}
                                       </span>
                                     </div>
                                     {d.isOverdue && (
-                                      <span className="text-[0.625rem] font-medium text-[#D32F2F] leading-none">
+                                      <span className="text-[0.5rem] sm:text-[0.55rem] font-medium text-[#D32F2F] leading-none">
                                         Просрочено
                                       </span>
                                     )}
                                   </div>
                                 ) : (
-                                  <div className="flex gap-1 items-center min-w-0">
+                                  <div className="flex gap-1 items-center">
                                     <img
                                       src="/calendar-icon.svg"
                                       alt=""
-                                      className="w-2.5 h-2.5 flex-shrink-0"
+                                      className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                     />
-                                    <span className="text-xs text-[#6F7D75]">-</span>
+                                    <span className="text-[0.6rem] sm:text-xs">-</span>
                                   </div>
                                 )}
                               </div>
                             </div>
-
                             <div className="flex flex-col justify-center items-center">
                               {task.deadline && !isCompleted && progress && (
-                                <div className="relative w-10 h-10">
+                                <div className="relative w-6 h-6 sm:w-8 sm:h-8">
                                   <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
                                     <circle
                                       cx="18"
@@ -845,59 +716,18 @@ export default function TasksPage() {
                                 </div>
                               )}
                             </div>
-
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col items-center gap-1">
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color}`}
+                                className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${p.bg} ${p.color}`}
                               >
-                                {task.priority === 'high' && (
-                                  <img
-                                    src="/highPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.priority === 'medium' && (
-                                  <img
-                                    src="/mediumPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.priority === 'low' && (
-                                  <img
-                                    src="/lowPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                <span className="truncate">{p.label}</span>
+                                <img src={p.icon} alt="" className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+                                {p.label}
                               </span>
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color}`}
+                                className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${dt.bg} ${dt.color}`}
                               >
-                                {task.deadlineType === 'hard' && (
-                                  <img
-                                    src="/hardDeadlineType-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.deadlineType === 'soft' && (
-                                  <img
-                                    src="/softDeadlineType-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.deadlineType === 'none' && (
-                                  <img
-                                    src="/noDeadline-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                <span className="truncate">{dt.label}</span>
+                                <img src={dt.icon} alt="" className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+                                {dt.label}
                               </span>
                             </div>
                           </div>
@@ -907,142 +737,87 @@ export default function TasksPage() {
                 </div>
               </div>
 
-              <div className="w-[32%] rounded-xl flex flex-col bg-white p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#8CA693]"></div>
-                    <h3 className="text-sm font-medium text-[#2F3A34]">Завершено</h3>
+              <div className="min-w-[260px] sm:min-w-[280px] md:w-[32%] rounded-xl flex flex-col bg-white p-2 sm:p-4">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#8CA693]" />
+                    <h3 className="text-[0.7rem] sm:text-sm font-medium text-[#2F3A34]">
+                      Завершено
+                    </h3>
                   </div>
-                  <span className="text-xs text-[#6F7D75] bg-[#F0F3ED] px-2 py-1 rounded-md">
+                  <span className="text-[0.6rem] sm:text-xs text-[#6F7D75] bg-[#F0F3ED] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md">
                     {tasks.filter((t) => t.status === 'done').length}
                   </span>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 space-y-2">
                   {tasks.filter((t) => t.status === 'done').length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-32 text-[#6F7D75]">
-                      <img src="/allTasks-icon.svg" alt="" className="w-8 h-8 mb-3 opacity-70" />
-                      <p className="font-medium text-center">Нет задач</p>
+                    <div className="flex flex-col items-center justify-center h-28 sm:h-32 text-[#6F7D75]">
+                      <img
+                        src="/allTasks-icon.svg"
+                        alt=""
+                        className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-3 opacity-70"
+                      />
+                      <p className="font-medium text-center text-[0.65rem] sm:text-sm">Нет задач</p>
                     </div>
                   ) : (
                     tasks
                       .filter((task) => task.status === 'done')
                       .map((task) => {
                         const p = getPriorityConfig(task.priority);
-                        const dt = getDeadlineConfig(task.deadlineType);
-                        const d = formatDate(task.deadline);
-
+                        const dt = getDeadlineTypeConfig(task.deadlineType);
+                        const d = formatDeadlineFull(task.deadline);
                         return (
                           <div
                             key={task._id}
                             onClick={() => navigate(`/tasks/${task._id}`)}
-                            className="bg-[#E4F0E5] rounded-[0.625rem] p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow mb-3"
+                            className="bg-[#E4F0E5] rounded-lg p-1.5 sm:p-3 grid grid-cols-[1.5fr_1fr_1fr] gap-1.5 sm:gap-3 border border-[#D9D9D9] cursor-pointer hover:shadow-lg transition-shadow"
                           >
                             <div className="flex flex-col justify-between min-w-0">
-                              <div className="flex items-center gap-1 mb-2 min-w-0">
+                              <div className="flex items-center gap-1 mb-1">
                                 <img
                                   src="/taskDone-icon.svg"
                                   className="w-3.5 h-3.5 flex-shrink-0"
                                 />
-                                <h4
-                                  className="text-xs font-medium text-[#2F3A34] truncate w-full"
-                                  title={task.title}
-                                >
+                                <h4 className="text-[0.65rem] sm:text-xs font-medium text-[#2F3A34] truncate line-through">
                                   {task.title}
                                 </h4>
                               </div>
-                              <div className="flex flex-col items-start gap-1 text-xs text-[#6F7D75] min-w-0">
-                                <div className="flex gap-1 items-center min-w-0">
+                              <div className="flex flex-col items-start gap-0.5 text-[0.6rem] sm:text-xs text-[#6F7D75]">
+                                <div className="flex gap-1 items-center">
                                   <img
                                     src="/projects-icon.svg"
                                     alt=""
-                                    className="w-2.5 h-2.5 flex-shrink-0"
+                                    className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                   />
                                   <span className="truncate">
                                     {task.projectId ? 'Проект' : 'Личное'}
                                   </span>
                                 </div>
-                                {task.deadline ? (
-                                  <div className="flex flex-col items-start min-w-0">
-                                    <div className="flex gap-1 items-center min-w-0">
-                                      <img
-                                        src="/calendar-icon.svg"
-                                        alt=""
-                                        className="w-2.5 h-2.5 flex-shrink-0"
-                                      />
-                                      <span className="text-xs font-medium truncate text-[#6F7D75]">
-                                        {d.text}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="flex gap-1 items-center min-w-0">
+                                {task.deadline && (
+                                  <div className="flex gap-1 items-center">
                                     <img
                                       src="/calendar-icon.svg"
                                       alt=""
-                                      className="w-2.5 h-2.5 flex-shrink-0"
+                                      className="w-2 h-2 sm:w-2.5 sm:h-2.5"
                                     />
-                                    <span className="text-xs text-[#6F7D75]">-</span>
+                                    <span className="text-[0.6rem] sm:text-xs">{d.text}</span>
                                   </div>
                                 )}
                               </div>
                             </div>
-
-                            <div className="flex flex-col justify-center items-center">
-                              <div className="relative w-10 h-10"></div>
-                            </div>
-
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex flex-col justify-center items-center" />
+                            <div className="flex flex-col items-center gap-1">
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${p.bg} ${p.color} opacity-75`}
+                                className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${p.bg} ${p.color}`}
                               >
-                                {task.priority === 'high' && (
-                                  <img
-                                    src="/highPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.priority === 'medium' && (
-                                  <img
-                                    src="/mediumPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.priority === 'low' && (
-                                  <img
-                                    src="/lowPriority-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                <span className="truncate">{p.label}</span>
+                                <img src={p.icon} alt="" className="w-2 h-2 sm:w-3 sm:h-3" />
+                                {p.label}
                               </span>
                               <span
-                                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${dt.bg} ${dt.color} opacity-75`}
+                                className={`inline-flex items-center gap-0.5 sm:gap-1 px-1 sm:px-2 py-0.5 rounded-md text-[0.55rem] sm:text-[0.65rem] font-medium ${dt.bg} ${dt.color}`}
                               >
-                                {task.deadlineType === 'hard' && (
-                                  <img
-                                    src="/hardDeadlineType-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.deadlineType === 'soft' && (
-                                  <img
-                                    src="/softDeadlineType-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                {task.deadlineType === 'none' && (
-                                  <img
-                                    src="/noDeadline-icon.svg"
-                                    alt=""
-                                    className="w-3.5 h-3.5 flex-shrink-0"
-                                  />
-                                )}
-                                <span className="truncate">{dt.label}</span>
+                                <img src={dt.icon} alt="" className="w-2 h-2 sm:w-3 sm:h-3" />
+                                {dt.label}
                               </span>
                             </div>
                           </div>

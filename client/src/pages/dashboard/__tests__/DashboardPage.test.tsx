@@ -33,7 +33,7 @@ const getDeadlineTypeConfig = (dt: TaskDeadlineType) => {
   switch (dt) {
     case 'hard':
       return {
-        label: 'Жёсткий',
+        label: 'Жесткий',
         color: 'text-[#D32F2F]',
         icon: '/hardDeadlineType-icon.svg',
         bg: 'bg-[#FFEDEE]',
@@ -108,7 +108,7 @@ describe('DashboardPage helpers', () => {
   describe('getDeadlineTypeConfig', () => {
     it('returns correct config for hard deadline', () => {
       expect(getDeadlineTypeConfig('hard')).toEqual({
-        label: 'Жёсткий',
+        label: 'Жесткий',
         color: 'text-[#D32F2F]',
         icon: '/hardDeadlineType-icon.svg',
         bg: 'bg-[#FFEDEE]',

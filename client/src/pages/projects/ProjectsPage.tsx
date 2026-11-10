@@ -2,15 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetProjectsQuery } from '../../features/projects/projectsApi';
 import type { Project } from '../../entities/project/model';
-
-const projectIconConfig = {
-  plant: { src: '/project-plant-icon.svg', iconBg: 'bg-[#F0F1F2]' },
-  sun: { src: '/project-sun-icon.svg', iconBg: 'bg-[#FFEFD3]' },
-  waves: { src: '/project-waves-icon.svg', iconBg: 'bg-[#E9F0F9]' },
-  star: { src: '/project-star-icon.svg', iconBg: 'bg-[#F5F3FF]' },
-  mountains: { src: '/project-mountains-icon.svg', iconBg: 'bg-[#EDD7C9]' },
-  flower: { src: '/project-flower-icon.svg', iconBg: 'bg-[#FFC9C9]' },
-};
+import { getProjectIconConfig } from '../../utils/projectIcons';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -69,8 +61,8 @@ export default function ProjectsPage() {
         <p className="text-sm text-[#6F7D75] mb-4">Проектов всего: {projects.length}</p>
 
         <div className="mb-4">
-          <div className="flex flex-col md:flex-row gap-24">
-            <div className="flex-1 relative">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-24 items-start">
+            <div className="w-full flex-1 relative">
               <img
                 src="/search2-icon.svg"
                 alt=""
@@ -99,9 +91,9 @@ export default function ProjectsPage() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8CA693]"></div>
           </div>
         ) : displayedProjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {displayedProjects.map((project) => {
-              const iconData = projectIconConfig[project.icon] || projectIconConfig.plant;
+              const iconData = getProjectIconConfig(project.icon);
               const lastUpdate = project.updatedAt
                 ? new Date(project.updatedAt).toLocaleDateString('ru-RU')
                 : '...';
@@ -110,7 +102,7 @@ export default function ProjectsPage() {
                 <div
                   key={project._id}
                   onClick={() => navigate(`/projects/${project._id}`)}
-                  className="group bg-white py-5 px-7 rounded-[1.5rem] shadow-[0_6px_20px_rgb(0,0,0,0.05)] transition-all cursor-pointer flex flex-col border border-transparent hover:border-[#8CA693]/25"
+                  className="group bg-white py-5 px-4 sm:px-7 rounded-[1.5rem] shadow-[0_6px_20px_rgb(0,0,0,0.05)] transition-all cursor-pointer flex flex-col border border-transparent hover:border-[#8CA693]/25"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4 min-w-0">
@@ -161,15 +153,15 @@ export default function ProjectsPage() {
                   <div className="grid grid-cols-3 gap-2 text-xs mb-4">
                     <div className="text-center p-2 font-medium text-[#4C95E9] border border-[#4C95E9] rounded-lg">
                       <div className="truncate text-base">{project.todoTasks || 0}</div>
-                      <div className="text-xs">Ожидают</div>
+                      <div className="text-[0.625rem] sm:text-xs">Ожидают</div>
                     </div>
                     <div className="text-center p-2 font-medium text-[#FFC65C] border border-[#FFC65C] rounded-lg">
                       <div className="truncate text-base">{project.inProgressTasks || 0}</div>
-                      <div className="text-xs">В работе</div>
+                      <div className="text-[0.625rem] sm:text-xs">В работе</div>
                     </div>
                     <div className="text-center p-2 font-medium text-[#8CA693] border border-[#8CA693] rounded-lg">
                       <div className="truncate text-base">{project.completedTasks || 0}</div>
-                      <div className="text-xs">Завершено</div>
+                      <div className="text-[0.625rem] sm:text-xs">Завершено</div>
                     </div>
                   </div>
 

@@ -80,7 +80,7 @@ describe('TasksPage', () => {
     renderWithProviders(<TasksPage />);
     expect(screen.getByText('Test Task')).toBeInTheDocument();
     expect(screen.getByText('Высокий')).toBeInTheDocument();
-    expect(screen.getByText(/Ж[eё]сткий/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ж[eе]сткий/i)).toBeInTheDocument();
   });
 
   it('toggles view between list and kanban', () => {

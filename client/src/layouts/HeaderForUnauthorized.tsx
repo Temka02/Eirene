@@ -9,7 +9,7 @@ export default function HeaderForUnauthorized() {
   const hideRegister = pathname === '/register';
 
   return (
-    <nav className="flex justify-end items-center gap-[1.2rem] text-[1.1rem]">
+    <nav className=" flex justify-end items-center gap-2 md:gap-[1.2rem] text-sm md:text-base ">
       {!hideLogin && <LoginBtn />}
       {!hideRegister && <RegisterBtn />}
     </nav>

@@ -1,12 +1,11 @@
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useGetNotificationsQuery } from '../features/notifications/notificationsApi';
-import type { RootState } from '../store';
-import type { User } from '../entities/user/model';
+import { useGetMeQuery } from '../features/auth/authApi';
 
 export default function HeaderForAuthorized() {
   const navigate = useNavigate();
-  const user = useSelector((state: RootState) => state.auth.user) as User | null;
+  const { data: meData } = useGetMeQuery();
+  const user = meData?.user;
 
   const { data: unreadNotifications } = useGetNotificationsQuery({
     isRead: false,
@@ -39,21 +38,6 @@ export default function HeaderForAuthorized() {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
           )}
         </button>
-
-        <div className="hidden md:flex items-center">
-          <div className="relative">
-            <img
-              src="/search-icon.svg"
-              alt=""
-              className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-            />
-            <input
-              type="text"
-              placeholder="Поиск.."
-              className="w-64 h-11 pl-16 pr-4 bg-white rounded-xl text-sm placeholder-[#5F6F65] focus:outline-none focus:ring-1 focus:ring-[#8CA693] transition"
-            />
-          </div>
-        </div>
 
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center flex-shrink-0 py-1">

@@ -27,6 +27,7 @@ module.exports = {
     '!src/setupTests.ts',
     '!src/api/apiClient.ts',
     '!src/main.tsx',
+    '!src/config.ts',
   ],
 
   coverageThreshold: {

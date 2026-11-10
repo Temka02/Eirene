@@ -8,6 +8,7 @@ import {
   useMarkAsReadMutation,
 } from '../../features/notifications/notificationsApi';
 import type { Notification as NotificationItem } from '../../entities/notification/model';
+import { formatDeadlineFull } from '../../utils/taskDisplay';
 
 type TabType = 'all' | 'unread';
 type NotificationType = 'all' | 'deadline' | 'achievement';
@@ -51,6 +52,19 @@ export default function NotificationsPage() {
         );
       }
       Sentry.captureException(error);
+    }
+  };
+
+  const getNotificationTypeLabel = (type: NotificationType) => {
+    switch (type) {
+      case 'all':
+        return 'Все';
+      case 'deadline':
+        return 'Напоминания';
+      case 'achievement':
+        return 'Завершенные';
+      default:
+        return 'Все';
     }
   };
 
@@ -171,7 +185,7 @@ export default function NotificationsPage() {
           <div className="flex bg-white p-1 rounded-xl shadow-sm">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-6 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'all'
                   ? 'bg-[#F0F3ED] text-[#2F3A34]'
                   : 'text-[#6F7D75] hover:bg-[#F0F3ED]/50'
@@ -181,7 +195,7 @@ export default function NotificationsPage() {
             </button>
             <button
               onClick={() => setActiveTab('unread')}
-              className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-6 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'unread'
                   ? 'bg-[#F0F3ED] text-[#2F3A34]'
                   : 'text-[#6F7D75] hover:bg-[#F0F3ED]/50'
@@ -195,22 +209,16 @@ export default function NotificationsPage() {
             <button
               onClick={handleMarkAllRead}
               disabled={isMarkingAll || unreadCount === 0}
-              className="bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] rounded-lg px-6 py-2 text-sm text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#8CA693] shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] rounded-lg sm:px-6 p-2 text-xs sm:text-sm text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isMarkingAll ? 'Обновление...' : unreadCount > 0 ? `Прочитать все` : 'Все прочитано'}
             </button>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex w-44 items-center justify-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-sm text-[#6F7D75] hover:bg-[#F0F3ED]/50 transition-colors"
+              className="flex w-36 sm:w-44 items-center justify-center gap-2 bg-white px-5 py-2.5 rounded-xl shadow-[0_6px_20px_0_rgba(0,0,0,0.05)] text-[#6F7D75] hover:bg-[#F0F3ED]/50 transition-colors"
             >
-              <span className="text-sm font-medium">
-                {selectedType === 'all'
-                  ? 'Все'
-                  : selectedType === 'deadline'
-                    ? 'Напоминания'
-                    : selectedType === 'achievement'
-                      ? 'Завершенные'
-                      : 'Системные'}
+              <span className="text-xs sm:text-sm font-medium">
+                {getNotificationTypeLabel(selectedType)}
               </span>
               <img
                 src="/asideArrow-icon.svg"
@@ -220,7 +228,7 @@ export default function NotificationsPage() {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+              <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-lg border border-[#F0F1F2] py-1 z-50">
                 {(['all', 'deadline', 'achievement'] as NotificationType[]).map((type) => (
                   <button
                     key={type}
@@ -228,19 +236,13 @@ export default function NotificationsPage() {
                       setSelectedType(type);
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                    className={`w-full text-left p-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm transition-colors ${
                       selectedType === type
                         ? 'bg-[#F0F3ED] text-[#2F3A34] font-medium'
                         : 'text-[#6F7D75] hover:bg-[#F0F3ED]/70'
                     }`}
                   >
-                    {type === 'all'
-                      ? 'Все'
-                      : type === 'deadline'
-                        ? 'Напоминания'
-                        : type === 'achievement'
-                          ? 'Завершенные'
-                          : 'Системные'}
+                    {getNotificationTypeLabel(type)}
                   </button>
                 ))}
               </div>
@@ -268,7 +270,7 @@ export default function NotificationsPage() {
                   {group.items.map((notification) => (
                     <div
                       key={notification._id}
-                      className={`bg-white p-2.5 rounded-2xl flex items-center gap-4 transition-all border-2 border-[#F0F1F2] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)]`}
+                      className={`bg-white px-1.5 py-2 sm:p-2.5 rounded-2xl flex items-center gap-4 transition-all border-2 border-[#F0F1F2] shadow-[0_6px_20px_0_rgba(0,0,0,0.1)]`}
                     >
                       <div
                         className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${getIconBg(notification.type)}`}
@@ -307,14 +309,9 @@ export default function NotificationsPage() {
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <img src="/calendar-icon.svg" alt="" className="w-3 h-3" />
-                                    <span>
-                                      Дедлайн:{' '}
-                                      {new Date(notification.deadline!).toLocaleString('ru-RU', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })}
+                                    <span className="translate-y-[1px]">
+                                      <span className="hidden sm:inline">Дедлайн: </span>
+                                      {formatDeadlineFull(notification.deadline).text}
                                     </span>
                                   </div>
                                 </>
@@ -328,21 +325,16 @@ export default function NotificationsPage() {
                                     />
                                     <span>
                                       Мягкий{' '}
-                                      <span className="text-[#8CA693] ml-2">
+                                      <span className="hidden sm:inline text-[#8CA693] ml-2">
                                         Можно перенести, если нужно
                                       </span>
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <img src="/calendar-icon.svg" alt="" className="w-3 h-3" />
-                                    <span>
-                                      Дедлайн:{' '}
-                                      {new Date(notification.deadline!).toLocaleString('ru-RU', {
-                                        day: 'numeric',
-                                        month: 'long',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })}
+                                    <span className="translate-y-[1px]">
+                                      <span className="hidden sm:inline">Дедлайн: </span>
+                                      {formatDeadlineFull(notification.deadline).text}
                                     </span>
                                   </div>
                                 </>
@@ -357,12 +349,20 @@ export default function NotificationsPage() {
 
                       <div className="flex gap-2">
                         {notification.taskId && notification.type !== 'achievement' && (
-                          <button
-                            onClick={() => navigate(`/tasks/${notification.taskId}`)}
-                            className="flex-shrink-0 px-4 py-2 text-sm text-[#8CA693] bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED] transition-colors"
-                          >
-                            Перейти
-                          </button>
+                          <>
+                            <button
+                              onClick={() => navigate(`/tasks/${notification.taskId}`)}
+                              className="hidden sm:flex flex-shrink-0 px-4 py-2 text-sm text-[#8CA693] bg-white border border-[#D9D9D9] rounded-lg hover:bg-[#F0F3ED] transition-colors"
+                            >
+                              Перейти
+                            </button>
+                            <button
+                              onClick={() => navigate(`/tasks/${notification.taskId}`)}
+                              className="block sm:hidden"
+                            >
+                              <img src="/notification-link-icon.svg" className="w-3 h-3" />
+                            </button>
+                          </>
                         )}
 
                         {!notification.taskId && notification.projectId && (
